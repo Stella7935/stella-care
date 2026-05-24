@@ -194,7 +194,7 @@ input,select,textarea{font-family:inherit}
   <div class="logo">🌟 <em>STELLA</em> <span style="color:rgba(255,255,255,.4);font-weight:400;font-size:12px">介護記録</span></div>
   <div id="hs">
     <span class="si">🔍</span>
-    <input type="text" id="gsearch" placeholder="利用者名・症状・薬品名・メモ内容で検索…" oninput="gSearch(this.value)" autocomplete="off">
+    <input type="text" id="gsearch" placeholder="利用者名・症状・メモ内容で検索…" oninput="gSearch(this.value)" autocomplete="off">
     <div id="sr" class="h"></div>
   </div>
   <div class="hdr-r">
@@ -205,7 +205,7 @@ input,select,textarea{font-family:inherit}
       <option value="松久正継" style="color:#000">松久正継</option>
       <option value="今井隆二" style="color:#000">今井隆二</option>
     </select>
-    <button class="btn ba sm" onclick="openM('mr')">＋ 利用者追加</button>
+    
   </div>
 </header>
 <div id="main">
@@ -641,6 +641,23 @@ input,select,textarea{font-family:inherit}
     <div class="fg" style="margin-bottom:9px"><label>アレルギー</label><input type="text" id="ral" placeholder="例：ペニシリン系、卵 等（なければ「なし」）"></div>
     <div class="fg"><label>特記事項・注意点 ⚠️（更新するとダッシュボードに2〜3日表示されます）</label><textarea id="rnt" rows="3" placeholder="例：経管栄養、吸引あり、看取り希望 等"></textarea></div>
   </div>
+
+  <!-- 普段のバイタル基準値 -->
+  <div style="font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.5px;margin:12px 0 6px">📌 普段のバイタル基準値（異常値アラート用）</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div class="fg"><label>体温 最低℃</label><input type="number" id="ref-tempMin" step="0.1" placeholder="例: 35.5"></div>
+    <div class="fg"><label>体温 最高℃</label><input type="number" id="ref-tempMax" step="0.1" placeholder="例: 37.5"></div>
+    <div class="fg"><label>脈拍 最低</label><input type="number" id="ref-plsMin" placeholder="例: 50"></div>
+    <div class="fg"><label>脈拍 最高</label><input type="number" id="ref-plsMax" placeholder="例: 100"></div>
+    <div class="fg"><label>血圧上 最低</label><input type="number" id="ref-bphMin" placeholder="例: 90"></div>
+    <div class="fg"><label>血圧上 最高</label><input type="number" id="ref-bphMax" placeholder="例: 160"></div>
+    <div class="fg"><label>血圧下 最低</label><input type="number" id="ref-bplMin" placeholder="例: 50"></div>
+    <div class="fg"><label>血圧下 最高</label><input type="number" id="ref-bplMax" placeholder="例: 100"></div>
+    <div class="fg"><label>SpO₂ 最低%</label><input type="number" id="ref-spoMin" placeholder="例: 95"></div>
+    <div class="fg"><label>呼吸 最低</label><input type="number" id="ref-rspMin" placeholder="例: 12"></div>
+    <div class="fg"><label>呼吸 最高</label><input type="number" id="ref-rspMax" placeholder="例: 20"></div>
+  </div>
+
   <div class="mf"><button class="btn bo" onclick="closeM('mr')">キャンセル</button><button class="btn bb" id="mr-save-btn" onclick="saveRes()">💾 登録</button></div>
 </div></div>
 
@@ -1365,7 +1382,7 @@ async function initDB(){
       S.excretion[e.date][e.resident_id][e.hour]={id:e.id,type:e.type,amt:e.amount,bristol:e.bristol?e.bristol.split(',').map(Number).filter(Boolean):[],tekibin:e.tekibin==='1',sleep:e.sleep?parseInt(e.sleep):null};
     });
     // メモ
-    S.memos=memosRaw.map(m=>({id:m.id,rid:m.resident_id,tag:m.tag,au:m.author,tx:m.content,t:m.created_at?.slice(0,16)||''}));
+    S.memos=memosRaw.map(m=>({id:m.id,rid:m.resident_id,tag:m.tag,au:m.au||m.author||'',tx:m.tx||m.content||'',t:m.created_at?.slice(0,16)||'',startDate:m.start_date||'',expiry:m.end_date||''}));
     // 日々の記録
     S.daily={};S.residents.forEach(r=>{S.daily[r.id]=[];});
     dailyRaw.forEach(d=>{
@@ -1381,12 +1398,16 @@ async function initDB(){
       });
     });
     // 申し送り
-    S.handovers=handoversRaw.map(h=>({
-      id:h.id,date:h.date,shift:h.shift,author:h.author,
-      urgent:h.urgent||'',ops:h.ops||'',next:h.next||'',
-      residents:h.residents_json?JSON.parse(h.residents_json):{},
-      created:h.created_at?.slice(0,16)||h.date
-    }));
+    S.handovers=handoversRaw.map(h=>{
+      let parsed={};
+      try{parsed=h.content?JSON.parse(h.content):{};}catch(e){}
+      return {
+        id:h.id,date:h.date,shift:h.shift,author:h.author,
+        urgent:parsed.urgent||'',ops:parsed.ops||'',next:parsed.next||'',
+        residents:parsed.residents||{},
+        created:h.created_at?.slice(0,16)||h.date
+      };
+    });
     // 体重
     S.weights={};S.residents.forEach(r=>{S.weights[r.id]=[];});
     weightsRaw.forEach(w=>{
@@ -1480,7 +1501,7 @@ function renderDash(){
     // シフト開始以降に記録されたバイタルがあるか
     return vitals.some(v=>v.time>=shiftStart);
   }).length;
-  const urg=S.memos.filter(m=>m.tag==='urg').length,tm=S.memos.filter(m=>m.t.startsWith(TODAY)).length;
+  const urg=S.memos.filter(m=>m.tag==='urg').length,tm=S.memos.filter(m=>(m.t||'').startsWith(TODAY)).length;
   document.getElementById('ds').innerHTML=`
     <div class="sc"><div class="sn">${tot}</div><div class="sl">👥 入居者数</div></div>
     <div class="sc"><div class="sn" style="color:${rec===tot?'var(--green)':'var(--amber2)'}">${rec}</div><div class="sl">✅ ${shiftLabel}バイタル済</div><div class="ss" style="color:var(--ink3)">残り${tot-rec}名</div></div>
@@ -1516,7 +1537,7 @@ function renderDash(){
     if(TODAY<start) return false; // まだ表示開始前
     if(!m.expiry) return true;    // 期限なし
     return m.expiry>=TODAY;       // 期限内
-  }).sort((a,b)=>b.t.localeCompare(a.t)).slice(0,4);
+  }).sort((a,b)=>(b.t||'').localeCompare(a.t||'')).slice(0,4);
   document.getElementById('dm').innerHTML=activeMemos.length?activeMemos.map(m=>{
     const r=S.residents.find(x=>x.id===m.rid);
     const periodLabel=(m.startDate||m.expiry)?`<span style="font-size:10px;color:var(--ink3)">${m.startDate?m.startDate:''}${m.expiry?`〜${m.expiry}`:''}</span>`:'';
@@ -2675,7 +2696,7 @@ function deleteDischargedResident(rid){
   const r=S.residents.find(x=>x.id===rid);
   if(!confirm(`${r?.name} さんのデータを完全に削除しますか？\nこの操作は取り消せません。`))return;
   S.residents=S.residents.filter(x=>x.id!==rid);
-  delete S.vitals[rid];delete S.daily[rid];delete S.drugs[rid];delete S.weights[rid];
+  delete S.vitals[rid];delete S.daily[rid];delete S.weights[rid];
   S.memos=S.memos.filter(m=>m.rid!==rid);
   renderDischarged();toast('🗑 データを削除しました');
 }
@@ -2748,7 +2769,7 @@ async function saveDailyRecord(){
     id:rec.id||rnd(),resident_id:rid,date:rec.date,time:rec.time,author:rec.author,
     meal_mm:rec.meal_mm,meal_ms:rec.meal_ms,meal_lm:rec.meal_lm,meal_ls:rec.meal_ls,
     meal_em:rec.meal_em,meal_es:rec.meal_es,meal_note:rec.meal_note,
-    bath:rec.bath,oral:rec.oral,activity:rec.activity,act_note:rec.act_note,
+    bath:rec.bath,oral:rec.oral,act:rec.activity,act_note:rec.act_note,
     condition:rec.condition,mood:rec.mood,observation:rec.observation,
     care:rec.care,handover:rec.handover
   };
@@ -2771,7 +2792,7 @@ async function saveDailyRecord(){
       const hoTime=rec.date+'T'+(rec.time||new Date().toTimeString().slice(0,5));
       const ho={id:rnd(),date:rec.date,shift:getCurrentShift(),author:rec.author,urgent:'',ops:'',next:'',residents:{[rid]:rec.handover},created:hoTime};
       try{
-        const hres=await dbInsert('handovers',{id:rnd(),date:ho.date,shift:ho.shift,author:ho.author,urgent:'',ops:'',next:'',residents_json:JSON.stringify(ho.residents)});
+        const hres=await dbInsert('handovers',{id:rnd(),date:ho.date,shift:ho.shift,author:ho.author,urgent:false,content:JSON.stringify({urgent:'',ops:'',next:'',residents:ho.residents})});
         if(hres&&hres[0])ho.id=String(hres[0].id);
       }catch(e){console.error('handover save error',e);}
       S.handovers.unshift(ho);
@@ -2942,15 +2963,15 @@ async function saveHandover(){
   try{
     const res=await dbInsert('handovers',{
       id:ho.id||rnd(),date:ho.date,shift:ho.shift,author:ho.author,
-      urgent:ho.urgent,ops:ho.ops,next:ho.next,
-      residents_json:JSON.stringify(ho.residents)
+      urgent:ho.urgent!==''?true:false,
+      content:JSON.stringify({urgent:ho.urgent,ops:ho.ops,next:ho.next,residents:ho.residents})
     });
     if(res&&res[0])ho.id=String(res[0].id);
     showStatus('✅ クラウドに保存','green');
   }catch(e){console.error('handover save error',e);showStatus('⚠️ ローカルのみ保存','red');}
   S.handovers.unshift(ho);
   if(ho.urgent.trim()){
-    const memoRes=await dbInsert('memos',{id:rnd(),resident_id:'',tag:'urg',author:`${ho.shift} ${ho.author}`,content:`【申し送り緊急】${ho.urgent}`}).catch(e=>null);
+    const memoRes=await dbInsert('memos',{id:rnd(),resident_id:'',tag:'urg',au:`${ho.shift} ${ho.author}`,tx:`【申し送り緊急】${ho.urgent}`}).catch(e=>null);
     const memoId=memoRes&&memoRes[0]?memoRes[0].id:rnd();
     S.memos.unshift({id:memoId,rid:'',tag:'urg',au:`${ho.shift} ${ho.author}`,tx:`【申し送り緊急】${ho.urgent}`,t:ho.created});
     updNB();
@@ -3078,68 +3099,9 @@ function setADL(rid,k,v){if(!S.adl[rid])S.adl[rid]={};S.adl[rid][k]=v;renderADL(
 function setADLNote(rid,k,v){if(!S.adl[rid])S.adl[rid]={};S.adl[rid][k+'_note']=v;}
 
 // DRUGS
-function dtHTML(rid){
-  const d=S.drugs[rid]||[];
-  if(!d.length) return'<div style="text-align:center;color:var(--ink3);padding:18px;font-size:14px">薬情データなし</div>';
-  return`<div class="tw"><table class="dt">
-    <thead><tr><th>薬品名</th><th>用量</th><th>タイミング</th><th>目的・注意</th><th>写真</th><th></th></tr></thead>
-    <tbody>${d.map((x,i)=>`<tr>
-      <td><strong>${x.name}</strong></td>
-      <td>${x.dose||''}</td>
-      <td><span class="pl pb">${x.timing||''}</span></td>
-      <td style="color:var(--ink3);font-size:12px">${x.note||''}</td>
-      <td style="text-align:center">${x.photoUrl?`<img src="${x.photoUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer" onclick="showDrugPhoto('${x.photoUrl}')" title="クリックで拡大">`:'-'}</td>
-      <td style="white-space:nowrap">
-        <button class="btn bo xs" onclick="editDrug('${rid}',${i})">編集</button>
-        <button class="btn br xs" onclick="delDrug('${rid}',${i})">削除</button>
-      </td>
-    </tr>`).join('')}
-    </tbody></table></div>`;
-}
 
-function editDrug(rid,idx){
-  const d=S.drugs[rid]?.[idx];if(!d)return;
-  document.getElementById('dnm').value=d.name||'';
-  document.getElementById('dds').value=d.dose||'';
-  document.getElementById('dtm').value=d.timing||'朝食後';
-  document.getElementById('dnt').value=d.note||'';
-  document.getElementById('drug-raw').value=d.raw||'';
-  document.getElementById('md').dataset.editIdx=idx;
-  toast('📝 内容を編集して「＋追加」を押してください');
-}
 
-function openDM(rid){
-  const r=S.residents.find(x=>x.id===rid);
-  document.getElementById('md').dataset.rid=rid;
-  delete document.getElementById('md').dataset.editIdx;
-  document.getElementById('mdtitle').textContent=`💊 ${r?.name} さんの薬情`;
-  document.getElementById('mdlist').innerHTML=dtHTML(rid);
-  ['dnm','dds','dnt','drug-raw'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const dtmEl=document.getElementById('dtm');if(dtmEl)dtmEl.value='朝食後';
-  const prev=document.getElementById('drug-photo-preview');if(prev)prev.style.display='none';
-  const btn=document.getElementById('drug-read-btn');if(btn)btn.style.display='none';
-  const alert=document.getElementById('drug-allergy-alert');if(alert)alert.style.display='none';
-  const status=document.getElementById('drug-read-status');if(status)status.textContent='写真を参考に下の入力欄に薬品名・用量・服用タイミングを入力してください';
-  openM('md');
-}
 
-const ALLERGY_MAP={
-  'ペニシリン':['アモキシシリン','アンピシリン','ピペラシリン'],
-  'セフェム':['セファレキシン','セフジニル','セフカペン','セフジトレン'],
-  'アスピリン':['アスピリン','アセチルサリチル酸'],
-  '卵':['インフルエンザワクチン'],
-  '造影剤':['ヨード','ガドリニウム'],
-  'キノロン':['レボフロキサシン','シプロフロキサシン','モキシフロキサシン'],
-  'スルホンアミド':['スルファメトキサゾール','バクタ','ST合剤'],
-};
-
-function showDrugPhoto(src){
-  const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';
-  ov.innerHTML=`<div style="text-align:center"><img src="${src}" style="max-width:92vw;max-height:85vh;border-radius:8px"><div style="color:#fff;margin-top:8px;font-size:14px">タップで閉じる</div></div>`;
-  ov.onclick=()=>ov.remove();
-  document.body.appendChild(ov);
-}
 
 // DETAIL
 function loadDet(){
@@ -3149,7 +3111,7 @@ function loadDet(){
   const r=S.residents.find(x=>x.id===rid);if(!r)return;
   // タブをリセット（基本情報に戻す）
   S.detTab='info';
-  const age=calcAge(r.birth),vits=S.vitals[rid]||[],lv=vits.slice(-1)[0],memos=S.memos.filter(m=>m.rid===rid),drugs=S.drugs[rid]||[];
+  const age=calcAge(r.birth),vits=S.vitals[rid]||[],lv=vits.slice(-1)[0],memos=S.memos.filter(m=>m.rid===rid);
   body.innerHTML=`
     <div class="card" style="margin-bottom:13px">
       <div style="display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap">
@@ -3166,7 +3128,6 @@ function loadDet(){
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn bb sm" onclick="qVFromDet('${rid}')">＋ バイタル</button>
           <button class="btn bt sm" onclick="openMemoFor('${rid}')">＋ メモ</button>
-          <button class="btn ba sm" onclick="openDM('${rid}')">💊 薬情</button>
           <button class="btn bo sm" onclick="editR('${rid}')">✏️ 編集</button>
         </div>
       </div>
@@ -3255,8 +3216,7 @@ function loadDet(){
 }
 function swTab(id,btn){
   // 個別記録のタブコンテンツのみ切り替え
-  // 実際のID: ti(基本情報), tvh(バイタル), tadl(ADL), tddly(日々), tmd2(メモ), tdrg(薬情), tw2(体重)
-  const tabMap={info:'ti', vh:'tvh', adl:'tadl', ddly:'tddly', md2:'tmd2', w2:'tw2'};
+    const tabMap={info:'ti', vh:'tvh', adl:'tadl', ddly:'tddly', md2:'tmd2', w2:'tw2'};
   const allTabIds=['ti','tvh','tadl','tddly','tmd2','tw2'];
   allTabIds.forEach(tid=>{
     const el=document.getElementById(tid);
@@ -3336,7 +3296,7 @@ function checkMemoDuplicate(){
   if(recent.length){
     alertEl.style.display='block';
     alertEl.innerHTML=`⚠️ 類似のメモが${recent.length}件あります（直近7日以内）<br>`+
-      recent.slice(0,2).map(m=>`<div style="font-size:12px;margin-top:4px;color:var(--ink2)">・${m.t.replace('T',' ')} ${m.au}: ${m.tx.slice(0,40)}…</div>`).join('');
+      recent.slice(0,2).map(m=>`<div style="font-size:12px;margin-top:4px;color:var(--ink2)">・${(m.t||'').replace('T',' ')} ${m.au||''}: ${m.tx.slice(0,40)}…</div>`).join('');
   } else {
     alertEl.style.display='none';
   }
@@ -3385,10 +3345,10 @@ async function saveMemo(){
   };
   try{
     if(editId){
-      await dbUpdate('memos',editId,{resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
+      await dbUpdate('memos',editId,{resident_id:memo.rid,tag:memo.tag,au:memo.au,tx:memo.tx,start_date:memo.startDate,end_date:memo.expiry});
       const idx=S.memos.findIndex(x=>x.id==editId);if(idx>=0)S.memos[idx]=memo;
     } else {
-      const res=await dbInsert('memos',{id:rnd(),resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
+      const res=await dbInsert('memos',{id:rnd(),resident_id:memo.rid,tag:memo.tag,au:memo.au,tx:memo.tx,start_date:memo.startDate,end_date:memo.expiry});
       if(res&&res[0])memo.id=res[0].id;
       S.memos.unshift(memo);
     }
@@ -3416,7 +3376,7 @@ async function saveRes(){
     history:iv('rhx'),allergy:iv('ral')||'なし',emergency:iv('rec'),notes:newNotes,
     notesUpdatedAt:notesUpdated?new Date().toISOString().slice(0,10):(eid?(S.residents.find(x=>x.id===eid)?.notesUpdatedAt||''):'')
   };
-  const dbData={name:r.name,kana:r.kana,room:r.room,gender:r.gender,birth:r.birth,care_level:r.careLevel,entry_date:r.entryDate,history:r.history,allergy:r.allergy,emergency:r.emergency,notes:r.notes};
+  const dbData={id:r.id,name:r.name,kana:r.kana,room:r.room,gender:r.gender,birth:r.birth,care_level:r.careLevel,status:r.status,entry_date:r.entryDate,discharge_date:r.dischargeDate,doctor:r.doctor,care_manager:r.careManager,welfare_vendor:r.welfareVendor,history:r.history,allergy:r.allergy,emergency:r.emergency,notes:r.notes};
   try{
     if(eid){await dbUpdate('residents',eid,dbData);}
     else{const res=await dbInsert('residents',dbData);if(res&&res[0])r.id=res[0].id;}
@@ -3465,10 +3425,6 @@ function editR(rid){
 }
 
 // GLOBAL SEARCH
-// 薬情写真プレビュー
-// 薬情写真拡大表示
-// 薬情写真削除
-// 個人記録ページから薬情を開いた時に既存写真を表示
 function gSearch(q){
   const box=document.getElementById('sr');q=q.trim();
   if(!q){box.classList.add('h');return;}
@@ -3498,15 +3454,6 @@ function gSearch(q){
       if(searchText.includes(ql)){
         const r=S.residents.find(x=>x.id==rid);
         res.push({type:'daily',ic:'📓',title:`${r?.name||''}の日々の記録`,sub:`${rec.date} ${rec.condition||''} ${(rec.observation||'').slice(0,40)}`,id:rid});
-      }
-    });
-  });
-  // 薬情
-  Object.entries(S.drugs||{}).forEach(([rid,drugs])=>{
-    (drugs||[]).forEach(d=>{
-      if(((d.name||'')+(d.note||'')).toLowerCase().includes(ql)){
-        const r=S.residents.find(x=>x.id===rid);
-        res.push({type:'drug',ic:'💊',title:`${r?.name||''}の薬情`,sub:`${d.name} ${d.timing} ${d.note}`,id:rid});
       }
     });
   });
