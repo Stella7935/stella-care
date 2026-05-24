@@ -1474,8 +1474,8 @@ function gv(v){
   else if(v==='vit'){initVitalPage();}
   else if(v==='ex'){document.getElementById('exd').value=TODAY;renderEx();}
   else if(v==='weight'){populateWeightSel();renderWeight();}
-  else if(v==='handover'){document.getElementById('ho-date').value=TODAY;renderHandover();}
-  else if(v==='daily'){popDlySelects();document.getElementById('dly-date').value=TODAY;loadDaily();}
+  else if(v==='handover'){if(!S._searchDate){document.getElementById('ho-date').value=TODAY;}S._searchDate=null;renderHandover();}
+  else if(v==='daily'){popDlySelects();if(!S._searchDate){document.getElementById('dly-date').value=TODAY;}S._searchDate=null;loadDaily();}
   else if(v==='det'){popS('ds2');if(S.cur)document.getElementById('ds2').value=S.cur;loadDet();}
   else if(v==='discharged'){renderDischarged();}
   else if(v==='settings'){renderSettings();}
@@ -3456,7 +3456,7 @@ function gSearch(q){
       const searchText=[rec.observation,rec.care,rec.handover,rec.act_note,rec.meal_note,rec.author].filter(Boolean).join(' ').toLowerCase();
       if(searchText.includes(ql)){
         const r=S.residents.find(x=>x.id==rid);
-        res.push({type:'daily',ic:'📓',title:`${r?.name||''}の日々の記録`,sub:`${rec.date} ${rec.condition||''} ${(rec.observation||'').slice(0,40)}`,id:rid});
+        res.push({type:'daily',ic:'📓',title:`${r?.name||''}の日々の記録`,sub:`${rec.date} ${rec.condition||''} ${(rec.observation||'').slice(0,40)}`,id:rid,date:rec.date});
       }
     });
   });
@@ -3478,14 +3478,31 @@ function gSearch(q){
     box.innerHTML=`<div style="padding:13px;color:var(--ink3);font-size:13px;text-align:center">「${q}」に関する記録が見つかりませんでした</div>`;
     box.classList.remove('h');return;
   }
-  box.innerHTML=res.slice(0,12).map(r=>`<div class="sri" onclick="goRes('${r.id}','${r.type}')"><div class="sn">${r.ic} ${r.title}</div><div class="sd">${r.sub}</div></div>`).join('');
+  box.innerHTML=res.slice(0,12).map(r=>`<div class="sri" onclick="goRes('${r.id}','${r.type}','${r.date||''}')"><div class="sn">${r.ic} ${r.title}</div><div class="sd">${r.sub}</div></div>`).join('');
   box.classList.remove('h');
 }
-function goRes(rid,type){
+function goRes(rid,type,date){
   document.getElementById('gsearch').value='';document.getElementById('sr').classList.add('h');
   S.cur=rid;
   if(type==='memo'){gv('memo');setTimeout(()=>{document.getElementById('mfr').value=rid;renderMemos();},60);}
-  else if(type==='daily'){gv('daily');setTimeout(()=>{document.getElementById('dly-res').value=rid;loadDaily();},60);}
+  else if(type==='daily'){
+    // 当日に上書きしないよう先に日付をセット
+    S._searchDate=date||null;
+    gv('daily');
+    setTimeout(()=>{
+      if(date){document.getElementById('dly-date').value=date;}
+      document.getElementById('dly-res').value=rid;
+      loadDaily();
+    },60);
+  }
+  else if(type==='handover'){
+    gv('handover');
+    setTimeout(()=>{if(date){document.getElementById('ho-date').value=date;renderHandover();}},60);
+  }
+  else if(type==='vit'){
+    gv('det');
+    setTimeout(()=>{document.getElementById('ds2').value=rid;loadDet();},60);
+  }
   else{document.getElementById('ds2').value=rid;gv('det');}
 }
 document.addEventListener('click',e=>{if(!e.target.closest('#hs'))document.getElementById('sr').classList.add('h');});
