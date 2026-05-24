@@ -1336,8 +1336,8 @@ setTimeout(async ()=>{
 async function initDB(){
   try{
     showStatus('⏳ データ読み込み中...','blue');
-    const [residents,vitalsRaw,excRaw,memosRaw,drugsRaw,dailyRaw,handoversRaw,weightsRaw]=await Promise.all([
-      dbGet('residents'),dbGet('vitals'),dbGet('excretion'),dbGet('memos'),dbGet(),
+    const [residents,vitalsRaw,excRaw,memosRaw,dailyRaw,handoversRaw,weightsRaw]=await Promise.all([
+      dbGet('residents'),dbGet('vitals'),dbGet('excretion'),dbGet('memos'),
       dbGet('daily_records'),dbGet('handovers'),dbGet('weights')
     ]);
     // 利用者
@@ -1366,12 +1366,6 @@ async function initDB(){
     });
     // メモ
     S.memos=memosRaw.map(m=>({id:m.id,rid:m.resident_id,tag:m.tag,au:m.author,tx:m.content,t:m.created_at?.slice(0,16)||''}));
-    // 薬情
-    // S.drugs削除済みS.residents.forEach(r=>{S.drugs[r.id]=[];});
-    drugsRaw.forEach(d=>{
-      if(!S.drugs[d.resident_id])S.drugs[d.resident_id]=[];
-      S.drugs[d.resident_id].push({id:d.id,name:d.name,dose:d.dose,timing:d.timing,note:d.note});
-    });
     // 日々の記録
     S.daily={};S.residents.forEach(r=>{S.daily[r.id]=[];});
     dailyRaw.forEach(d=>{
