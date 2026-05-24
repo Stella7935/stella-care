@@ -1,0 +1,3583 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ステラ 介護記録システム</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --ink:#1a2535;--ink2:#4a5568;--ink3:#8a94a6;
+  --bg:#eef2f7;--surface:#ffffff;--sf2:#f7f9fc;
+  --blue:#1a4a8a;--blue2:#2563b0;--blue3:#dbeafe;
+  --teal:#0e7a7a;--teal2:#0d9488;--teal3:#ccfbf1;
+  --amber:#b45309;--amber2:#d97706;--amber3:#fef3c7;
+  --rose:#be123c;--rose2:#e11d48;--rose3:#ffe4e6;
+  --green:#166534;--green2:#16a34a;--green3:#dcfce7;
+  --violet:#6d28d9;--violet3:#ede9fe;
+  --bd:#dde3ed;--bd2:#c8d0de;
+  --r:12px;--r2:8px;--sh:0 1px 4px rgba(26,37,53,.08),0 4px 16px rgba(26,37,53,.06);--sh2:0 8px 32px rgba(26,37,53,.14);
+  --sw:252px;--hw:60px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+/* LAYOUT */
+#hdr{position:fixed;top:0;left:0;right:0;height:var(--hw);background:var(--blue);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.logo{font-weight:700;font-size:19px;color:#fff;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.logo em{color:#93c5fd;font-style:normal}
+#hs{flex:1;max-width:420px;position:relative}
+#hs input{width:100%;padding:7px 12px 7px 34px;border-radius:20px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:15px;outline:none;transition:.2s}
+#hs input::placeholder{color:rgba(255,255,255,.5)}
+#hs input:focus{background:rgba(255,255,255,.22);box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:rgba(255,255,255,.55)}
+#sr{position:absolute;top:calc(100%+6px);left:0;right:0;background:#fff;border-radius:var(--r2);box-shadow:var(--sh2);max-height:380px;overflow-y:auto;z-index:300;border:1px solid var(--bd)}
+.sri{padding:9px 13px;cursor:pointer;border-bottom:1px solid var(--bd);transition:.12s}
+.sri:hover{background:var(--sf2)}
+.sri .sn{font-weight:600;font-size:15px;color:var(--blue)}
+.sri .sd{font-size:13px;color:var(--ink3);margin-top:1px}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hd{color:rgba(255,255,255,.7);font-size:14px;white-space:nowrap}
+#main{display:flex;margin-top:var(--hw);min-height:calc(100vh - var(--hw))}
+/* SIDEBAR */
+#sb{width:var(--sw);background:var(--blue);position:fixed;top:var(--hw);bottom:0;left:0;overflow-y:auto;z-index:100;border-right:1px solid rgba(255,255,255,.07)}
+.ns{padding:14px 14px 3px;font-size:12px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1.2px;font-weight:600}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 15px;color:rgba(255,255,255,.7);font-size:15px;cursor:pointer;border-left:3px solid transparent;transition:.14s;user-select:none}
+.ni:hover{background:rgba(255,255,255,.07);color:#fff}
+.ni.on{background:rgba(255,255,255,.11);color:#93c5fd;border-left-color:#60a5fa;font-weight:500}
+.ni .ic{font-size:17px;width:20px;text-align:center;flex-shrink:0}
+.nb{margin-left:auto;background:var(--rose2);color:#fff;font-size:12px;font-weight:700;padding:1px 6px;border-radius:20px}
+/* CONTENT */
+#ct{margin-left:var(--sw);flex:1;padding:20px}
+/* PH */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.ph h1{font-size:21px;font-weight:700;color:var(--blue)}
+/* CARD */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--bd);padding:16px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--bg)}
+.ct{font-size:16px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:6px}
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:var(--r2);border:none;font-size:15px;font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:.14s;white-space:nowrap}
+.bb{background:var(--blue);color:#fff} .bb:hover{background:var(--blue2)}
+.bt{background:var(--teal);color:#fff} .bt:hover{background:var(--teal2)}
+.ba{background:var(--amber);color:#fff} .ba:hover{background:var(--amber2)}
+.br{background:var(--rose2);color:#fff} .br:hover{opacity:.85}
+.bo{background:transparent;border:1.5px solid var(--bd2);color:var(--ink2)} .bo:hover{border-color:var(--blue);color:var(--blue)}
+.sm{padding:4px 10px;font-size:14px}
+.xs{padding:3px 7px;font-size:13px}
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:3px;flex:1}
+.fg label{font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px}
+.fg input,.fg select,.fg textarea{padding:7px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:15px;background:var(--sf2);color:var(--ink);transition:.14s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue2);background:#fff;box-shadow:0 0 0 3px rgba(37,99,176,.1)}
+.fg textarea{resize:vertical;min-height:68px}
+.fr{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+/* TABLES */
+.tw{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--bd)}
+.vt{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+.vt th{background:var(--blue);color:#fff;padding:8px 7px;text-align:center;font-size:12px;font-weight:600;position:sticky;top:0;z-index:5;white-space:nowrap;overflow:hidden}
+.vt th:first-child{text-align:left;padding-left:10px}
+.vt td{padding:6px 4px;border-bottom:1px solid var(--bd);text-align:center;vertical-align:middle;overflow:hidden}
+.vt td:first-child{text-align:left;padding-left:6px}
+.vt tr:hover td{background:var(--sf2)}
+.vt input,.vt textarea{width:100%;box-sizing:border-box;background:var(--sf2);border:1.5px solid var(--bd);border-radius:5px;padding:4px 3px;font-size:12px;text-align:center;font-family:inherit;color:var(--ink)}
+.vt input:focus,.vt textarea:focus{background:var(--sf2);border-color:var(--blue2);outline:none}
+.ok{color:var(--green);font-weight:600} .wn{color:var(--amber2);font-weight:600} .al{color:var(--rose2);font-weight:700}
+/* EXCRETION */
+.et{width:100%;border-collapse:collapse;13px}
+.et th{background:#0f5a5a;color:#fff;padding:5px 2px;text-align:center;font-size:12px;font-weight:600;white-space:nowrap;position:sticky;top:0}
+.et td{padding:3px 2px;border:1px solid #c0e0e0;text-align:center}
+.et .rn{text-align:left;padding-left:8px;font-weight:600;font-size:14px;white-space:nowrap}
+.et .rr{color:var(--blue);font-weight:700;font-size:14px}
+.ec{width:42px;height:42px;border-radius:7px;border:2px solid #a0c8c8;cursor:pointer;font-size:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;background:#f0fafa;color:#0f5a5a;transition:.1s;user-select:none}
+.ec:hover{transform:scale(1.18)}
+.ec.U{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd}
+.ec.S{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.ec.B{background:#ede9fe;color:#5b21b6;border-color:#c4b5fd}
+.ec.O{background:#dcfce7;color:#166534;border-color:#86efac}
+.ec.X{background:#f1f5f9;color:#94a3b8;border-color:#cbd5e1}
+.ec.constipation{outline:2px solid var(--rose2)!important}
+/* RESIDENT */
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:11px}
+.rc{background:var(--surface);border:2px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:.2s;text-align:center}
+.rc:hover{border-color:var(--blue2);box-shadow:var(--sh);transform:translateY(-2px)}
+.rc.sel{border-color:var(--amber2);background:#fffbeb}
+.av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue2),var(--blue));display:flex;align-items:center;justify-content:center;font-size:21px;color:#fff;margin:0 auto 8px;font-weight:700}
+.rname{font-weight:700;font-size:15px;margin-bottom:3px}
+.rsub{font-size:13px;color:var(--ink3)}
+/* PILLS */
+.pl{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600}
+.pb{background:var(--blue3);color:var(--blue)} .pt{background:var(--teal3);color:var(--teal)}
+.pa{background:var(--amber3);color:var(--amber)} .pr{background:var(--rose3);color:var(--rose2)}
+.pg{background:var(--green3);color:var(--green)} .pv{background:var(--violet3);color:var(--violet)}
+/* TABS */
+.tabs{display:flex;background:var(--bg);border-radius:9px;padding:3px;gap:2px;margin-bottom:14px;flex-wrap:wrap}
+.tab{flex:1;min-width:70px;padding:6px 8px;border:none;background:transparent;color:var(--ink3);font-size:14px;font-weight:600;border-radius:7px;cursor:pointer;transition:.14s;font-family:inherit;white-space:nowrap}
+.tab.on{background:#fff;color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.09)}
+/* MEMO */
+.mi{border-left:4px solid var(--amber2);background:var(--sf2);border-radius:0 var(--r2) var(--r2) 0;padding:11px;margin-bottom:9px}
+.mi.med{border-left-color:var(--blue2);background:var(--blue3)}
+.mi.urg{border-left-color:var(--rose2);background:var(--rose3)}
+.mi.care{border-left-color:var(--teal2);background:var(--teal3)}
+.mm{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:3px}
+.mt2{font-size:15px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+/* STATS */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
+.sc{background:var(--surface);border-radius:var(--r);padding:14px;box-shadow:var(--sh);border:1px solid var(--bd)}
+.sn{font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:var(--blue);line-height:1;margin-bottom:2px}
+.sl{font-size:13px;color:var(--ink3)}
+.ss{font-size:12px;margin-top:3px}
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(10,20,40,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:14px}
+.mdl{background:#fff;border-radius:var(--r);box-shadow:var(--sh2);width:100%;max-width:560px;max-height:92vh;overflow-y:auto}
+.mh{padding:14px 18px 11px;border-bottom:2px solid var(--bg);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.mtt{font-size:17px;font-weight:700;color:var(--blue)}
+.mb{padding:16px 18px}
+.mf{padding:11px 18px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px;background:#fff;position:sticky;bottom:0}
+.cls{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink3);line-height:1;padding:2px}
+.cls:hover{color:var(--ink)}
+/* ADL */
+.ag{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.ar{background:var(--sf2);border-radius:var(--r2);padding:9px}
+.al2{font-size:12px;font-weight:600;color:var(--ink3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.ao{display:flex;gap:3px;flex-wrap:wrap}
+.aob{flex:1;min-width:50px;padding:4px 3px;border:1.5px solid var(--bd);border-radius:5px;font-size:13px;background:#fff;cursor:pointer;text-align:center;transition:.14s;font-family:inherit}
+.aob.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.aob:hover:not(.on){border-color:var(--blue2)}
+/* DRUG */
+.dt{width:100%;border-collapse:collapse;14px}
+.dt th{background:var(--blue);color:#fff;padding:7px 9px;text-align:left;13px}
+.dt td{padding:7px 9px;border-bottom:1px solid var(--bd)}
+.dt tr:hover td{background:var(--sf2)}
+/* MV */
+.mvr{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:4px}
+.mv{display:flex;align-items:center;gap:6px;background:var(--sf2);border-radius:var(--r2);padding:8px 11px;flex:1;min-width:90px}
+.mvi{19px}
+.mvv{font-size:19px;font-weight:700;font-family:'DM Mono',monospace;color:var(--blue);line-height:1}
+.mvl{font-size:12px;color:var(--ink3)}
+/* TOAST */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(36px);background:var(--ink);color:#fff;padding:9px 20px;border-radius:22px;font-size:15px;z-index:9999;opacity:0;transition:.28s;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.h{display:none!important}
+@media(max-width:900px){
+  #sb{transform:translateX(-100%);transition:.25s}
+  #sb.open{transform:none;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+  #ct{margin-left:0}
+  .sr{grid-template-columns:1fr 1fr}
+  #hs{max-width:200px}
+  .ph h1{font-size:17px}
+}
+@media(max-width:600px){
+  .sr{grid-template-columns:1fr 1fr}
+  .ag{grid-template-columns:1fr}
+  .fr{flex-direction:column}
+  .mdl{border-radius:var(--r) var(--r) 0 0;margin-top:auto;max-width:100%}
+  .ov{align-items:flex-end;padding:0}
+  .ph{flex-direction:column;align-items:flex-start;gap:8px}
+  .ph>div{width:100%;flex-wrap:wrap}
+  .tabs .tab{font-size:11px;padding:6px 6px}
+  #hs{max-width:160px}
+  .hdr-r .hd{display:none}
+  #staff-sel{max-width:100px;font-size:12px;padding:4px 6px}
+  .btn.ba.sm{font-size:12px;padding:5px 8px}
+  .tw{font-size:12px}
+  .vt th,.vt td{padding:6px 4px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <button id="menu-btn" onclick="toggleMenu()" style="display:none;background:none;border:none;color:#fff;font-size:22px;padding:4px 8px;cursor:pointer;flex-shrink:0">☰</button>
+  <div class="logo">🌟 <em>STELLA</em> <span style="color:rgba(255,255,255,.4);font-weight:400;font-size:12px">介護記録</span></div>
+  <div id="hs">
+    <span class="si">🔍</span>
+    <input type="text" id="gsearch" placeholder="利用者名・症状・薬品名・メモ内容で検索…" oninput="gSearch(this.value)" autocomplete="off">
+    <div id="sr" class="h"></div>
+  </div>
+  <div class="hdr-r">
+    <div id="hd" style="color:#fff;font-size:15px;font-weight:600;white-space:nowrap;background:rgba(255,255,255,.12);padding:5px 12px;border-radius:20px;letter-spacing:.3px"></div>
+    <select id="staff-sel" onchange="setCurrentStaff(this.value)"
+      style="padding:5px 10px;border-radius:20px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:13px;font-family:inherit;cursor:pointer;max-width:130px">
+      <option value="" style="color:#000">スタッフ選択</option>
+      <option value="松久正継" style="color:#000">松久正継</option>
+      <option value="今井隆二" style="color:#000">今井隆二</option>
+    </select>
+    <button class="btn ba sm" onclick="openM('mr')">＋ 利用者追加</button>
+  </div>
+</header>
+<div id="main">
+<nav id="sb">
+  <div class="ns">メイン</div>
+  <div class="ni on" id="n-dash" onclick="gv('dash')"><span class="ic">🏠</span>ダッシュボード</div>
+  <div class="ni" id="n-res" onclick="gv('res')"><span class="ic">👥</span>利用者一覧</div>
+  <div class="ns">記録</div>
+  <div class="ni" id="n-vit" onclick="gv('vit')"><span class="ic">📊</span>バイタル記録</div>
+  <div class="ni" id="n-ex" onclick="gv('ex')"><span class="ic">🚿</span>排泄チェック</div>
+  <div class="ni" id="n-daily" onclick="gv('daily')"><span class="ic">📓</span>日々の記録</div>
+  <div class="ni" id="n-handover" onclick="gv('handover')"><span class="ic">🔔</span>申し送り</div>
+  <div class="ni" id="n-weight" onclick="gv('weight')"><span class="ic">⚖️</span>体重管理</div>
+  <div class="ns">個別管理</div>
+  <div class="ni" id="n-det" onclick="gv('det')"><span class="ic">📋</span>個別記録</div>
+  <div class="ni" id="n-memo" onclick="gv('memo')"><span class="ic">📝</span>共有メモ<span class="nb h" id="nb"></span></div>
+  <div class="ns">管理</div>
+  <div class="ni" id="n-discharged" onclick="gv('discharged')"><span class="ic">📁</span>退居者管理</div>
+  <div class="ni" id="n-settings" onclick="gv('settings')"><span class="ic">⚙️</span>設定</div>
+</nav>
+<main id="ct">
+
+<!-- DASHBOARD -->
+<div id="v-dash">
+
+  <div class="ph"><h1>ダッシュボード</h1></div>
+  <!-- 特記事項更新通知 -->
+  <div id="ds-notes-alert" class="card h" style="margin-bottom:14px;background:var(--amber3);border-color:var(--amber2)"></div>
+  <div class="sr" id="ds"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="card"><div class="ch"><div class="ct">⚠️ 本日バイタル未記録</div></div><div id="du"></div></div>
+    <div class="card"><div class="ch"><div class="ct">📝 最新メモ</div><button class="btn bo sm" onclick="gv('memo')">全て</button></div><div id="dm"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="ch"><div class="ct">🔔 本日の申し送り</div><button class="btn bo sm" onclick="gv('handover')">詳細・追加</button></div><div id="dho"></div></div>
+  <div class="card"><div class="ch"><div class="ct">🚿 本日の排泄サマリー</div><button class="btn bo sm" onclick="gv('ex')">詳細</button></div><div id="dex"></div></div>
+</div>
+
+<!-- RESIDENTS -->
+<div id="v-res" class="h">
+  <div class="ph"><h1>利用者一覧</h1><button class="btn bb" onclick="openM('mr')">＋ 利用者追加</button></div>
+  <div class="rg" id="rg"></div>
+</div>
+
+<!-- VITALS -->
+<div id="v-vit" class="h">
+  <div class="ph">
+    <h1 id="vit-page-title">📊 バイタル一括入力</h1>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input type="date" id="vd" onchange="renderVitalInput()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+      <input type="time" id="vt" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+      <button class="btn bb" id="btn-save-all" onclick="saveAllVitals()" style="font-size:15px;font-weight:700;padding:9px 22px">💾 全員保存</button>
+    </div>
+  </div>
+  <!-- タブ切替 -->
+  <div class="tabs" style="margin-bottom:14px">
+    <button class="tab on" id="vtab-history" onclick="switchVTab('history',this)">📋 個人履歴</button>
+    <button class="tab" id="vtab-input" onclick="switchVTab('input',this)">📝 一括入力</button>
+  </div>
+  <!-- 入力タブ -->
+  <div id="vt-input">
+    <div class="card" style="margin-bottom:12px;padding:10px 14px;background:var(--blue3);border-left:4px solid var(--blue)">
+      <div style="font-size:13px;color:var(--blue)">💡 各利用者のバイタルを入力して「💾 全員保存」を押してください。<strong>赤字は基準値を超えた項目</strong>、<strong>橙字は注意値</strong>です。</div>
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table class="vt" id="vit-input-tbl" style="table-layout:fixed;width:100%">
+          <thead>
+            <tr>
+              <th style="width:80px;text-align:left">利用者</th>
+              <th style="width:68px">体温℃</th>
+              <th style="width:58px">脈拍</th>
+              <th style="width:62px">血圧上</th>
+              <th style="width:62px">血圧下</th>
+              <th style="width:62px">SpO₂%</th>
+              <th style="width:54px">呼吸</th>
+              <th style="width:120px">特記事項</th>
+              <th style="width:100px">処置</th>
+              <th style="width:72px">サイン</th>
+            </tr>
+          </thead>
+          <tbody id="vit-input-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- 履歴タブ -->
+  <div id="vt-history" class="h">
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="vh-sel" onchange="initIndivForm();loadVHistory()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff;font-family:inherit;min-width:160px"></select>
+        <input type="date" id="vh-date" onchange="loadVHistory()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+        <span style="font-size:12px;color:var(--ink3)">※日付未選択で全履歴表示</span>
+      </div>
+    </div>
+    <!-- 個人入力フォーム（ページ埋め込み） -->
+    <div class="card" style="margin-bottom:12px;border:2px solid var(--blue);background:var(--blue3)" id="vi-form-card">
+      <div class="ch" style="border-color:var(--blue2)">
+        <div class="ct">✏️ バイタル追加入力</div>
+        <button class="btn bb" onclick="saveIndivVital()" style="font-size:14px;font-weight:700;padding:8px 20px">💾 保存</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <div class="fg" style="min-width:130px"><label>日付</label><input type="date" id="vi-form-date"></div>
+        <div class="fg" style="min-width:100px"><label>時間</label><input type="time" id="vi-form-time"></div>
+        <div class="fg" style="min-width:80px"><label>体温℃</label><input type="number" id="vi-form-temp" step="0.1" placeholder="36.5"></div>
+        <div class="fg" style="min-width:70px"><label>脈拍</label><input type="number" id="vi-form-pls" placeholder="75"></div>
+        <div class="fg" style="min-width:75px"><label>血圧上</label><input type="number" id="vi-form-bph" placeholder="120"></div>
+        <div class="fg" style="min-width:75px"><label>血圧下</label><input type="number" id="vi-form-bpl" placeholder="80"></div>
+        <div class="fg" style="min-width:75px"><label>SpO₂%</label><input type="number" id="vi-form-spo" placeholder="98"></div>
+        <div class="fg" style="min-width:65px"><label>呼吸</label><input type="number" id="vi-form-rsp" placeholder="16"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="fg" style="flex:2;min-width:160px"><label>特記事項</label><textarea id="vi-form-nt" rows="2" placeholder="状態変化・訴え等"></textarea></div>
+        <div class="fg" style="min-width:130px"><label>処置</label><textarea id="vi-form-tr" rows="2" placeholder="実施処置"></textarea></div>
+        <div class="fg" style="min-width:100px"><label>サイン（記録者）</label><input type="text" id="vi-form-sg" placeholder="記録者名"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct" id="vh-title">📋 バイタル履歴</div></div>
+      <div class="tw">
+        <table class="vt" id="vh-tbl">
+          <thead><tr><th>日付</th><th>時間</th><th>体温℃</th><th>脈拍</th><th>血圧上</th><th>血圧下</th><th>SpO₂%</th><th>呼吸</th><th>特記事項</th><th>処置</th><th>サイン</th><th></th></tr></thead>
+          <tbody id="vh-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXCRETION -->
+<div id="v-ex" class="h">
+  <div class="ph"><h1>排泄チェック表</h1>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <input type="date" id="exd" onchange="renderEx()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:10px;padding:12px 16px">
+    <div style="font-weight:700;font-size:14px;color:var(--teal);margin-bottom:10px">凡例</div>
+    <div style="background:var(--teal3);border-radius:var(--r2);padding:8px 12px;margin-bottom:10px;border-left:3px solid var(--teal2)">
+      <div style="font-size:13px;font-weight:600;color:var(--teal)">💡 尿・便の記録はこちら（排泄チェック表）に入力してください</div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:2px">血尿・血便等の性状異常はバイタル記録の「特記事項」に記載してください</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:44px;height:44px;background:#dbeafe;border:2px solid #93c5fd;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+          <span style="font-size:13px;line-height:1">💧</span>
+        </div><span style="font-size:13px">排尿</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:44px;height:44px;background:#fef3c7;border:2px solid #fcd34d;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+          <span style="font-size:12px;line-height:1">💩小</span>
+          <span style="font-size:10px;line-height:1;color:#6d28d9">B:4</span>
+        </div><span style="font-size:13px">排便（上：種類+量　下：ブリストル+摘）</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:44px;height:44px;background:#ede9fe;border:2px solid #c4b5fd;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+          <span style="font-size:12px;line-height:1">両中</span>
+        </div><span style="font-size:13px">排尿＋排便</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:44px;height:44px;background:#dcfce7;border:2px solid #86efac;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <span style="font-size:12px;line-height:1">✓</span>
+        </div><span style="font-size:13px">オムツチェック</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:44px;height:44px;background:#f1f5f9;border:2px solid #cbd5e1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <span style="font-size:13px;color:#94a3b8">×</span>
+        </div><span style="font-size:13px">なし</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:44px;height:44px;background:#fef9e7;border:2px solid #f59e0b;border-radius:7px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;font-size:10px;padding:2px">
+          <span style="color:#92400e;font-weight:700;line-height:1.2">2</span>
+          <span style="color:#1d4ed8;font-size:11px;line-height:1.2">💧</span>
+          <span></span>
+          <span></span>
+        </div><span style="font-size:13px">睡眠帯（左上:睡眠1=良眠/2=浅眠/3=不眠、右上:排泄）</span>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--bd);padding-top:10px">
+      <div style="font-weight:700;font-size:13px;color:var(--ink3);margin-bottom:6px">排便量：少＝少量　中＝中量　大＝多量</div>
+      <div style="font-weight:700;font-size:13px;color:var(--ink3);margin-bottom:6px">ブリストルスケール（B:番号で表示）：</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px">
+        <span style="background:#fde8d8;padding:3px 8px;border-radius:6px;color:#7c3a00"><strong>B1</strong> コロコロ（硬）</span>
+        <span style="background:#fde8d8;padding:3px 8px;border-radius:6px;color:#7c3a00"><strong>B2</strong> 硬い塊</span>
+        <span style="background:#fef3c7;padding:3px 8px;border-radius:6px;color:#92400e"><strong>B3</strong> やや硬</span>
+        <span style="background:#dcfce7;padding:3px 8px;border-radius:6px;color:#166534"><strong>B4</strong> 普通（理想）</span>
+        <span style="background:#fef3c7;padding:3px 8px;border-radius:6px;color:#92400e"><strong>B5</strong> やや軟</span>
+        <span style="background:#ffe4e6;padding:3px 8px;border-radius:6px;color:#be123c"><strong>B6</strong> 泥状</span>
+        <span style="background:#ffe4e6;padding:3px 8px;border-radius:6px;color:#be123c"><strong>B7</strong> 水様（軟）</span>
+        <span style="background:#f0fdf4;padding:3px 8px;border-radius:6px;color:#166534"><strong>摘</strong> 摘便実施</span>
+      </div>
+      <div style="margin-top:6px;font-size:12px;color:var(--rose2);font-weight:600">🔴 排便-3日以上で赤色警告</div>
+    </div>
+  </div>
+  <div class="card"><div class="tw" id="exw"></div></div>
+  <!-- 便秘管理パネル -->
+  <div class="card" style="margin-top:12px">
+    <div class="ch"><div class="ct">📅 排便状況サマリー（便秘管理）</div></div>
+    <div id="constipation-panel"></div>
+  </div>
+</div>
+
+<!-- DAILY RECORD -->
+<div id="v-daily" class="h">
+  <div class="ph"><h1>日々の記録</h1>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <select id="dly-res" onchange="loadDaily()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff;font-family:inherit"></select>
+      <input type="date" id="dly-date" onchange="loadDaily()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
+      <button class="btn bb" onclick="openDailyModal()">＋ 記録追加</button>
+    </div>
+  </div>
+  <!-- 今日の記録サマリーカード -->
+  <div id="daily-summary" class="card" style="margin-bottom:14px"></div>
+  <!-- 記録一覧 -->
+  <div class="card">
+    <div class="ch"><div class="ct" id="daily-title">📓 日々の記録一覧</div></div>
+    <div id="daily-list"></div>
+  </div>
+</div>
+<!-- HANDOVER 申し送り -->
+<div id="v-handover" class="h">
+  <div class="ph">
+    <h1>🔔 申し送り</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="date" id="ho-date" onchange="renderHandover()" style="padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:15px;background:#fff">
+      <select id="ho-shift" onchange="renderHandover()" style="padding:7px 10px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:15px;background:#fff;font-family:inherit">
+        <option value="">全シフト</option>
+        <option value="早番">🌅 早番</option>
+        <option value="日勤">☀️ 日勤</option>
+        <option value="遅番">🌆 遅番</option>
+        <option value="夜勤">🌙 夜勤</option>
+      </select>
+      <button class="btn bb" onclick="openHandoverModal()">＋ 申し送り追加</button>
+    </div>
+  </div>
+
+  <!-- 今日のバイタル警告 -->
+  <div id="ho-vitalalert" class="card" style="margin-bottom:14px"></div>
+
+  <!-- シフト別申し送り一覧 -->
+  <div id="ho-list"></div>
+</div>
+
+<!-- WEIGHT -->
+<div id="v-weight" class="h">
+  <div class="ph">
+    <h1>⚖️ 体重管理</h1>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <div class="tabs" style="margin-bottom:0;background:rgba(0,0,0,.06);padding:3px;border-radius:8px">
+        <button class="tab on" id="wmode-all" onclick="setWMode('all')" style="min-width:70px">全員一覧</button>
+        <button class="tab" id="wmode-ind" onclick="setWMode('individual')" style="min-width:70px">個別推移</button>
+      </div>
+      <select id="w-res-sel" onchange="renderWeight()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff;font-family:inherit;display:none"></select>
+      <button class="btn bb sm" onclick="openWeightModal()">＋ 体重入力</button>
+    </div>
+  </div>
+  <div class="card" id="weight-content"></div>
+</div>
+
+<div id="v-det" class="h">
+  <div class="ph"><h1>個別記録</h1>
+    <select id="ds2" onchange="loadDet()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff;font-family:inherit;min-width:160px"></select>
+  </div>
+  <div id="detb"><div style="text-align:center;padding:60px;color:var(--ink3)">利用者を選択してください</div></div>
+</div>
+
+<!-- SETTINGS 設定 -->
+<div id="v-settings" class="h">
+  <div class="ph"><h1>⚙️ 設定</h1></div>
+
+  <!-- スタッフ管理 -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="ch"><div class="ct">👥 スタッフ管理</div></div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:13px;color:var(--ink3);margin-bottom:8px">登録スタッフ一覧</div>
+      <div id="staff-list"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg" style="flex:1;min-width:160px">
+        <label>スタッフ名を追加</label>
+        <input type="text" id="new-staff-name" placeholder="例：田中花子">
+      </div>
+      <button class="btn bb" onclick="addStaff()" style="flex-shrink:0">＋ 追加</button>
+    </div>
+  </div>
+
+  <!-- PINロック -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="ch"><div class="ct">🔒 PINロック設定</div></div>
+    <div style="font-size:13px;color:var(--ink3);margin-bottom:12px">アプリ起動時に4桁のPINを入力してロック解除します</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg" style="min-width:120px">
+        <label>現在のPIN</label>
+        <input type="password" id="current-pin" maxlength="4" inputmode="numeric" placeholder="4桁">
+      </div>
+      <div class="fg" style="min-width:120px">
+        <label>新しいPIN</label>
+        <input type="password" id="new-pin" maxlength="4" inputmode="numeric" placeholder="4桁">
+      </div>
+      <div class="fg" style="min-width:120px">
+        <label>確認</label>
+        <input type="password" id="new-pin2" maxlength="4" inputmode="numeric" placeholder="4桁">
+      </div>
+      <button class="btn bb" onclick="changePinUI()" style="flex-shrink:0">🔑 変更</button>
+    </div>
+    <div id="pin-msg" style="margin-top:8px;font-size:13px;height:20px"></div>
+  </div>
+
+  <!-- アプリ情報 -->
+  <div class="card">
+    <div class="ch"><div class="ct">ℹ️ アプリ情報</div></div>
+    <div style="font-size:13px;color:var(--ink3);line-height:1.8">
+      <div>施設名：有料老人ホームステラ</div>
+      <div>施設長：松久正継　☎ 070-3366-8943</div>
+      <div>社長・サ責：今井隆二　☎ 080-3580-9866</div>
+      <div style="margin-top:8px">バージョン：2026.05</div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCHARGED 退居者管理 -->
+<div id="v-discharged" class="h">
+  <div class="ph"><h1>📁 退居者管理</h1>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <select id="dis-filter" onchange="renderDischarged()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff;font-family:inherit">
+        <option value="">全て</option>
+        <option value="入居前">入居前</option>
+        <option value="退去">退去</option>
+        <option value="死亡">死亡</option>
+      </select>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;background:var(--amber3);border-left:4px solid var(--amber2);padding:12px 16px">
+    <div style="font-size:14px;color:var(--amber)">📌 退居者のデータは法令上5年間の保管が必要です。退去日から5年経過した方のデータは削除可能です。</div>
+  </div>
+  <div id="discharged-list"></div>
+</div>
+
+<!-- MEMO -->
+<div id="v-memo" class="h">
+  <div class="ph"><h1>共有メモ</h1>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <select id="mfr" onchange="renderMemos()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff;font-family:inherit"></select>
+      <select id="mft" onchange="renderMemos()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff;font-family:inherit">
+        <option value="">全カテゴリ</option><option value="gen">一般</option><option value="med">医療</option><option value="care">ケア</option><option value="urg">緊急</option>
+      </select>
+      <select id="mfperiod" onchange="renderMemos()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff;font-family:inherit">
+        <option value="0">全期間</option>
+        <option value="1">今日のみ</option>
+        <option value="3">直近3日</option>
+        <option value="7">直近7日</option>
+        <option value="30">直近30日</option>
+      </select>
+      <button class="btn bb" onclick="openM('mm')">＋ メモ追加</button>
+    </div>
+  </div>
+  <div id="ml"></div>
+</div>
+</main>
+</div>
+
+<div id="toast"></div>
+
+<!-- MODAL: VITAL -->
+<div id="mv" class="ov h"><div class="mdl">
+  <div class="mh">
+    <div class="mtt" id="mv-title">📊 バイタル入力</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button id="v-save-btn" onclick="saveV()" style="background:#1a4a8a;color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">💾 保存</button>
+      <button class="cls" onclick="closeM('mv')">×</button>
+    </div>
+  </div>
+  <div class="mb">
+    <input type="hidden" id="v-edit-id">
+    <div class="fr"><div class="fg"><label>日付</label><input type="date" id="vd2"></div><div class="fg"><label>時間</label><input type="time" id="vt2"></div></div>
+    <div class="fr">
+      <div class="fg"><label>体温℃</label><input type="number" id="vtemp" step="0.1" placeholder="36.5"></div>
+      <div class="fg"><label>脈拍</label><input type="number" id="vpls" placeholder="75"></div>
+      <div class="fg"><label>血圧上</label><input type="number" id="vbph" placeholder="120"></div>
+      <div class="fg"><label>血圧下</label><input type="number" id="vbpl" placeholder="80"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>SpO₂%</label><input type="number" id="vspo" placeholder="98"></div>
+      <div class="fg"><label>呼吸</label><input type="number" id="vrsp" placeholder="16"></div>
+    </div>
+    <div class="fr">
+      <div class="fg" style="flex:2"><label>特記事項</label><textarea id="vnt" rows="2" placeholder="状態変化・訴え等"></textarea></div>
+      <div class="fg"><label>処置</label><textarea id="vtr" rows="2" placeholder="実施処置"></textarea></div>
+    </div>
+    <div class="fg"><label>サイン（記録者）</label><input type="text" id="vsg" placeholder="例：田中（記録者名）"></div>
+  </div>
+</div></div>
+
+<!-- MODAL: RESIDENT -->
+<div id="mr" class="ov h"><div class="mdl" style="max-width:640px">
+  <div class="mh"><div class="mtt" id="mr-title">👤 利用者登録</div><button class="cls" onclick="closeM('mr')">×</button></div>
+  <div class="mb">
+    <!-- 基本情報 -->
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">基本情報</div>
+    <div class="fr">
+      <div class="fg" style="flex:2"><label>氏名</label><input type="text" id="rnm" placeholder="例：山田 太郎"></div>
+      <div class="fg"><label>読み</label><input type="text" id="rkn" placeholder="例：やまだ たろう"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>居室</label><input type="text" id="rrm" placeholder="例：1, 2-A"></div>
+      <div class="fg"><label>性別</label><select id="rgd"><option>男性</option><option>女性</option></select></div>
+      <div class="fg"><label>生年月日</label><input type="date" id="rbd"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>要介護度</label><select id="rcl"><option>要支援1</option><option>要支援2</option><option>要介護1</option><option>要介護2</option><option>要介護3</option><option>要介護4</option><option>要介護5</option></select></div>
+      <div class="fg"><label>状態</label>
+        <select id="rst"><option value="入居前">入居前</option><option value="入居中" selected>入居中</option><option value="退去">退去</option><option value="死亡">死亡</option></select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>入居日</label><input type="date" id="red"></div>
+      <div class="fg"><label>退去日</label><input type="date" id="rdis" title="退去・死亡の場合に入力"></div>
+    </div>
+
+    <!-- 関係者情報 -->
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px">関係者・サービス情報</div>
+    <div class="fr">
+      <div class="fg"><label>訪問診療先</label><input type="text" id="rdoc" placeholder="例：〇〇在宅クリニック"></div>
+      <div class="fg"><label>担当ケアマネ</label><input type="text" id="rcm" placeholder="例：田中ケアマネ（〇〇事業所）"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>福祉用具業者</label><input type="text" id="rwl" placeholder="例：〇〇福祉用具"></div>
+      <div class="fg"><label>緊急連絡先</label><input type="text" id="rec" placeholder="例：長男 山田次郎 080-xxxx-xxxx"></div>
+    </div>
+
+    <!-- 医療・介護情報 -->
+    <div style="font-size:12px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px">医療・介護情報</div>
+    <div class="fg" style="margin-bottom:9px"><label>病歴・既往症</label><textarea id="rhx" placeholder="例：高血圧、糖尿病、認知症 等"></textarea></div>
+    <div class="fg" style="margin-bottom:9px"><label>アレルギー</label><input type="text" id="ral" placeholder="例：ペニシリン系、卵 等（なければ「なし」）"></div>
+    <div class="fg"><label>特記事項・注意点 ⚠️（更新するとダッシュボードに2〜3日表示されます）</label><textarea id="rnt" rows="3" placeholder="例：経管栄養、吸引あり、看取り希望 等"></textarea></div>
+  </div>
+  <div class="mf"><button class="btn bo" onclick="closeM('mr')">キャンセル</button><button class="btn bb" id="mr-save-btn" onclick="saveRes()">💾 登録</button></div>
+</div></div>
+
+<!-- MODAL: MEMO -->
+<div id="mm" class="ov h"><div class="mdl">
+  <div class="mh"><div class="mtt" id="mm-title">📝 共有メモ追加</div><button class="cls" onclick="closeM('mm')">×</button></div>
+  <input type="hidden" id="mm-edit-id">
+  <div class="mb">
+    <div class="fr">
+      <div class="fg" style="flex:2"><label>利用者</label><select id="mmr" style="padding:7px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:var(--sf2);color:var(--ink)" onchange="checkMemoDuplicate()"></select></div>
+      <div class="fg"><label>カテゴリ</label><select id="mmt" style="padding:7px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:var(--sf2);color:var(--ink)" onchange="checkMemoDuplicate()">
+        <option value="gen">一般</option><option value="med">医療</option><option value="care">ケア</option><option value="urg">緊急</option>
+      </select></div>
+    </div>
+    <div class="fg" style="margin-bottom:9px"><label>記録者</label><input type="text" id="mma" placeholder="例：田中、佐藤等"></div>
+    <div class="fg" style="margin-bottom:9px"><label>内容</label><textarea id="mmtx" rows="3" placeholder="共有したい内容を入力" oninput="checkMemoDuplicate()"></textarea></div>
+    <!-- 表示期間 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:11px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📅 ダッシュボード表示期間</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+        <div class="fg" style="flex:1;min-width:120px"><label>表示開始日</label><input type="date" id="mm-start" style="padding:7px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff"></div>
+        <div style="padding-top:18px;color:var(--ink3);font-weight:600">〜</div>
+        <div class="fg" style="flex:1;min-width:120px"><label>表示終了日</label><input type="date" id="mm-end" style="padding:7px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff"></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="btn bo xs" onclick="setMemoDateRange(1)">1日</button>
+        <button type="button" class="btn bo xs" onclick="setMemoDateRange(3)">3日</button>
+        <button type="button" class="btn bo xs" onclick="setMemoDateRange(7)">7日</button>
+        <button type="button" class="btn bo xs" onclick="setMemoDateRange(14)">14日</button>
+        <button type="button" class="btn bo xs" onclick="setMemoDateRange(30)">30日</button>
+        <button type="button" class="btn bo xs" onclick="setMemoDateRange(0)">期限なし</button>
+      </div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:6px">設定した期間のみダッシュボードに表示されます。空欄にすると期限なしになります。</div>
+    </div>
+    <!-- 重複チェック表示エリア -->
+    <div id="mm-dup-alert" style="display:none;background:var(--amber3);border-radius:var(--r2);padding:10px;font-size:13px;color:var(--amber);border-left:3px solid var(--amber2)"></div>
+  </div>
+  <div class="mf"><button class="btn bo" onclick="closeM('mm')">キャンセル</button><button class="btn bb" id="mm-save-btn" onclick="saveMemo()">💾 保存</button></div>
+</div></div>
+
+
+
+<!-- MODAL: 排泄詳細入力 -->
+<div id="mex" class="ov h"><div class="mdl" style="max-width:420px">
+  <div class="mh"><div class="mtt" id="mex-title">🚿 排泄詳細入力</div><button class="cls" onclick="closeM('mex')">×</button></div>
+  <div class="mb">
+    <div style="font-size:13px;color:var(--ink3);margin-bottom:14px" id="mex-sub"></div>
+
+    <!-- 排泄種類 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">排泄種類</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn sm" id="mex-u" onclick="setExType('U')" style="background:#dbeafe;color:#1d4ed8;border:2px solid #93c5fd">💧 排尿</button>
+        <button class="btn sm" id="mex-s" onclick="setExType('S')" style="background:#fef3c7;color:#92400e;border:2px solid #fcd34d">💩 排便</button>
+        <button class="btn sm" id="mex-b" onclick="setExType('B')" style="background:#ede9fe;color:#5b21b6;border:2px solid #c4b5fd">両方</button>
+        <button class="btn sm" id="mex-o" onclick="setExType('O')" style="background:#dcfce7;color:#166534;border:2px solid #86efac">📋 オムツチェック</button>
+        <button class="btn sm" id="mex-x" onclick="setExType('X')" style="background:#f1f5f9;color:#64748b;border:2px solid #cbd5e1">× なし</button>
+        <button class="btn sm" id="mex-n" onclick="setExType('')" style="background:#fff;color:#94a3b8;border:2px solid #e2e8f0">消去</button>
+      </div>
+    </div>
+
+    <!-- 排便量（排便・両方の時のみ） -->
+    <div id="mex-stool-area" style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">排便量</div>
+      <div style="display:flex;gap:7px">
+        <button class="btn sm" id="mex-a1" onclick="setExAmt(1)" style="border:2px solid var(--bd)">少（1）</button>
+        <button class="btn sm" id="mex-a2" onclick="setExAmt(2)" style="border:2px solid var(--bd)">中（2）</button>
+        <button class="btn sm" id="mex-a3" onclick="setExAmt(3)" style="border:2px solid var(--bd)">大（3）</button>
+      </div>
+    </div>
+
+    <!-- ブリストルスケール -->
+    <div id="mex-bristol-area" style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">ブリストルスケール</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <button class="btn xs" id="mex-b1" onclick="setExBristol(1)" style="border:2px solid var(--bd);padding:6px 4px">1<div style="font-size:9px;color:var(--ink3)">コロコロ</div></button>
+        <button class="btn xs" id="mex-b2" onclick="setExBristol(2)" style="border:2px solid var(--bd);padding:6px 4px">2<div style="font-size:9px;color:var(--ink3)">硬い塊</div></button>
+        <button class="btn xs" id="mex-b3" onclick="setExBristol(3)" style="border:2px solid var(--bd);padding:6px 4px">3<div style="font-size:9px;color:var(--ink3)">やや硬</div></button>
+        <button class="btn xs" id="mex-b4" onclick="setExBristol(4)" style="border:2px solid var(--bd);padding:6px 4px">4<div style="font-size:9px;color:var(--ink3)">普通</div></button>
+        <button class="btn xs" id="mex-b5" onclick="setExBristol(5)" style="border:2px solid var(--bd);padding:6px 4px">5<div style="font-size:9px;color:var(--ink3)">やや軟</div></button>
+        <button class="btn xs" id="mex-b6" onclick="setExBristol(6)" style="border:2px solid var(--bd);padding:6px 4px">6<div style="font-size:9px;color:var(--ink3)">泥状</div></button>
+        <button class="btn xs" id="mex-b7" onclick="setExBristol(7)" style="border:2px solid var(--bd);padding:6px 4px">7<div style="font-size:9px;color:var(--ink3)">水様</div></button>
+      </div>
+    </div>
+
+    <!-- 摘便 -->
+    <div id="mex-tekibin-area" style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">摘便</div>
+      <button class="btn sm" id="mex-tek" onclick="toggleTekibin()" style="border:2px solid var(--bd)">□ 摘便あり</button>
+    </div>
+
+    <!-- 睡眠（睡眠帯のみ） -->
+    <div id="mex-sleep-area" style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">😴 睡眠状況（21〜6時）</div>
+      <div style="display:flex;gap:7px">
+        <button class="btn sm" id="mex-sl1" onclick="setExSleep(1)" style="border:2px solid var(--bd)">1 良眠</button>
+        <button class="btn sm" id="mex-sl2" onclick="setExSleep(2)" style="border:2px solid var(--bd)">2 浅眠</button>
+        <button class="btn sm" id="mex-sl3" onclick="setExSleep(3)" style="border:2px solid var(--bd)">3 不眠</button>
+        <button class="btn sm" id="mex-sl0" onclick="setExSleep(0)" style="border:2px solid var(--bd)">消去</button>
+      </div>
+    </div>
+  </div>
+  <div class="mf">
+    <button class="btn bo" onclick="closeM('mex')">キャンセル</button>
+    <button class="btn bb" onclick="saveExDetail()">💾 保存</button>
+  </div>
+</div></div>
+
+<!-- MODAL: 体重入力 -->
+<div id="mw" class="ov h"><div class="mdl" style="max-width:420px">
+  <div class="mh"><div class="mtt">⚖️ 体重入力</div><button class="cls" onclick="closeM('mw')">×</button></div>
+  <input type="hidden" id="w-edit-id">
+  <div class="mb">
+    <div class="fr">
+      <div class="fg" style="flex:2"><label>利用者</label>
+        <select id="w-res" style="padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:var(--sf2);font-family:inherit"></select>
+      </div>
+      <div class="fg"><label>日付</label><input type="date" id="w-date"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>体重（kg）</label><input type="number" id="w-val" step="0.1" placeholder="例：52.3"></div>
+      <div class="fg"><label>備考</label><input type="text" id="w-note" placeholder="例：朝食前・浮腫あり"></div>
+    </div>
+  </div>
+  <div class="mf">
+    <button class="btn bo" onclick="closeM('mw')">キャンセル</button>
+    <button class="btn bb" onclick="saveWeight()">💾 保存</button>
+  </div>
+</div></div>
+
+<!-- MODAL: 申し送り -->
+<div id="mho" class="ov h"><div class="mdl">
+  <div class="mh"><div class="mtt">🔔 申し送り入力</div><button class="cls" onclick="closeM('mho')">×</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label>日付</label><input type="date" id="ho-d"></div>
+      <div class="fg"><label>シフト</label>
+        <select id="ho-s" style="padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:15px;background:var(--sf2);font-family:inherit">
+          <option value="早番">🌅 早番</option>
+          <option value="日勤">☀️ 日勤</option>
+          <option value="遅番">🌆 遅番</option>
+          <option value="夜勤">🌙 夜勤</option>
+        </select>
+      </div>
+      <div class="fg"><label>記録者</label><input type="text" id="ho-au" placeholder="例：田中、佐藤等"></div>
+    </div>
+
+    <!-- 全体連絡 -->
+    <div style="background:var(--rose3);border-radius:var(--r2);padding:12px;margin-bottom:10px;border-left:4px solid var(--rose2)">
+      <div style="font-size:14px;font-weight:700;color:var(--rose2);margin-bottom:8px">⚠️ 要注意・緊急連絡事項</div>
+      <div class="fg"><textarea id="ho-urgent" rows="3" placeholder="全スタッフへの緊急・重要な連絡事項を記入"></textarea></div>
+    </div>
+
+    <!-- 利用者別申し送り -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px">👤 利用者別の申し送り</div>
+      <div id="ho-res-inputs"></div>
+    </div>
+
+    <!-- 業務連絡 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:14px;font-weight:700;color:var(--teal);margin-bottom:8px">📋 業務・環境連絡</div>
+      <div class="fg"><textarea id="ho-ops" rows="2" placeholder="設備・物品・連絡事項等（訪問診療の連絡・薬の補充等）"></textarea></div>
+    </div>
+
+    <!-- 次シフトへの依頼 -->
+    <div class="fg">
+      <label>次のシフトへのお願い・確認事項</label>
+      <textarea id="ho-next" rows="3" placeholder="次のシフトで確認・実施してほしいこと"></textarea>
+    </div>
+  </div>
+  <div class="mf">
+    <button class="btn bo" onclick="closeM('mho')">キャンセル</button>
+    <button class="btn bb" onclick="saveHandover()">💾 保存</button>
+  </div>
+</div></div>
+
+<!-- MODAL: 日々の記録 -->
+<div id="mdly" class="ov h"><div class="mdl">
+  <div class="mh"><div class="mtt" id="mdly-title">📓 日々の記録入力</div><button class="cls" onclick="closeM('mdly')">×</button></div>
+  <input type="hidden" id="dly-edit-id">
+  <input type="hidden" id="dly-edit-rid">
+  <div class="mb">
+    <div class="fr">
+      <div class="fg" style="flex:2"><label>利用者</label><select id="dly-res2" style="padding:7px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:var(--sf2);font-family:inherit"></select></div>
+      <div class="fg"><label>日付</label><input type="date" id="dly-d"></div>
+      <div class="fg"><label>時間</label><input type="time" id="dly-t"></div>
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label>記録者</label><input type="text" id="dly-au" placeholder="例：田中、佐藤等"></div>
+
+    <!-- 食事 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:14px;font-weight:700;color:var(--amber);margin-bottom:10px">🍽️ 食事</div>
+
+      <!-- 朝食 -->
+      <div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border-left:4px solid #f59e0b">
+        <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:8px">🌅 朝食</div>
+        <div class="fr" style="margin-bottom:6px">
+          <div class="fg"><label>主食</label>
+            <select id="dly-meal-mm" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+              <option value="">-</option><option>全量</option><option>9割</option><option>8割</option><option>7割</option><option>半量</option><option>3割</option><option>2割</option><option>1割</option><option>不摂取</option><option>絶食</option>
+            </select>
+          </div>
+          <div class="fg"><label>副食</label>
+            <select id="dly-meal-ms" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+              <option value="">-</option><option>全量</option><option>9割</option><option>8割</option><option>7割</option><option>半量</option><option>3割</option><option>2割</option><option>1割</option><option>不摂取</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 昼食 -->
+      <div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border-left:4px solid #3b82f6">
+        <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px">☀️ 昼食</div>
+        <div class="fr" style="margin-bottom:6px">
+          <div class="fg"><label>主食</label>
+            <select id="dly-meal-lm" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+              <option value="">-</option><option>全量</option><option>9割</option><option>8割</option><option>7割</option><option>半量</option><option>3割</option><option>2割</option><option>1割</option><option>不摂取</option><option>絶食</option>
+            </select>
+          </div>
+          <div class="fg"><label>副食</label>
+            <select id="dly-meal-ls" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+              <option value="">-</option><option>全量</option><option>9割</option><option>8割</option><option>7割</option><option>半量</option><option>3割</option><option>2割</option><option>1割</option><option>不摂取</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 夕食 -->
+      <div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border-left:4px solid #8b5cf6">
+        <div style="font-size:13px;font-weight:700;color:var(--violet);margin-bottom:8px">🌙 夕食</div>
+        <div class="fr" style="margin-bottom:6px">
+          <div class="fg"><label>主食</label>
+            <select id="dly-meal-em" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+              <option value="">-</option><option>全量</option><option>9割</option><option>8割</option><option>7割</option><option>半量</option><option>3割</option><option>2割</option><option>1割</option><option>不摂取</option><option>絶食</option>
+            </select>
+          </div>
+          <div class="fg"><label>副食</label>
+            <select id="dly-meal-es" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
+              <option value="">-</option><option>全量</option><option>9割</option><option>8割</option><option>7割</option><option>半量</option><option>3割</option><option>2割</option><option>1割</option><option>不摂取</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="fg"><label>食事形態・水分・特記</label><input type="text" id="dly-meal-note" placeholder="ミキサー食・とろみ・水分量・補助食品等"></div>
+    </div>
+
+    <!-- 入浴 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">🛁 入浴・清潔ケア</div>
+      <div class="fr">
+        <div class="fg"><label>入浴状況</label>
+          <select id="dly-bath" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
+            <option value="">-（本日なし）</option><option>入浴</option><option>清拭</option><option>入浴拒否</option><option>体調不良のため中止</option>
+          </select>
+        </div>
+        <div class="fg"><label>口腔ケア</label>
+          <select id="dly-oral" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
+            <option value="">-</option><option>実施</option><option>一部介助</option><option>拒否</option><option>未実施</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 活動 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">🏃 活動・リハビリ</div>
+      <div class="fr">
+        <div class="fg"><label>活動内容</label>
+          <select id="dly-act" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
+            <option value="">-</option><option>訪問リハビリ</option><option>マッサージ</option><option>可動域訓練</option><option>車椅子離床</option><option>外出・散歩</option><option>居室安静</option><option>面会あり</option><option>その他</option>
+          </select>
+        </div>
+        <div class="fg"><label>活動詳細</label><input type="text" id="dly-act-note" placeholder="内容・参加状況等"></div>
+      </div>
+    </div>
+
+    <!-- 体調・様子観察 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px">🩺 体調・様子観察</div>
+      <div class="fr">
+        <div class="fg"><label>全体的な様子</label>
+          <select id="dly-cond" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
+            <option value="">-</option><option>良好</option><option>普通</option><option>やや不良</option><option>不良</option><option>急変あり</option>
+          </select>
+        </div>
+        <div class="fg"><label>表情・言動</label>
+          <select id="dly-mood" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
+            <option value="">-</option><option>穏やか</option><option>笑顔あり</option><option>不穏</option><option>興奮</option><option>傾眠傾向</option><option>意識低下</option><option>訴え多い</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>体調・様子の詳細（自由記述）</label><textarea id="dly-obs" rows="3" placeholder="状態の変化・訴え・特記事項等を詳しく記録"></textarea></div>
+    </div>
+
+    <!-- ケア実施 -->
+    <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--violet);margin-bottom:8px">💉 ケア実施記録</div>
+      <div class="fg"><label>実施したケア・処置</label><textarea id="dly-care" rows="2" placeholder="体位交換・褥瘡処置・吸引・与薬・点滴等"></textarea></div>
+    </div>
+
+    <!-- 申し送り事項 -->
+    <div class="fg"><label>⚠️ 申し送り事項（次のシフトへ）</label><textarea id="dly-hand" rows="2" placeholder="次のシフトへ引き継ぐ重要事項"></textarea></div>
+  </div>
+  <div class="mf">
+    <button class="btn bo" onclick="closeM('mdly')">キャンセル</button>
+    <button class="btn bb" onclick="saveDailyRecord()">💾 保存</button>
+  </div>
+</div></div>
+
+<script>
+const TODAY=new Date().toISOString().split('T')[0];
+
+const S={
+  residents:[
+    {id:'r1',name:'山田 太郎',kana:'やまだたろう',room:'1',gender:'男性',birth:'1940-04-01',careLevel:'要介護4',entryDate:'2022-01-15',status:'入居中',doctor:'〇〇在宅クリニック',careManager:'田中CM（〇〇事業所）',history:'高血圧、心房細動、認知症（中等度）、前立腺肥大',allergy:'なし',emergency:'長男 山田次郎 080-xxxx-xxxx',notes:'内服薬多数。朝食後確認必要。認知症で指示が通りにくい場面あり。',notesUpdatedAt:'2026-05-18'},
+    {id:'r2',name:'佐藤 花子',kana:'さとうはなこ',room:'2-A',gender:'女性',birth:'1945-08-15',careLevel:'要介護3',entryDate:'2022-06-01',status:'入居中',history:'2型糖尿病（インスリン使用）、白内障術後、変形性膝関節症',allergy:'ペニシリン系',emergency:'娘 佐藤美子 090-xxxx-xxxx',notes:'血糖コントロール中。低血糖に注意。'},
+    {id:'r3',name:'鈴木 一郎',kana:'すずきいちろう',room:'3-A',gender:'男性',birth:'1938-11-03',careLevel:'要介護5',entryDate:'2021-09-10',status:'入居中',history:'脳梗塞後遺症（右片麻痺）、嚥下障害、誤嚥性肺炎既往、褥瘡既往',allergy:'なし',emergency:'妻 鈴木幸子 070-xxxx-xxxx',notes:'経口摂取困難。ミキサー食・とろみ必須。吸引機使用あり。'},
+    {id:'r4',name:'田中 清子',kana:'たなかきよこ',room:'4',gender:'女性',birth:'1942-02-18',careLevel:'要介護3',entryDate:'2023-02-20',status:'入居中',history:'骨粗鬆症、腰椎圧迫骨折術後、高血圧',allergy:'なし',emergency:'長男 田中健一 080-xxxx-xxxx',notes:'転倒リスク高。歩行器使用。立位時ふらつきあり。'},
+    {id:'r5',name:'伊藤 玲子',kana:'いとうれいこ',room:'5-A',gender:'女性',birth:'1944-07-30',careLevel:'要介護2',entryDate:'2023-08-01',status:'入居中',history:'高血圧、変形性膝関節症、軽度認知機能低下',allergy:'なし',emergency:'夫 伊藤一郎 090-xxxx-xxxx',notes:''},
+    {id:'r6',name:'渡辺 幸枝',kana:'わたなべゆきえ',room:'5-B',gender:'女性',birth:'1946-03-15',careLevel:'要介護2',entryDate:'2024-01-10',status:'入居中',history:'心不全（安定期）、慢性腎臓病、軽度貧血',allergy:'造影剤',emergency:'長女 渡辺真理 080-xxxx-xxxx',notes:'水分制限あり。体重測定毎朝必須。'},
+  ],
+  vitals:{},excretion:{},memos:[
+    {id:'m1',rid:'r3',tag:'urg',au:'担当者',tx:'吸引頻度が昨夜から増加。痰の性状→黄色・粘稠。主治医（マリン在宅）連絡済み。本日往診予定。全スタッフ注意。',t:'2026-05-17T08:30'},
+    {id:'m2',rid:'r1',tag:'med',au:'担当者',tx:'昨夜血圧高め（158/95→166/98）。本日朝も継続確認中。家族連絡・降圧薬調整検討。',t:'2026-05-17T09:15'},
+    {id:'m3',rid:'r4',tag:'care',au:'担当者',tx:'昨日リハビリ後に疲労強く夕食量低下。本日午前安静優先。食事量詳細記録。',t:'2026-05-16T15:00'},
+    {id:'m4',rid:'r6',tag:'med',au:'担当者',tx:'朝の体重測定：前日比+1.2kg。浮腫増悪の可能性。水分・排泄量の確認強化。主治医報告済み。',t:'2026-05-17T07:45'},
+  ],
+  drugs:{
+    r1:[{name:'アムロジピン錠5mg',dose:'1錠',timing:'朝食後',note:'降圧薬'},{name:'ワーファリン錠1mg',dose:'2錠',timing:'夕食後',note:'抗凝固薬・心房細動'},{name:'ドネペジル塩酸塩錠5mg',dose:'1錠',timing:'就寝前',note:'認知症治療薬'}],
+    r2:[{name:'ランタス注',dose:'10単位',timing:'就寝前',note:'持効型インスリン'},{name:'メトホルミン塩酸塩錠250mg',dose:'2錠',timing:'朝昼夕食後',note:'糖尿病薬'}],
+    r3:[{name:'アスピリン腸溶錠100mg',dose:'1錠',timing:'朝食後',note:'脳梗塞再発予防'}],
+  },
+  adl:{},daily:{},handovers:[],weights:{},cur:null,view:'dash'
+};
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const now=new Date();
+  // 日付表示
+  const hdEl=document.getElementById('hd');
+  if(hdEl) hdEl.textContent=now.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  // 入力フィールドの初期値
+  const setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  setVal('vd2',TODAY);setVal('vt2',now.toTimeString().slice(0,5));
+  setVal('vd',TODAY);setVal('exd',TODAY);
+  // モバイル対応
+  checkMobile();
+  // サンプルデータでUIを即時表示
+  initSample();
+  populateSels();renderDash();renderRG();updNB();
+  // クラウドをバックグラウンドで読み込み
+  loadCloudData();
+});
+
+// ════════════════════════════════════
+
+// ════════════════════════════════════
+// セキュリティ：PINロック
+// ════════════════════════════════════
+const APP_PIN = '1234'; // 初期PIN（設定画面で変更可能）
+let isUnlocked = false;
+
+function checkPin(){
+  // 既にアンロック済みまたはセッション内でアンロック済み
+  try{
+    if(sessionStorage.getItem('stella_unlocked')==='1'){isUnlocked=true;return true;}
+  }catch(e){}
+  return false;
+}
+
+function showPinLock(){
+  const overlay=document.createElement('div');
+  overlay.id='pin-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:#1a4a8a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:メイリオ,sans-serif';
+  overlay.innerHTML=`
+    <div style="text-align:center;color:#fff;margin-bottom:32px">
+      <div style="font-size:32px;margin-bottom:8px">⭐ STELLA</div>
+      <div style="font-size:18px;opacity:.8">介護記録システム</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border-radius:16px;padding:32px;width:280px;text-align:center">
+      <div style="color:#fff;font-size:16px;margin-bottom:16px">PINを入力してください</div>
+      <input type="password" id="pin-input" maxlength="4" inputmode="numeric"
+        style="width:120px;text-align:center;font-size:28px;letter-spacing:8px;padding:12px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;outline:none"
+        onkeydown="if(event.key==='Enter')submitPin()">
+      <div style="margin-top:16px">
+        <button onclick="submitPin()" style="background:#fff;color:#1a4a8a;border:none;padding:12px 32px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">ログイン</button>
+      </div>
+      <div id="pin-error" style="color:#fca5a5;font-size:13px;margin-top:12px;height:20px"></div>
+    </div>
+    <div style="color:rgba(255,255,255,.5);font-size:12px;margin-top:24px">有料老人ホームステラ</div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(()=>document.getElementById('pin-input')?.focus(),300);
+}
+
+function submitPin(){
+  const input=document.getElementById('pin-input');
+  const stored=localStorage.getItem('stella_pin')||APP_PIN;
+  if(input.value===stored){
+    isUnlocked=true;
+    try{sessionStorage.setItem('stella_unlocked','1');}catch(e){}
+    document.getElementById('pin-overlay')?.remove();
+  } else {
+    const err=document.getElementById('pin-error');
+    if(err){err.textContent='PINが違います';setTimeout(()=>{err.textContent='';},2000);}
+    input.value='';
+    input.focus();
+  }
+}
+
+function changePin(newPin){
+  localStorage.setItem('stella_pin',newPin);
+  toast('✅ PINを変更しました');
+}
+
+// SUPABASE設定
+// ════════════════════════════════════
+const SB_URL='https://cencmwdtnrkmihatmhol.supabase.co';
+// Stella2 新プロジェクト anon key
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlbmNtd2R0bnJrbWloYXRtaG9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MDQ4NTYsImV4cCI6MjA5NDk4MDg1Nn0.k0cCR2RWMTSdDVA5mprptd6Lh9SEc7LOXUhpye7luJ4';
+const SB_KEY_NEW='sb_publishable_TQOvxH6O4qsDeqdA92DdYw_xoryVhNK';
+
+async function sbFetch(path,opts={}){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000);
+  try{
+    // signalとheadersをoptsから分離（DataCloneError防止）
+    const {headers:extraHeaders,signal:_,method,body}=opts;
+    const res=await fetch(`${SB_URL}/rest/v1/${path}`,{
+      method:method||'GET',
+      body:body||undefined,
+      headers:{
+        'apikey':SB_KEY,
+        'Authorization':`Bearer ${SB_KEY}`,
+        'Content-Type':'application/json',
+        'Prefer':'return=representation',
+        ...(extraHeaders||{})
+      },
+      signal:controller.signal
+    });
+    clearTimeout(timer);
+    if(!res.ok){
+      const e=await res.text();
+      console.warn('DB接続エラー:',res.status,e);
+      throw new Error(e);
+    }
+    const txt=await res.text();
+    return txt?JSON.parse(txt):[];
+  }catch(e){
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+async function dbGet(table,params=''){
+  return await sbFetch(`${table}?${params}&order=created_at.asc`);
+}
+async function dbPost(table,data){ return await dbInsert(table,data); }
+async function dbInsert(table,data){
+  return await sbFetch(table,{method:'POST',body:JSON.stringify(data)});
+}
+async function dbUpdate(table,id,data){
+  return await sbFetch(`${table}?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(data)});
+}
+async function dbDelete(table,id){
+  return await sbFetch(`${table}?id=eq.${id}`,{method:'DELETE'});
+}
+
+// ════════════════════════════════════
+// REALTIME SYNC（複数端末対応）
+// ════════════════════════════════════
+let realtimeWS=null;
+let realtimeHB=null;
+let realtimePoll=null;
+let realtimeRetryCount=0;
+let realtimeEnabled=true;
+
+function startRealtime(){
+  // ローカルファイル（file://）ではWebSocketが使えないためポーリングで代替
+  if(location.protocol==='file:'){
+    console.info('ローカルファイル：ポーリングモードで同期します');
+    startPolling();
+    return;
+  }
+
+  if(realtimeWS){try{realtimeWS.close();}catch(e){}}
+  clearInterval(realtimeHB);
+
+  const wsUrl=SB_URL.replace('https://','wss://')+'/realtime/v1/websocket?apikey='+SB_KEY+'&vsn=1.0.0';
+  try{
+    realtimeWS=new WebSocket(wsUrl);
+  }catch(e){
+    // file://環境ではSecurityErrorが発生するためポーリングに切り替え
+    startPolling();
+    return;
+  }
+
+  realtimeWS.onopen=()=>{
+    realtimeRetryCount=0;
+    stopPolling(); // WebSocket成功時はポーリング停止
+    ['vitals','excretion','memos','daily_records','handovers','weights','residents'].forEach(table=>{
+      realtimeWS.send(JSON.stringify({
+        topic:`realtime:public:${table}`,event:'phx_join',
+        payload:{config:{broadcast:{self:false},presence:{key:''},postgres_changes:[{event:'*',schema:'public',table}]}},
+        ref:`join_${table}`
+      }));
+    });
+    realtimeHB=setInterval(()=>{
+      if(realtimeWS&&realtimeWS.readyState===1){
+        realtimeWS.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:'hb'}));
+      }
+    },25000);
+    showStatus('🔄 リアルタイム同期ON','green');
+  };
+
+  realtimeWS.onmessage=async(evt)=>{
+    try{
+      const msg=JSON.parse(evt.data);
+      if(msg.event!=='postgres_changes')return;
+      const {table}=msg.payload?.data||{};
+      if(!table)return;
+      await reloadTable(table);
+      refreshCurrentPage(S.view);
+      showStatus('🔄 他の端末が更新しました','blue');
+    }catch(e){}
+  };
+
+  realtimeWS.onclose=()=>{
+    clearInterval(realtimeHB);
+    realtimeRetryCount++;
+    // 3回失敗したらポーリングに切り替え
+    if(realtimeRetryCount>=3){
+      console.info('WebSocket接続失敗：ポーリングモードに切り替えます');
+      startPolling();
+      return;
+    }
+    const delay=Math.min(5000*realtimeRetryCount,30000);
+    setTimeout(()=>{if(document.visibilityState!=='hidden'&&realtimeEnabled)startRealtime();},delay);
+  };
+  realtimeWS.onerror=()=>{realtimeWS.close();};
+}
+
+// ポーリング（30秒ごとにデータ更新）- file://環境・WebSocket失敗時の代替
+function startPolling(){
+  stopPolling();
+  realtimePoll=setInterval(async()=>{
+    try{
+      await Promise.all(['vitals','excretion','memos','daily_records','weights'].map(t=>reloadTable(t)));
+      refreshCurrentPage(S.view);
+    }catch(e){}
+  },120000);
+  showStatus('☁️ クラウド接続中','blue');
+}
+
+function stopPolling(){
+  if(realtimePoll){clearInterval(realtimePoll);realtimePoll=null;}
+}
+
+function refreshCurrentPage(view){
+  try{
+    renderDash(); // 常にダッシュボードを更新
+    // バイタル入力中は再描画しない（入力データ保護）
+    if(view==='vit'){
+      // 入力テーブルは再描画せず、履歴タブのみ更新
+      if(document.getElementById('vt-history')&&!document.getElementById('vt-history').classList.contains('h')){
+        loadVHistory();
+      }
+    }
+    else if(view==='ex'){
+      // 排泄チェック表入力中はS.excretionを上書きしない
+      // （reloadTableで既に更新済み、表示のみ更新）
+      renderEx();
+    }
+    else if(view==='daily')loadDaily();
+    else if(view==='memo')renderMemos();
+    else if(view==='weight')renderWeight();
+    else if(view==='handover')renderHandover();
+  }catch(e){}
+}
+
+// テーブル単位の再読み込み
+async function reloadTable(table){
+  try{
+    if(table==='vitals'){
+      // バイタル入力タブ表示中は上書きしない（入力データ保護）
+      const inputTab=document.getElementById('vt-input');
+      const isInputting=inputTab&&!inputTab.classList.contains('h')&&S.view==='vit';
+      if(isInputting){return;}
+      const data=await dbGet('vitals');
+      // ローカルのみのデータ（Supabase未保存）を保護
+      const newVitals={};
+      data.forEach(v=>{if(!newVitals[v.resident_id])newVitals[v.resident_id]=[];newVitals[v.resident_id].push(v);});
+      // 既存ローカルデータとマージ（Supabaseにあるものは上書き、ないものは保持）
+      S.residents.forEach(r=>{
+        const local=(S.vitals[r.id]||[]).filter(v=>!v.id||v.id.startsWith('local_'));
+        S.vitals[r.id]=[...(newVitals[r.id]||[]),...local];
+        S.vitals[r.id].sort((a,b)=>a.date?.localeCompare(b.date)||a.time?.localeCompare(b.time));
+      });
+    } else if(table==='excretion'){
+      // 排泄チェック表入力中はリロードしない
+      const isExView = S.view==='ex';
+      if(isExView){ return; }
+      const data=await dbGet('excretion');
+      S.excretion={};
+      data.forEach(e=>{
+        if(!S.excretion[e.date])S.excretion[e.date]={};
+        if(!S.excretion[e.date][e.resident_id])S.excretion[e.date][e.resident_id]={};
+        S.excretion[e.date][e.resident_id][e.hour]={id:e.id,type:e.type,amt:e.amount,bristol:e.bristol?e.bristol.split(',').map(Number).filter(Boolean):[],tekibin:e.tekibin==='1',sleep:e.sleep?parseInt(e.sleep):null};
+      });
+    } else if(table==='memos'){
+      // メモ入力モーダルが開いている場合はリロードしない
+      const memoModal=document.getElementById('mm');
+      if(memoModal&&!memoModal.classList.contains('h')){ return; }
+      const data=await dbGet('memos');
+      S.memos=data;
+    } else if(table==='daily_records'){
+      const data=await dbGet('daily_records');
+      S.daily_records=data;
+    } else if(table==='weights'){
+      const data=await dbGet('weights');
+      S.weights={};
+      data.forEach(w=>{if(!S.weights[w.resident_id])S.weights[w.resident_id]=[];S.weights[w.resident_id].push(w);});
+    } else if(table==='residents'){
+      const data=await dbGet('residents');
+      // 既存のローカルデータとマージ
+      if(data&&data.length>0)S.residents=data;
+    }
+  }catch(e){console.warn('reloadTable error:',e);}
+}
+
+// visibilitychange: 画面復帰時に再接続
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    if(location.protocol==='file:'||realtimeRetryCount>=3){
+      // ポーリングモードなら手動更新
+      if(!realtimePoll) startPolling();
+    } else {
+      if(!realtimeWS||realtimeWS.readyState>1) startRealtime();
+    }
+  }
+});
+
+
+// ステータス表示
+function showStatus(msg,color='blue'){
+  let el=document.getElementById('db-status');
+  if(!el){
+    el=document.createElement('div');
+    el.id='db-status';
+    Object.assign(el.style,{
+      fontSize:'11px',fontWeight:'600',padding:'3px 10px',
+      borderRadius:'12px',fontFamily:'inherit',
+      background:'rgba(255,255,255,.15)',color:'#fff',
+      whiteSpace:'nowrap',transition:'.3s',flexShrink:'0'
+    });
+    // ヘッダーに追加（安全な方法）
+    const hdr=document.getElementById('hdr');
+    if(hdr) hdr.appendChild(el);
+    else document.body.appendChild(el);
+  }
+  el.textContent=msg;
+  if(color!=='red'){
+    clearTimeout(el._timer);
+    el._timer=setTimeout(()=>{if(el)el.textContent='☁️ 接続中';},3000);
+  }
+}
+
+// ════════════════════════════════════
+// DB初期化：クラウドからデータ読み込み
+// ════════════════════════════════════
+// クラウドをバックグラウンドで読み込む（UIをブロックしない）
+function loadCloudData(){
+  // PINロック確認
+if(!checkPin()){showPinLock();}
+setTimeout(async ()=>{
+    try{
+      showStatus('⏳ クラウド読み込み中...','blue');
+      const p=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),10000));
+      await Promise.race([initDB(),p]);
+      populateSels();renderDash();renderRG();updNB();
+      initStaffSel();
+      initStaffList();
+      showStatus('✅ クラウドに接続しました','green');
+      startRealtime();
+    }catch(e){
+      console.warn('クラウド接続失敗（オフラインモード）:',e.message);
+      showStatus('⚠️ オフラインモード','red');
+    }
+  },100);
+}
+
+async function initDB(){
+  try{
+    showStatus('⏳ データ読み込み中...','blue');
+    const [residents,vitalsRaw,excRaw,memosRaw,drugsRaw,dailyRaw,handoversRaw,weightsRaw]=await Promise.all([
+      dbGet('residents'),dbGet('vitals'),dbGet('excretion'),dbGet('memos'),dbGet(),
+      dbGet('daily_records'),dbGet('handovers'),dbGet('weights')
+    ]);
+    // 利用者
+    if(residents.length>0){
+      S.residents=residents.map(r=>({
+        id:String(r.id),name:r.name,kana:r.kana||'',room:r.room||'',gender:r.gender||'',
+        birth:r.birth||'',careLevel:r.care_level||'',status:r.status||'入居中',
+        entryDate:r.entry_date||'',dischargeDate:r.discharge_date||'',
+        doctor:r.doctor||'',careManager:r.care_manager||'',welfareVendor:r.welfare_vendor||'',
+        history:r.history||'',allergy:r.allergy||'',emergency:r.emergency||'',
+        notes:r.notes||'',notesUpdatedAt:r.notes_updated_at||''
+      }));
+    }
+    // バイタル
+    S.vitals={};S.residents.forEach(r=>{S.vitals[r.id]=[];});
+    vitalsRaw.forEach(v=>{
+      if(!S.vitals[v.resident_id])S.vitals[v.resident_id]=[];
+      S.vitals[v.resident_id].push({id:v.id,date:v.date,time:v.time,temp:v.temp,pls:v.pls||v.pulse,bph:v.bph||v.bp_high,bpl:v.bpl||v.bp_low,spo:v.spo||v.spo2,rsp:v.rsp||v.resp,nt:v.nt||v.notes||'',tr:v.tr||v.treatment||'',sg:v.sg||v.sign||''});
+    });
+    // 排泄
+    S.excretion={};
+    excRaw.forEach(e=>{
+      if(!S.excretion[e.date])S.excretion[e.date]={};
+      if(!S.excretion[e.date][e.resident_id])S.excretion[e.date][e.resident_id]={};
+      S.excretion[e.date][e.resident_id][e.hour]={id:e.id,type:e.type,amt:e.amount,bristol:e.bristol?e.bristol.split(',').map(Number).filter(Boolean):[],tekibin:e.tekibin==='1',sleep:e.sleep?parseInt(e.sleep):null};
+    });
+    // メモ
+    S.memos=memosRaw.map(m=>({id:m.id,rid:m.resident_id,tag:m.tag,au:m.author,tx:m.content,t:m.created_at?.slice(0,16)||''}));
+    // 薬情
+    // S.drugs削除済みS.residents.forEach(r=>{S.drugs[r.id]=[];});
+    drugsRaw.forEach(d=>{
+      if(!S.drugs[d.resident_id])S.drugs[d.resident_id]=[];
+      S.drugs[d.resident_id].push({id:d.id,name:d.name,dose:d.dose,timing:d.timing,note:d.note});
+    });
+    // 日々の記録
+    S.daily={};S.residents.forEach(r=>{S.daily[r.id]=[];});
+    dailyRaw.forEach(d=>{
+      if(!S.daily[d.resident_id])S.daily[d.resident_id]=[];
+      S.daily[d.resident_id].push({
+        id:d.id,rid:d.resident_id,date:d.date,time:d.time,author:d.author,
+        meal_mm:d.meal_mm,meal_ms:d.meal_ms,meal_lm:d.meal_lm,meal_ls:d.meal_ls,
+        meal_em:d.meal_em,meal_es:d.meal_es,meal_note:d.meal_note,
+        bath:d.bath,oral:d.oral,activity:d.activity,act_note:d.act_note,
+        condition:d.condition,mood:d.mood,observation:d.observation,
+        care:d.care,handover:d.handover,
+        created:d.created_at?.slice(0,16)||d.date
+      });
+    });
+    // 申し送り
+    S.handovers=handoversRaw.map(h=>({
+      id:h.id,date:h.date,shift:h.shift,author:h.author,
+      urgent:h.urgent||'',ops:h.ops||'',next:h.next||'',
+      residents:h.residents_json?JSON.parse(h.residents_json):{},
+      created:h.created_at?.slice(0,16)||h.date
+    }));
+    // 体重
+    S.weights={};S.residents.forEach(r=>{S.weights[r.id]=[];});
+    weightsRaw.forEach(w=>{
+      if(!S.weights[w.resident_id])S.weights[w.resident_id]=[];
+      S.weights[w.resident_id].push({id:w.id,date:w.date,weight:w.weight,note:w.note||''});
+    });
+    // データが空の場合はサンプルデータを投入
+    if(residents.length===0){await seedSampleData();}
+  }catch(e){
+    console.error('DB接続エラー:',e);
+    showStatus('⚠️ オフラインモード','red');
+    initSample();
+  }
+}
+
+// Init sample data to DB (first time only)
+async function seedSampleData(){
+  showStatus('⏳ 初期データを設定中...','blue');
+  for(const r of S.residents){
+    try{
+      const res=await dbInsert('residents',{
+        id:r.id,
+        name:r.name,kana:r.kana,room:r.room,gender:r.gender,
+        birth:r.birth,care_level:r.careLevel,status:r.status||'入居中',
+        entry_date:r.entryDate,history:r.history,
+        allergy:r.allergy,emergency:r.emergency,notes:r.notes
+      });
+    }catch(e){console.error('seed resident error',e);}
+  }
+  showStatus('✅ 初期データを保存しました','green');
+}
+
+function initSample(){
+  const days=['2026-05-15','2026-05-16','2026-05-17'];
+  S.residents.forEach(r=>{
+    S.vitals[r.id]=[];
+    days.forEach(d=>{S.vitals[r.id].push({id:rnd(),date:d,time:d===TODAY?'09:00':'08:30',
+      temp:(36.0+Math.random()*1.2).toFixed(1),pls:Math.floor(62+Math.random()*30),
+      bph:Math.floor(110+Math.random()*55),bpl:Math.floor(65+Math.random()*28),
+      spo:Math.floor(93+Math.random()*6),rsp:Math.floor(14+Math.random()*6),
+      uri:'あり',stl:Math.random()>.5?'あり':'なし',nt:'',tr:'',sg:'当番'});});
+  });
+  S.excretion[TODAY]={};
+  S.residents.forEach(r=>{
+    S.excretion[TODAY][r.id]={};
+    [8,10,12,14,16,18,20].forEach(h=>{
+      const v=Math.random();
+      if(v<.35)S.excretion[TODAY][r.id][h]={type:'U'};
+      else if(v<.55)S.excretion[TODAY][r.id][h]={type:'S',amt:Math.ceil(Math.random()*3),bristol:Math.ceil(Math.random()*7)};
+      else if(v<.6)S.excretion[TODAY][r.id][h]={type:'B',amt:2};
+    });
+  });
+}
+
+function gv(v){
+  document.querySelectorAll('[id^="v-"]').forEach(e=>e.classList.add('h'));
+  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('on'));
+  document.getElementById('v-'+v).classList.remove('h');
+  const n=document.getElementById('n-'+v);if(n)n.classList.add('on');
+  S.view=v;
+  if(v==='dash')renderDash();
+  else if(v==='res')renderRG();
+  else if(v==='vit'){initVitalPage();}
+  else if(v==='ex'){document.getElementById('exd').value=TODAY;renderEx();}
+  else if(v==='weight'){populateWeightSel();renderWeight();}
+  else if(v==='handover'){document.getElementById('ho-date').value=TODAY;renderHandover();}
+  else if(v==='daily'){popDlySelects();document.getElementById('dly-date').value=TODAY;loadDaily();}
+  else if(v==='det'){popS('ds2');if(S.cur)document.getElementById('ds2').value=S.cur;loadDet();}
+  else if(v==='discharged'){renderDischarged();}
+  else if(v==='settings'){renderSettings();}
+  else if(v==='memo'){popMF();popMM();renderMemos();}
+}
+
+function renderDash(){
+  const activeRes=S.residents.filter(r=>r.status==='入居中'||r.status===''||r.status===undefined||r.status===null).filter(r=>!r.dischargeDate||r.dischargeDate==='');
+  const tot=activeRes.length;
+  // シフト別バイタル記録済判定
+  const h=new Date().getHours(),m2=new Date().getMinutes();
+  const nowMin=h*60+m2;
+  // 日勤: 8:30〜17:30 → 510〜1050分
+  // 準夜勤: 17:30〜24:15 → 1050〜1455分
+  // 深夜: 0:00〜9:00 → 0〜540分
+  let shiftStart;
+  let shiftLabel;
+  if(nowMin>=510&&nowMin<1050){shiftStart='08:30';shiftLabel='日勤';}
+  else if(nowMin>=1050){shiftStart='17:30';shiftLabel='準夜勤';}
+  else{shiftStart='00:00';shiftLabel='深夜勤';}
+  const rec=activeRes.filter(r=>{
+    const vitals=(S.vitals[r.id]||[]).filter(v=>v.date===TODAY);
+    if(!vitals.length)return false;
+    // シフト開始以降に記録されたバイタルがあるか
+    return vitals.some(v=>v.time>=shiftStart);
+  }).length;
+  const urg=S.memos.filter(m=>m.tag==='urg').length,tm=S.memos.filter(m=>m.t.startsWith(TODAY)).length;
+  document.getElementById('ds').innerHTML=`
+    <div class="sc"><div class="sn">${tot}</div><div class="sl">👥 入居者数</div></div>
+    <div class="sc"><div class="sn" style="color:${rec===tot?'var(--green)':'var(--amber2)'}">${rec}</div><div class="sl">✅ ${shiftLabel}バイタル済</div><div class="ss" style="color:var(--ink3)">残り${tot-rec}名</div></div>
+    <div class="sc"><div class="sn" style="color:${urg?'var(--rose2)':'var(--green)'}">${urg}</div><div class="sl">⚠️ 緊急メモ</div></div>
+    <div class="sc"><div class="sn" style="color:var(--amber2)">${tm}</div><div class="sl">📝 本日のメモ</div></div>`;
+
+  // 特記事項更新通知（2〜3日以内に更新されたもの）
+  const recentNotes=S.residents.filter(r=>{
+    if(!r.notesUpdatedAt||!r.notes) return false;
+    const diff=Math.floor((new Date(TODAY)-new Date(r.notesUpdatedAt))/(1000*60*60*24));
+    return diff<=3;
+  });
+  const notesEl=document.getElementById('ds-notes-alert');
+  if(notesEl){
+    if(recentNotes.length){
+      notesEl.classList.remove('h');
+      notesEl.innerHTML=`<div style="font-weight:700;font-size:14px;color:var(--amber);margin-bottom:8px">📌 特記事項が更新されました（直近3日以内）</div>
+        ${recentNotes.map(r=>`<div style="background:#fff;border-radius:8px;padding:9px 12px;margin-bottom:6px;border-left:3px solid var(--amber2)">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px">${r.room}号室 ${r.name} <span style="font-size:11px;color:var(--ink3);font-weight:400">（更新日：${r.notesUpdatedAt}）</span></div>
+          <div style="font-size:13px;color:var(--amber)">${r.notes}</div>
+        </div>`).join('')}`;
+    } else {
+      notesEl.classList.add('h');
+    }
+  }
+
+  const unr=activeRes.filter(r=>!(S.vitals[r.id]||[]).some(v=>v.date===TODAY&&v.time>=shiftStart));
+  document.getElementById('du').innerHTML=unr.length?unr.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--bd)"><span>${r.room}号室 <strong>${r.name}</strong></span><button class="btn bb xs" onclick="qV('${r.id}')">記録する</button></div>`).join(''):'<div style="color:var(--green);padding:10px;text-align:center">✅ 全員記録済みです</div>';
+  // ダッシュボードのメモ：表示期間内のものだけ表示
+  const now2=new Date();
+  const activeMemos=[...S.memos].filter(m=>{
+    const start=m.startDate||'2000-01-01';
+    if(TODAY<start) return false; // まだ表示開始前
+    if(!m.expiry) return true;    // 期限なし
+    return m.expiry>=TODAY;       // 期限内
+  }).sort((a,b)=>b.t.localeCompare(a.t)).slice(0,4);
+  document.getElementById('dm').innerHTML=activeMemos.length?activeMemos.map(m=>{
+    const r=S.residents.find(x=>x.id===m.rid);
+    const periodLabel=(m.startDate||m.expiry)?`<span style="font-size:10px;color:var(--ink3)">${m.startDate?m.startDate:''}${m.expiry?`〜${m.expiry}`:''}</span>`:'';
+    return`<div style="padding:6px 2px;border-bottom:1px solid var(--bd)"><div style="display:flex;justify-content:space-between;align-items:center;gap:4px"><strong style="font-size:13px">${r?.name||'全体'}</strong><div style="display:flex;align-items:center;gap:4px"><span class="pl ${tp(m.tag)}">${tl(m.tag)}</span>${periodLabel}</div></div><div style="font-size:12px;color:var(--ink3);margin-top:2px">${m.tx.slice(0,55)}${m.tx.length>55?'…':''}</div></div>`;
+  }).join(''):'<div style="color:var(--ink3);padding:10px;text-align:center">表示期間内のメモなし</div>';
+  const ex=S.excretion[TODAY]||{};
+  document.getElementById('dex').innerHTML='<div style="display:flex;flex-wrap:wrap;gap:7px">'+S.residents.map(r=>{const d=ex[r.id]||{};const u=Object.values(d).filter(v=>v&&(v.type==='U'||v.type==='B')).length;const s=Object.values(d).filter(v=>v&&(v.type==='S'||v.type==='B')).length;return`<div style="background:var(--sf2);border-radius:7px;padding:6px 10px;display:flex;align-items:center;gap:7px"><strong style="font-size:12px">${r.name}</strong><span style="color:#1d4ed8;font-size:12px">💧${u}</span><span style="color:#92400e;font-size:12px">💩${s}</span></div>`;}).join('')+'</div>';
+  // 申し送りサマリー（現在のシフト帯に応じた表示）
+  const relevantHO=getRelevantHandovers();
+  const curShift=getCurrentShift();
+  const hoEl=document.getElementById('dho');
+  if(!relevantHO.length){
+    hoEl.innerHTML=`<div style="color:var(--ink3);font-size:14px;padding:6px 0">申し送りはまだありません <span class="pl pa" style="margin-left:6px">現在: ${curShift}</span></div>`;
+  } else {
+    const shiftOrder=['早番','日勤','遅番','夜勤'];
+    const sorted=[...relevantHO].sort((a,b)=>b.date.localeCompare(a.date)||shiftOrder.indexOf(a.shift)-shiftOrder.indexOf(b.shift));
+    hoEl.innerHTML=`<div style="font-size:12px;color:var(--ink3);margin-bottom:6px">現在のシフト: <span class="pl pb">${curShift}</span></div>`+
+    sorted.map(h=>{
+      const sh=SHIFTS.find(s=>s.val===h.shift)||{ic:'📋',color:'var(--ink)',bg:'var(--sf2)'};
+      const isYest=h.date!==TODAY;
+      return`<div style="padding:7px;border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-weight:700;font-size:14px;color:${sh.color};white-space:nowrap">${sh.ic} ${h.shift}</span>
+        ${isYest?`<span class="pl pa" style="font-size:11px">前日</span>`:''}
+        <span style="font-size:13px;color:var(--ink3)">${(h.created||h.date).replace('T',' ')} ${h.author}</span>
+        ${h.urgent?`<span class="pl pr" style="font-size:11px">⚠️ 緊急あり</span>`:''}
+        <button class="btn bo xs" onclick="gv('handover')" style="margin-left:auto">詳細</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderRG(){
+  document.getElementById('rg').innerHTML=S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>{
+    const age=calcAge(r.birth),lv=(S.vitals[r.id]||[]).slice(-1)[0];
+    const bp=lv&&parseInt(lv.bph)>150,sp=lv&&parseInt(lv.spo)<95;
+    return`<div class="rc ${S.cur===r.id?'sel':''}" onclick="selR('${r.id}')">
+      <div class="av">${r.name.charAt(0)}</div>
+      <div class="rname">${r.name}</div><div class="rsub">🏠${r.room} ・ ${age}歳 ・ ${r.gender}</div>
+      <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center">
+        <span class="pl pb">${r.careLevel}</span>${bp?'<span class="pl pr">BP高め</span>':''}${sp?'<span class="pl pa">SpO₂低下</span>':''}
+      </div></div>`;
+  }).join('');
+}
+function selR(id){S.cur=id;document.getElementById('ds2').value=id;gv('det');}
+
+// ════ バイタル表示モード ════
+let vMode='individual';
+function setVMode(m){
+  vMode=m;
+  document.getElementById('vs').style.display=m==='individual'?'':'none';
+  document.getElementById('vmode-ind').classList.toggle('on',m==='individual');
+  document.getElementById('vmode-all').classList.toggle('on',m==='all');
+  loadV();
+}
+
+// バイタルページ初期化
+function initVitalPage(){
+  // デフォルトは個人履歴タブ
+  switchVTab('history',document.getElementById('vtab-history'));
+  const now=new Date();
+  const vd=document.getElementById('vd');
+  const vt=document.getElementById('vt');
+  if(vd&&!vd.value) vd.value=TODAY;
+  if(vt&&!vt.value) vt.value=now.toTimeString().slice(0,5);
+  const sel=document.getElementById('vh-sel');
+  if(sel){
+    sel.innerHTML='<option value="">利用者を選択</option>'+
+      S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('');
+  }
+  renderVitalInput();
+}
+
+// タブ切替
+function switchVTab(tab,btn){
+  ['input','history'].forEach(t=>{
+    const el=document.getElementById('vt-'+t);
+    if(el) el.classList.toggle('h',t!==tab);
+  });
+  document.querySelectorAll('#v-vit .tab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  // タブに応じてヘッダー切替
+  const saveAll=document.getElementById('btn-save-all');
+  const title=document.getElementById('vit-page-title');
+  const vd=document.getElementById('vd');
+  const vt=document.getElementById('vt');
+  if(tab==='input'){
+    if(saveAll) saveAll.classList.remove('h');
+    if(vd) vd.classList.remove('h');
+    if(vt) vt.classList.remove('h');
+    if(title) title.textContent='📊 バイタル一括入力';
+  } else {
+    if(saveAll) saveAll.classList.add('h');
+    if(vd) vd.classList.add('h');
+    if(vt) vt.classList.add('h');
+    if(title) title.textContent='📋 個人バイタル';
+  }
+  if(tab==='history') loadVHistory();
+}
+
+// サイン自動反映：バイタル値が1つ以上入力されている行のみ反映
+// ════════════════════════════════════
+// 設定：スタッフ管理・PIN変更
+// ════════════════════════════════════
+
+// スタッフリスト初期化
+function initStaffList(){
+  if(!S.staffList){
+    try{
+      const saved=localStorage.getItem('stella_staff_list');
+      S.staffList=saved?JSON.parse(saved):['松久正継','今井隆二'];
+    }catch(e){S.staffList=['松久正継','今井隆二'];}
+  }
+  updateStaffSelector();
+}
+
+// スタッフセレクターを更新
+function updateStaffSelector(){
+  const sel=document.getElementById('staff-sel');
+  if(sel){
+    const cur=sel.value;
+    sel.innerHTML='<option value="" style="color:#000">スタッフ選択</option>'+
+      (S.staffList||[]).map(s=>`<option value="${s}" style="color:#000">${s}</option>`).join('');
+    if(cur) sel.value=cur;
+  }
+}
+
+// スタッフ追加
+function addStaff(){
+  const input=document.getElementById('new-staff-name');
+  const name=input?.value.trim();
+  if(!name){toast('⚠️ スタッフ名を入力してください');return;}
+  if(!S.staffList) S.staffList=[];
+  if(S.staffList.includes(name)){toast('⚠️ すでに登録されています');return;}
+  S.staffList.push(name);
+  try{localStorage.setItem('stella_staff_list',JSON.stringify(S.staffList));}catch(e){}
+  input.value='';
+  renderStaffList();
+  updateStaffSelector();
+  toast(`✅ ${name} を追加しました`);
+}
+
+// スタッフ削除
+function removeStaff(name){
+  if(!confirm(`「${name}」を削除しますか？`))return;
+  S.staffList=(S.staffList||[]).filter(s=>s!==name);
+  try{localStorage.setItem('stella_staff_list',JSON.stringify(S.staffList));}catch(e){}
+  renderStaffList();
+  updateStaffSelector();
+  toast(`🗑 ${name} を削除しました`);
+}
+
+// スタッフ一覧を描画
+function renderStaffList(){
+  const el=document.getElementById('staff-list');
+  if(!el)return;
+  if(!S.staffList||!S.staffList.length){
+    el.innerHTML='<div style="color:var(--ink3);font-size:13px">スタッフが登録されていません</div>';
+    return;
+  }
+  el.innerHTML=S.staffList.map(s=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--sf2);border-radius:8px;margin-bottom:6px">
+      <span style="font-size:14px;font-weight:600">👤 ${s}</span>
+      <button class="btn br xs" onclick="removeStaff('${s}')">削除</button>
+    </div>`).join('');
+}
+
+// PIN変更UI
+function changePinUI(){
+  const cur=document.getElementById('current-pin')?.value;
+  const np=document.getElementById('new-pin')?.value;
+  const np2=document.getElementById('new-pin2')?.value;
+  const msg=document.getElementById('pin-msg');
+  const stored=localStorage.getItem('stella_pin')||APP_PIN;
+  if(cur!==stored){
+    if(msg){msg.textContent='❌ 現在のPINが違います';msg.style.color='var(--rose2)';}
+    return;
+  }
+  if(!np||np.length!==4||!/^\d{4}$/.test(np)){
+    if(msg){msg.textContent='❌ 新しいPINは4桁の数字で入力してください';msg.style.color='var(--rose2)';}
+    return;
+  }
+  if(np!==np2){
+    if(msg){msg.textContent='❌ PINが一致しません';msg.style.color='var(--rose2)';}
+    return;
+  }
+  localStorage.setItem('stella_pin',np);
+  ['current-pin','new-pin','new-pin2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  if(msg){msg.textContent='✅ PINを変更しました';msg.style.color='var(--green)';}
+  setTimeout(()=>{if(msg)msg.textContent='';},3000);
+}
+
+// 設定ページを開く
+function renderSettings(){
+  initStaffList();
+  renderStaffList();
+}
+
+
+let currentStaff='';
+
+function setCurrentStaff(name){
+  currentStaff=name;
+  try{localStorage.setItem('stella_staff',name);}catch(e){}
+  const hd=document.getElementById('hd');
+  if(hd) hd.textContent=name?`👤 ${name}`:'';
+  applyStaffSignAll();
+}
+
+function applyStaffSignAll(){
+  if(!currentStaff) return;
+  // バイタル個人入力フォーム
+  const viSg=document.getElementById('vi-form-sg');
+  if(viSg&&!viSg.value) viSg.value=currentStaff;
+  // 日々の記録
+  const dlySg=document.getElementById('dly-au');
+  if(dlySg&&!dlySg.value) dlySg.value=currentStaff;
+  // 共有メモ
+  const mmAu=document.getElementById('mm-au');
+  if(mmAu&&!mmAu.value) mmAu.value=currentStaff;
+  // バイタル一括入力（バイタル入力済み行のみ）
+  (S.residents||[]).filter(r=>!r.status||r.status==='入居中').forEach(r=>{
+    const sg=document.getElementById(`vi-sg-${r.id}`);
+    if(sg&&!sg.value){
+      const hasVital=['temp','pls','bph','bpl','spo','rsp'].some(f=>{
+        const el=document.getElementById(`vi-${f}-${r.id}`);
+        return el&&el.value.trim()!=='';
+      });
+      if(hasVital) sg.value=currentStaff;
+    }
+  });
+}
+
+function getStaffSign(){return currentStaff||'';}
+
+function initStaffSel(){
+  try{
+    const saved=localStorage.getItem('stella_staff');
+    if(saved){
+      const sel=document.getElementById('staff-sel');
+      if(sel) sel.value=saved;
+      setCurrentStaff(saved);
+    }
+  }catch(e){}
+}
+
+function autoFillSign(inputEl){
+  const val=inputEl.value.trim();
+  if(!val) return;
+  const residents=S.residents.filter(r=>!r.status||r.status==='入居中');
+  residents.forEach(r=>{
+    const sgEl=document.getElementById(`vi-sg-${r.id}`);
+    if(!sgEl||sgEl.value) return; // 既に入力済みはスキップ
+    // バイタル値が1つでも入力されているか確認
+    const hasVital=['temp','pls','bph','bpl','spo','rsp'].some(f=>{
+      const el=document.getElementById(`vi-${f}-${r.id}`);
+      return el&&el.value.trim()!=='';
+    });
+    // 特記事項・処置も確認
+    const hasNote=['nt','tr'].some(f=>{
+      const el=document.getElementById(`vi-${f}-${r.id}`);
+      return el&&el.value.trim()!=='';
+    });
+    if(hasVital||hasNote) sgEl.value=val;
+  });
+}
+
+// 全員一括入力テーブル描画
+function renderVitalInput(){
+  const date=document.getElementById('vd')?.value||TODAY;
+  const body=document.getElementById('vit-input-body');
+  if(!body) return;
+  const residents=S.residents.filter(r=>!r.status||r.status==='入居中');
+  body.innerHTML=residents.map(r=>{
+    const ref=S.vitalRef?.[r.id]||{};
+    const existing=(S.vitals[r.id]||[]).find(v=>v.date===date);
+    const val=(f)=>existing?.[f]||'';
+    const inp=(field,placeholder,w,min,max)=>
+      `<input type="number" id="vi-${field}-${r.id}" value="${val(field)}" placeholder="${placeholder}"
+        oninput="checkVital('${r.id}','${field}',this.value,${min},${max})">`;
+    return `<tr id="vrow-${r.id}">
+      <td style="text-align:left;font-weight:600;word-break:break-all;font-size:12px">
+        ${r.room}号<br>${r.name}
+        ${existing?'<br><span style="font-size:10px;color:var(--green)">✅済</span>':''}
+      </td>
+      <td>${inp('temp','36.5',65,ref.tempMin||35.5,ref.tempMax||37.4)}</td>
+      <td>${inp('pls','75',55,ref.plsMin||50,ref.plsMax||100)}</td>
+      <td>${inp('bph','120',58,ref.bphMin||90,ref.bphMax||149)}</td>
+      <td>${inp('bpl','80',58,ref.bplMin||60,ref.bplMax||89)}</td>
+      <td>${inp('spo','98',58,ref.spoMin||95,100)}</td>
+      <td>${inp('rsp','16',50,ref.rspMin||12,ref.rspMax||20)}</td>
+      <td><textarea id="vi-nt-${r.id}" placeholder="特記事項" rows="2">${val('nt')}</textarea></td>
+      <td><textarea id="vi-tr-${r.id}" placeholder="処置" rows="2">${val('tr')}</textarea></td>
+      <td><input type="text" id="vi-sg-${r.id}" value="${val('sg')}" placeholder="記録者"
+        onblur="autoFillSign(this)"></td>
+    </tr>`;
+  }).join('');
+}
+
+// 基準値チェックで色変更
+function checkVital(rid,field,val,min,max){
+  const el=document.getElementById(`vi-${field}-${rid}`);
+  if(!el) return;
+  const v=parseFloat(val);
+  if(!val||isNaN(v)){
+    el.style.borderColor='';el.style.color='';el.style.background='';
+    return;
+  }
+  if(v<min||v>max){
+    el.style.borderColor='var(--rose2)';el.style.color='var(--rose2)';el.style.background='var(--rose3)';
+  } else {
+    el.style.borderColor='';el.style.color='';el.style.background='';
+  }
+}
+
+// 全員一括保存
+async function saveAllVitals(){
+  const date=document.getElementById('vd').value;
+  const time=document.getElementById('vt').value;
+  if(!date||!time){toast('⚠ 日付と時間を入力してください');return;}
+  const residents=S.residents.filter(r=>!r.status||r.status==='入居中');
+  let saved=0;
+  for(const r of residents){
+    const temp=document.getElementById(`vi-temp-${r.id}`)?.value;
+    const pls=document.getElementById(`vi-pls-${r.id}`)?.value;
+    const bph=document.getElementById(`vi-bph-${r.id}`)?.value;
+    const bpl=document.getElementById(`vi-bpl-${r.id}`)?.value;
+    const spo=document.getElementById(`vi-spo-${r.id}`)?.value;
+    const rsp=document.getElementById(`vi-rsp-${r.id}`)?.value;
+    const nt=document.getElementById(`vi-nt-${r.id}`)?.value||'';
+    const tr=document.getElementById(`vi-tr-${r.id}`)?.value||'';
+    const sg=document.getElementById(`vi-sg-${r.id}`)?.value||'';
+    if(!temp&&!pls&&!bph&&!bpl&&!spo&&!rsp&&!nt&&!tr) continue;
+    const entry={id:rnd(),date,time,temp:temp||'',pls:pls||'',bph:bph||'',bpl:bpl||'',spo:spo||'',rsp:rsp||'',nt,tr,sg};
+    if(!S.vitals[r.id]) S.vitals[r.id]=[];
+    S.vitals[r.id].push(entry);
+    S.vitals[r.id].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+    saved++;
+    try{await dbPost('vitals',{resident_id:r.id,date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg});}
+    catch(e){console.error('vital save:',r.name,e);}
+  }
+  if(saved===0){toast('⚠ 入力データがありません');return;}
+  toast(`✅ ${saved}名分のバイタルを保存しました`);
+  renderVitalInput();
+  if(S.view==='dash') renderDash();
+}
+
+// 個人履歴
+// 個人入力フォームを初期化
+function initIndivForm(){
+  const now=new Date();
+  document.getElementById('vi-form-date').value=TODAY;
+  document.getElementById('vi-form-time').value=now.toTimeString().slice(0,5);
+  ['temp','pls','bph','bpl','spo','rsp','nt','tr'].forEach(f=>{
+    const el=document.getElementById('vi-form-'+f);
+    if(el) el.value='';
+  });
+  // スタッフ名を自動セット
+  const sg=document.getElementById('vi-form-sg');
+  if(sg) sg.value=getStaffSign();
+  // 編集IDをリセット
+  const fc=document.getElementById('vi-form-card');
+  if(fc) { delete fc.dataset.editId; fc.querySelector('.ct').textContent='✏️ バイタル追加入力'; }
+}
+
+// 履歴から編集：フォームに値を反映
+function editVital(rid,id){
+  const v=(S.vitals[rid]||[]).find(x=>x.id===id);
+  if(!v) return;
+  document.getElementById('vi-form-date').value=v.date||TODAY;
+  document.getElementById('vi-form-time').value=v.time||'';
+  document.getElementById('vi-form-temp').value=v.temp||'';
+  document.getElementById('vi-form-pls').value=v.pls||'';
+  document.getElementById('vi-form-bph').value=v.bph||'';
+  document.getElementById('vi-form-bpl').value=v.bpl||'';
+  document.getElementById('vi-form-spo').value=v.spo||'';
+  document.getElementById('vi-form-rsp').value=v.rsp||'';
+  document.getElementById('vi-form-nt').value=v.nt||'';
+  document.getElementById('vi-form-tr').value=v.tr||'';
+  document.getElementById('vi-form-sg').value=v.sg||'';
+  // 編集モード
+  const fc=document.getElementById('vi-form-card');
+  if(fc){ fc.dataset.editId=id; fc.querySelector('.ct').textContent='✏️ バイタル編集中'; }
+  // フォームまでスクロール
+  fc?.scrollIntoView({behavior:'smooth',block:'start'});
+  toast('📝 フォームに値を反映しました。修正後「💾 保存」を押してください');
+}
+
+// 個人バイタル保存（新規・編集兼用）
+async function saveIndivVital(){
+  const rid=document.getElementById('vh-sel')?.value;
+  if(!rid){toast('⚠ 利用者を選択してください');return;}
+  const date=document.getElementById('vi-form-date').value;
+  const time=document.getElementById('vi-form-time').value;
+  if(!date||!time){toast('⚠ 日付と時間を入力してください');return;}
+  const temp=document.getElementById('vi-form-temp').value;
+  const pls=document.getElementById('vi-form-pls').value;
+  const bph=document.getElementById('vi-form-bph').value;
+  const bpl=document.getElementById('vi-form-bpl').value;
+  const spo=document.getElementById('vi-form-spo').value;
+  const rsp=document.getElementById('vi-form-rsp').value;
+  const nt=document.getElementById('vi-form-nt').value||'';
+  const tr=document.getElementById('vi-form-tr').value||'';
+  const sg=document.getElementById('vi-form-sg').value||'';
+  if(!temp&&!pls&&!bph&&!bpl&&!spo&&!rsp&&!nt&&!tr){toast('⚠ 値を入力してください');return;}
+
+  const fc=document.getElementById('vi-form-card');
+  const editId=fc?.dataset.editId;
+
+  if(editId){
+    // 編集モード：既存レコードを更新
+    const idx=(S.vitals[rid]||[]).findIndex(x=>x.id===editId);
+    if(idx>=0){
+      S.vitals[rid][idx]={...S.vitals[rid][idx],date,time,temp,pls,bph,bpl,spo,rsp,nt,tr,sg};
+      S.vitals[rid].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+    }
+    try{ await dbUpdate('vitals',editId,{date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg}); }
+    catch(e){ console.error('vital update:',e); }
+    toast('✅ バイタルを更新しました');
+  } else {
+    // 新規モード
+    const entry={id:'local_'+rnd(),date,time,temp,pls,bph,bpl,spo,rsp,nt,tr,sg};
+    if(!S.vitals[rid]) S.vitals[rid]=[];
+    S.vitals[rid].push(entry);
+    S.vitals[rid].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+    try{ await dbPost('vitals',{resident_id:rid,date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg}); }
+    catch(e){ console.error('vital save:',e); }
+    toast('✅ バイタルを保存しました');
+  }
+  initIndivForm();
+  loadVHistory();
+  if(S.view==='dash') renderDash();
+}
+
+// 過去データからIQR法で普段のバイタルを算出
+function calcVitalRef(rid){
+  const vitals=(S.vitals[rid]||[]).filter(v=>v.temp||v.pls||v.bph);
+  if(vitals.length < 3) return null;
+
+  // IQR法：Q1〜Q3を「普段の範囲」とし外れ値を除外
+  function iqrStats(arr){
+    if(!arr.length) return null;
+    const sorted=[...arr].sort((a,b)=>a-b);
+    const n=sorted.length;
+    const q1=sorted[Math.floor(n*0.25)];
+    const q3=sorted[Math.floor(n*0.75)];
+    const iqr=q3-q1;
+    // 外れ値除外（Q1-1.5*IQR ～ Q3+1.5*IQR の範囲のみ使用）
+    const filtered=sorted.filter(v=>v>=q1-1.5*iqr&&v<=q3+1.5*iqr);
+    if(!filtered.length) return null;
+    const median=filtered[Math.floor(filtered.length/2)];
+    return {
+      median: Math.round(median*10)/10,
+      q1: Math.round(q1*10)/10,
+      q3: Math.round(q3*10)/10,
+      min: Math.round(Math.min(...filtered)*10)/10,
+      max: Math.round(Math.max(...filtered)*10)/10,
+      count: filtered.length
+    };
+  }
+
+  const parse=(arr)=>arr.map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+  const temps=parse(vitals.map(v=>v.temp)).filter(v=>v>34&&v<42);
+  const plss=parse(vitals.map(v=>v.pls)).filter(v=>v>20&&v<200);
+  const bphs=parse(vitals.map(v=>v.bph)).filter(v=>v>50&&v<250);
+  const bpls=parse(vitals.map(v=>v.bpl)).filter(v=>v>30&&v<150);
+  const spos=parse(vitals.map(v=>v.spo)).filter(v=>v>70&&v<=100);
+  const rsps=parse(vitals.map(v=>v.rsp)).filter(v=>v>5&&v<60);
+
+  const tS=iqrStats(temps), pS=iqrStats(plss), bhS=iqrStats(bphs);
+  const blS=iqrStats(bpls), sS=iqrStats(spos), rS=iqrStats(rsps);
+
+  return {
+    count: vitals.length,
+    // 表示用中央値
+    temp: tS?.median, pls: pS?.median,
+    bph: bhS?.median, bpl: blS?.median,
+    spo: sS?.median,  rsp: rS?.median,
+    // 警告閾値（Q1〜Q3の範囲外を警告）
+    tempMin: tS?.q1,  tempMax: tS?.q3,
+    plsMin:  pS?.q1,  plsMax:  pS?.q3,
+    bphMin:  bhS?.q1, bphMax:  bhS?.q3,
+    bplMin:  blS?.q1, bplMax:  blS?.q3,
+    spoMin:  sS?.q1,
+    rspMin:  rS?.q1,  rspMax:  rS?.q3,
+    // 参考：外れ値除外後の最小・最大
+    tempRange: tS?`${tS.min}〜${tS.max}`:null,
+    bphRange:  bhS?`${bhS.min}〜${bhS.max}`:null,
+  };
+}
+
+function loadVHistory(){
+  const rid=document.getElementById('vh-sel')?.value;
+  const date=document.getElementById('vh-date')?.value;
+  const body=document.getElementById('vh-body');
+  const title=document.getElementById('vh-title');
+  if(!body) return;
+  if(!rid){body.innerHTML='<tr><td colspan="12" style="text-align:center;padding:20px;color:var(--ink3)">利用者を選択してください</td></tr>';return;}
+  const r=S.residents.find(x=>x.id===rid);
+  if(title) title.textContent=`📋 ${r?.name} さんのバイタル履歴`;
+  let vitals=[...(S.vitals[rid]||[])];
+  if(date) vitals=vitals.filter(v=>v.date===date);
+  vitals.sort((a,b)=>b.date.localeCompare(a.date)||b.time.localeCompare(a.time));
+  const calc=calcVitalRef(rid);
+  const ref=calc||S.vitalRef?.[rid]||{};
+  // IQR法で算出した基準値を表示
+  const refInfo = calc ?
+    `<div style="font-size:12px;background:var(--blue3);border-left:3px solid var(--blue);padding:10px 14px;margin-bottom:10px;border-radius:var(--r2)">
+      <div style="font-weight:700;color:var(--blue);margin-bottom:6px">📌 過去${calc.count}件から算出した普段の値（IQR法・外れ値除外済み）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;color:var(--ink2)">
+        ${calc.temp?`<span>体温 <strong>${calc.temp}℃</strong><span style="color:var(--ink3);font-size:11px">（${calc.tempMin}〜${calc.tempMax}℃）</span></span>`:''}
+        ${calc.pls?`<span>脈拍 <strong>${calc.pls}</strong><span style="color:var(--ink3);font-size:11px">（${calc.plsMin}〜${calc.plsMax}）</span></span>`:''}
+        ${calc.bph?`<span>血圧 <strong>${calc.bph}/${calc.bpl}</strong><span style="color:var(--ink3);font-size:11px">（上:${calc.bphMin}〜${calc.bphMax} / 下:${calc.bplMin}〜${calc.bplMax}）</span></span>`:''}
+        ${calc.spo?`<span>SpO₂ <strong>${calc.spo}%</strong><span style="color:var(--ink3);font-size:11px">（${calc.spoMin}%以上）</span></span>`:''}
+        ${calc.rsp?`<span>呼吸 <strong>${calc.rsp}</strong><span style="color:var(--ink3);font-size:11px">（${calc.rspMin}〜${calc.rspMax}）</span></span>`:''}
+      </div>
+      <div style="font-size:11px;color:var(--ink3);margin-top:6px">括弧内がQ1〜Q3の範囲。この範囲を外れると色で警告します。</div>
+    </div>` :
+    `<div style="font-size:12px;color:var(--ink3);padding:6px 0">記録が3件以上になると普段の値が自動表示されます（IQR法で外れ値を自動除外）</div>`;
+  if(!vitals.length){
+    body.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:20px;color:var(--ink3)">記録がありません</td></tr>`;
+    return;
+  }
+  body.innerHTML=vitals.map(v=>{
+    const tc=parseFloat(v.temp)>=(ref.tempMax||37.5)?'al':parseFloat(v.temp)>=37.0?'wn':'ok';
+    const bc=parseInt(v.bph)>=(ref.bphMax||150)?'al':parseInt(v.bph)>=140?'wn':'';
+    const sc=parseInt(v.spo)<=(ref.spoMin||94)?'al':parseInt(v.spo)<=95?'wn':'';
+    return `<tr>
+      <td>${v.date}</td><td>${v.time}</td>
+      <td class="${tc}">${v.temp||'-'}℃</td><td>${v.pls||'-'}</td>
+      <td class="${bc}">${v.bph||'-'}</td><td>${v.bpl||'-'}</td>
+      <td class="${sc}">${v.spo||'-'}%</td><td>${v.rsp||'-'}</td>
+      <td style="text-align:left;font-size:11px;max-width:140px">${v.nt||''}</td>
+      <td style="font-size:11px">${v.tr||''}</td><td style="font-size:11px">${v.sg||''}</td>
+      <td style="white-space:nowrap">
+        <button class="btn ba xs" onclick="editVital('${rid}','${v.id}')" style="margin-bottom:3px">編集</button>
+        <button class="btn br xs" onclick="delVital('${rid}','${v.id}')">削除</button>
+      </td>
+    </tr>`;
+  }).join('');
+  // 基準値を履歴テーブルの上に表示
+  const card=body.closest('.card');
+  if(card){
+    let refEl=card.querySelector('#ref-info');
+    if(!refEl){refEl=document.createElement('div');refEl.id='ref-info';card.insertBefore(refEl,card.querySelector('.tw'));}
+    refEl.innerHTML=refInfo;
+  }
+}
+
+function delVital(rid,id){
+  if(!confirm('削除しますか？'))return;
+  S.vitals[rid]=(S.vitals[rid]||[]).filter(v=>v.id!==id);
+  loadVHistory();
+  if(S.view==='dash') renderDash();
+}
+
+function prepV(){} function saveV(){} function loadV(){renderVitalInput();}
+function qV(rid){
+  gv('vit');
+  setTimeout(()=>{
+    switchVTab('input', document.getElementById('vtab-input'));
+  }, 200);
+}
+function qVFromDet(rid){
+  // 個別記録から個人履歴タブへ直接遷移
+  gv('vit');
+  setTimeout(()=>{
+    switchVTab('history', document.getElementById('vtab-history'));
+    const sel=document.getElementById('vh-sel');
+    if(sel){sel.value=rid;initIndivForm();loadVHistory();}
+  }, 200);
+}
+
+async function loadV_unused(){
+  const date=document.getElementById('vd').value;
+  const body=document.getElementById('vb');
+  if(vMode==='all'){
+    // 全員一覧モード
+    document.getElementById('vtitle').textContent=`📊 全利用者バイタル一覧（${date||'全期間'}）`;
+    document.getElementById('vstats').innerHTML='';
+    let allRows='';
+    const activeForVit=S.residents.filter(r=>!r.status||r.status==='入居中');
+    for(const r of activeForVit){
+      try{
+        const fresh=await dbGet('vitals',`resident_id=eq.${r.id}${date?'&date=eq.'+date:''}&limit=1`);
+        if(fresh.length){
+          const v=fresh[0];
+          const lv={temp:v.temp,pls:v.pls||v.pulse,bph:v.bph||v.bp_high,bpl:v.bpl||v.bp_low,spo:v.spo||v.spo2,rsp:v.rsp||v.resp,nt:v.nt||v.notes||'',id:v.id,date:v.date,time:v.time,sg:v.sg||v.sign||'',tr:v.tr||v.treatment||''};
+          const tc=parseFloat(lv.temp)>=37.5?'al':parseFloat(lv.temp)>=37.0?'wn':'ok';
+          const bc=parseInt(lv.bph)>=160?'al':parseInt(lv.bph)>=140?'wn':'';
+          const sc=parseInt(lv.spo)<93?'al':parseInt(lv.spo)<96?'wn':'';
+          allRows+=`<tr style="cursor:pointer" onclick="selResAndLoad('${r.id}')">
+            <td><strong>${r.room}</strong></td><td><strong>${r.name}</strong></td>
+            <td>${lv.date}</td><td>${lv.time}</td>
+            <td class="${tc}">${lv.temp}℃</td><td>${lv.pls}</td>
+            <td class="${bc}">${lv.bph}/${lv.bpl}</td>
+            <td class="${sc}">${lv.spo}%</td><td>${lv.rsp}</td>
+            <td style="text-align:left;font-size:12px;color:var(--ink3);max-width:120px">${lv.nt||''}</td>
+            <td style="font-size:12px">${lv.sg||''}</td>
+            <td><button class="btn bb xs" onclick="event.stopPropagation();editV('${r.id}','${lv.id}')">編集</button><button class="btn br xs" onclick="event.stopPropagation();delV('${r.id}','${lv.id}')">削除</button></td>
+          </tr>`;
+        } else {
+          allRows+=`<tr style="background:var(--rose3)"><td>${r.room}</td><td>${r.name}</td><td colspan="10" style="color:var(--rose2);font-weight:600">⚠️ 本日未記録</td><td><button class="btn bb xs" onclick="qV('${r.id}')">記録する</button></td></tr>`;
+        }
+      }catch(e){console.error(e);}
+    }
+    document.getElementById('vtbl').querySelector('thead tr').innerHTML='<th>室</th><th>氏名</th><th>日付</th><th>時間</th><th>体温℃</th><th>脈拍</th><th>血圧</th><th>SpO₂%</th><th>呼吸</th><th>特記事項</th><th>サイン</th><th></th>';
+    body.innerHTML=allRows||'<tr><td colspan="12" style="text-align:center;padding:20px;color:var(--ink3)">記録がありません</td></tr>';
+    return;
+  }
+  // 個別モード
+  const rid=document.getElementById('vs').value;
+  if(!rid){body.innerHTML='<tr><td colspan="12" style="text-align:center;padding:20px;color:var(--ink3)">利用者を選択してください</td></tr>';return;}
+  const r=S.residents.find(x=>x.id==rid);
+  document.getElementById('vtitle').textContent=`📊 ${r?r.name:''} さんのバイタル記録`;
+  document.getElementById('vtbl').querySelector('thead tr').innerHTML='<th>日付</th><th>時間</th><th>体温℃</th><th>脈拍</th><th>血圧上</th><th>血圧下</th><th>SpO₂%</th><th>呼吸</th><th>特記事項</th><th>処置</th><th>サイン</th><th></th>';
+  try{
+    const fresh=await dbGet('vitals',`resident_id=eq.${rid}${date?'&date=eq.'+date:''}`);
+    S.vitals[rid]=fresh.map(v=>({id:v.id,date:v.date,time:v.time,temp:v.temp,pls:v.pls||v.pulse,bph:v.bph||v.bp_high,bpl:v.bpl||v.bp_low,spo:v.spo||v.spo2,rsp:v.rsp||v.resp,nt:v.nt||v.notes||'',tr:v.tr||v.treatment||'',sg:v.sg||v.sign||''}));
+  }catch(e){console.error('vitals load error',e);}
+  const vits=S.vitals[rid]||[];
+  if(!vits.length){body.innerHTML='<tr><td colspan="12" style="text-align:center;padding:20px;color:var(--ink3)">この日の記録がありません</td></tr>';document.getElementById('vstats').innerHTML='';return;}
+  body.innerHTML=vits.map(v=>{
+    const tc=parseFloat(v.temp)>=37.5?'al':parseFloat(v.temp)>=37.0?'wn':'ok';
+    const bc=parseInt(v.bph)>=160?'al':parseInt(v.bph)>=140?'wn':'';
+    const sc=parseInt(v.spo)<93?'al':parseInt(v.spo)<96?'wn':'';
+    return`<tr><td>${v.date}</td><td>${v.time}</td><td class="${tc}">${v.temp}℃</td><td>${v.pls}</td><td class="${bc}">${v.bph}</td><td>${v.bpl}</td><td class="${sc}">${v.spo}%</td><td>${v.rsp}</td><td style="text-align:left;max-width:130px;font-size:12px;color:var(--ink3)">${v.nt||''}</td><td style="font-size:12px">${v.tr||''}</td><td style="font-size:12px">${v.sg||''}</td><td style="white-space:nowrap"><button class="btn bo xs" onclick="editV('${rid}','${v.id}')">編集</button><button class="btn br xs" onclick="delV('${rid}','${v.id}')">削除</button></td></tr>`;
+  }).join('');
+  const lv=vits.slice(-1)[0];
+  document.getElementById('vstats').innerHTML=`<div class="ch" style="border:none;padding:0;margin-bottom:10px"><div class="ct">📈 最新バイタル（${lv.date} ${lv.time}）</div></div><div class="mvr">
+    <div class="mv"><span class="mvi">🌡️</span><div><div class="mvv ${parseFloat(lv.temp)>=37.5?'al':''}">${lv.temp}℃</div><div class="mvl">体温</div></div></div>
+    <div class="mv"><span class="mvi">💓</span><div><div class="mvv">${lv.pls}</div><div class="mvl">脈拍</div></div></div>
+    <div class="mv"><span class="mvi">🩸</span><div><div class="mvv ${parseInt(lv.bph)>=160?'al':parseInt(lv.bph)>=140?'wn':''}">${lv.bph}/${lv.bpl}</div><div class="mvl">血圧</div></div></div>
+    <div class="mv"><span class="mvi">💨</span><div><div class="mvv ${parseInt(lv.spo)<93?'al':parseInt(lv.spo)<96?'wn':''}">${lv.spo}%</div><div class="mvl">SpO₂</div></div></div>
+    <div class="mv"><span class="mvi">🫁</span><div><div class="mvv">${lv.rsp}</div><div class="mvl">呼吸</div></div></div>
+  </div>`;
+}
+
+function selResAndLoad(rid){document.getElementById('vs').value=rid;vMode='individual';setVMode('individual');}
+function prepV(){
+  document.getElementById('v-edit-id').value='';
+  ['vtemp','vpls','vbph','vbpl','vspo','vrsp','vnt','vtr','vsg'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  const now=new Date();document.getElementById('vd2').value=TODAY;document.getElementById('vt2').value=now.toTimeString().slice(0,5);
+  openM('mv');
+}
+function editV(rid,id){
+  const v=(S.vitals[rid]||[]).find(x=>x.id==id);if(!v)return;
+  document.getElementById('v-edit-id').value=id;
+
+  document.getElementById('vs').value=rid;
+  document.getElementById('vd2').value=v.date;document.getElementById('vt2').value=v.time;
+  document.getElementById('vtemp').value=v.temp;document.getElementById('vpls').value=v.pls;
+  document.getElementById('vbph').value=v.bph;document.getElementById('vbpl').value=v.bpl;
+  document.getElementById('vspo').value=v.spo;document.getElementById('vrsp').value=v.rsp;
+  document.getElementById('vnt').value=v.nt||'';document.getElementById('vtr').value=v.tr||'';
+  document.getElementById('vsg').value=v.sg||'';
+  openM('mv');
+}
+function qV_old(rid){document.getElementById('vs')&&(document.getElementById('vs').value=rid);gv('vit');}
+async function saveV(){
+  const rid=document.getElementById('vs').value;if(!rid){toast('⚠ 利用者を選択してください');return;}
+  const editId=document.getElementById('v-edit-id').value;
+  const v={id:editId||rnd(),date:iv('vd2'),time:iv('vt2'),temp:iv('vtemp'),pls:iv('vpls'),bph:iv('vbph'),bpl:iv('vbpl'),spo:iv('vspo'),rsp:iv('vrsp'),nt:iv('vnt'),tr:iv('vtr'),sg:iv('vsg')};
+  const dbData={resident_id:rid,date:v.date,time:v.time,temp:v.temp,pls:v.pls,bph:v.bph,bpl:v.bpl,spo:v.spo,rsp:v.rsp,nt:v.nt,tr:v.tr,sg:v.sg};
+  try{
+    if(editId){
+      await dbUpdate('vitals',editId,dbData);
+      const idx=(S.vitals[rid]||[]).findIndex(x=>x.id==editId);
+      if(idx>=0) S.vitals[rid][idx]=v;
+    } else {
+      const res=await dbInsert('vitals',dbData);
+      if(res&&res[0])v.id=String(res[0].id);
+      S.vitals[rid]=S.vitals[rid]||[];S.vitals[rid].push(v);
+      S.vitals[rid].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+    }
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('vitals save error',e);showStatus('⚠️ ローカルのみ保存','red');}
+  closeM('mv');await loadV();if(S.view==='dash')renderDash();toast(editId?'✅ バイタルを更新しました':'✅ バイタルを保存しました');
+}
+async function delV(rid,id){
+  if(!confirm('削除しますか？'))return;
+  try{await dbDelete('vitals',id);showStatus('🗑 削除しました','green');}catch(e){console.error(e);}
+  S.vitals[rid]=(S.vitals[rid]||[]).filter(v=>v.id!=id);loadV();
+}
+
+const SYM={U:'💧',S:'💩',B:'両',O:'✓',X:'×'};
+const SLH=[21,22,23,0,1,2,3,4,5,6];
+
+// 排泄モーダル用の一時データ
+let exModal={rid:null,hour:null,date:null,data:{}};
+
+function openExModal(rid,h,date){
+  const r=S.residents.find(x=>x.id==rid);
+  exModal={rid,hour:h,date,data:Object.assign({},{...((S.excretion[date]||{})[rid]||{})[h]||{}})};
+  const isSleep=SLH.includes(h);
+  document.getElementById('mex-title').textContent=`🚿 ${r?.name} さん ${h}時の記録`;
+  document.getElementById('mex-sub').textContent=`${date} ${h}:00${isSleep?' 【睡眠帯】':''}`;
+  // 睡眠エリアの表示制御
+  document.getElementById('mex-sleep-area').style.display=isSleep?'':'none';
+  // UI更新
+  updateExModalUI();
+  openM('mex');
+}
+
+function updateExModalUI(){
+  const d=exModal.data;
+  const type=d.type||'';
+  const hasStool=type==='S'||type==='B';
+  // 排泄種類ボタン
+  ['U','S','B','O','X',''].forEach(t=>{
+    const id=t===''?'mex-n':`mex-${t.toLowerCase()}`;
+    const el=document.getElementById(id);
+    if(el) el.style.opacity=type===t?'1':'0.45';
+  });
+  // 排便量・ブリストル表示
+  document.getElementById('mex-stool-area').style.display=hasStool?'':'none';
+  document.getElementById('mex-bristol-area').style.display=hasStool?'':'none';
+  document.getElementById('mex-tekibin-area').style.display=hasStool?'':'none';
+  // 排便量ボタン
+  [1,2,3].forEach(a=>{
+    const el=document.getElementById(`mex-a${a}`);
+    if(el){el.style.background=d.amt===a?'var(--amber)':'';el.style.color=d.amt===a?'#fff':'';}
+  });
+  // ブリストルボタン（複数選択）
+  const bArr=Array.isArray(d.bristol)?d.bristol:(d.bristol?[d.bristol]:[]);
+  [1,2,3,4,5,6,7].forEach(b=>{
+    const el=document.getElementById(`mex-b${b}`);
+    if(el){el.style.background=bArr.includes(b)?'var(--blue)':'';el.style.color=bArr.includes(b)?'#fff':'';}
+  });
+  // 摘便
+  const tek=document.getElementById('mex-tek');
+  if(tek){tek.textContent=d.tekibin?'✅ 摘便あり':'□ 摘便あり';tek.style.background=d.tekibin?'var(--teal)':'';tek.style.color=d.tekibin?'#fff':'';}
+  // 睡眠
+  [1,2,3,0].forEach(s=>{
+    const el=document.getElementById(`mex-sl${s}`);
+    if(el){el.style.background=d.sleep===s&&s!==0?'var(--blue)':'';el.style.color=d.sleep===s&&s!==0?'#fff':'';}
+  });
+}
+
+function setExType(t){
+  exModal.data.type=t;
+  if(t==='S'||t==='B'){if(!exModal.data.amt)exModal.data.amt=2;if(!exModal.data.bristol)exModal.data.bristol=4;}
+  updateExModalUI();
+}
+function setExAmt(a){exModal.data.amt=a;updateExModalUI();}
+function setExBristol(b){
+  if(!Array.isArray(exModal.data.bristol))exModal.data.bristol=exModal.data.bristol?[exModal.data.bristol]:[];
+  const arr=exModal.data.bristol;
+  const idx=arr.indexOf(b);
+  if(idx>=0)arr.splice(idx,1); else arr.push(b);
+  arr.sort((a,z)=>a-z);
+  updateExModalUI();
+}
+function toggleTekibin(){exModal.data.tekibin=!exModal.data.tekibin;updateExModalUI();}
+function setExSleep(s){exModal.data.sleep=s===0?null:s;updateExModalUI();}
+
+async function saveExDetail(){
+  const {rid,hour,date,data}=exModal;
+  if(!S.excretion[date])S.excretion[date]={};
+  if(!S.excretion[date][rid])S.excretion[date][rid]={};
+  const prev=S.excretion[date][rid][hour];
+  if(!data.type){delete S.excretion[date][rid][hour];}
+  else{S.excretion[date][rid][hour]={...prev,...data};}
+  // クラウド保存
+  try{
+    const cur=S.excretion[date][rid][hour];
+    const bArr=Array.isArray(cur?.bristol)?cur.bristol:(cur?.bristol?[cur.bristol]:[]);
+    const dbData={resident_id:rid,date,hour:String(hour),type:cur?.type||'',amount:cur?.amt||'',bristol:bArr.join(','),tekibin:cur?.tekibin?'1':'',sleep:cur?.sleep||''};
+    if(prev?.id){
+      if(cur)await dbUpdate('excretion',prev.id,dbData);
+      else await dbDelete('excretion',prev.id);
+    } else if(cur){
+      const res=await dbInsert('excretion',dbData);
+      if(res&&res[0])S.excretion[date][rid][hour].id=res[0].id;
+    }
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('excretion save error',e);}
+  closeM('mex');
+  renderEx();
+  renderDash(); // ダッシュボードの排泄サマリーを更新
+}
+
+function renderEx(){
+  const date=document.getElementById('exd').value;
+  const SH=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+  const lastStool={};
+  S.residents.forEach(r=>{
+    const allDates=Object.keys(S.excretion).sort().reverse();
+    for(const d of allDates){
+      const rd=(S.excretion[d]||{})[r.id]||{};
+      // 少量(amt=1)を除いた排便があった日が最終排便日
+      if(Object.values(rd).some(v=>v&&(v.type==='S'||v.type==='B')&&(v.amt||0)!==1)){
+        lastStool[r.id]=d;break;
+      }
+    }
+  });
+
+  const typeLabel={U:'💧',S:'💩',B:'💧💩',O:'✓',X:'×'};
+  const amtLabel={1:'少',2:'中',3:'大'}; // 小→少に変更
+  const typeBg={U:'#dbeafe',S:'#fef3c7',B:'#ede9fe',O:'#dcfce7',X:'#f5f5f5','':'#ffffff'};
+  const typeBd={U:'#93c5fd',S:'#fcd34d',B:'#c4b5fd',O:'#86efac',X:'#d1d5db','':'#e5e7eb'};
+
+  // セルサイズ定数
+  const CW=58, CH=54; // 通常セル幅・高さ
+  const SCW=62, SCH=58; // 睡眠帯セル（少し広く）
+
+  let h=`<table class="et"><thead><tr>
+    <th style="background:#0f5a5a;font-size:12px">室</th>
+    <th style="min-width:72px;text-align:left;padding-left:8px;background:#0f5a5a;font-size:12px">氏名</th>
+    <th style="min-width:52px;font-size:11px;background:#0f5a5a">排便<br>状況</th>
+    ${SH.map(hr=>`<th style="${SLH.includes(hr)?'background:#b45309;color:#fff':'background:#0f5a5a;color:#fff'};font-size:11px;min-width:${SLH.includes(hr)?SCW:CW}px;padding:4px 2px">${hr}時</th>`).join('')}
+    <th style="background:#0f5a5a;font-size:12px">便計</th>
+  </tr></thead><tbody>`;
+
+  S.residents.filter(r=>!r.status||r.status==='入居中').forEach(r=>{
+    const d=(S.excretion[date]||{})[r.id]||{};
+    const sc=Object.values(d).filter(v=>v&&(v.type==='S'||v.type==='B')&&(v.amt||0)!==1).length; // 少量(1)を除外
+    const ls=lastStool[r.id];
+    const constipDay=ls?Math.floor((new Date(date)-new Date(ls))/(1000*60*60*24)):99;
+    const constipBg=constipDay>=3?'background:#ffe4e6':'background:#f0fdf4';
+    const constipColor=constipDay>=3?'color:#be123c;font-weight:700':'color:#166534';
+    const constipText=constipDay===0?'✅今日':constipDay<99?`-${constipDay}日`:'未記録';
+
+    h+=`<tr>
+      <td class="rr">${r.room}</td>
+      <td class="rn">${r.name}</td>
+      <td style="${constipBg};${constipColor};font-size:12px;text-align:center;padding:3px;white-space:nowrap">${constipText}</td>
+      ${SH.map(hr=>{
+        const c=d[hr];
+        const isSleep=SLH.includes(hr);
+        const type=c?.type||'';
+        const bg=typeBg[type]||'#fff';
+        const bd2=typeBd[type]||'#e5e7eb';
+        const hasStool=type==='S'||type==='B';
+
+        // 上段：種類絵文字＋便量（漢字）
+        const typeT=type?typeLabel[type]:'';
+        const amtT=hasStool&&c?.amt?amtLabel[c.amt]||c.amt:'';
+        // 下段：ブリストル＋摘便
+        const briT=hasStool&&c?.bristol?`B${c.bristol}`:'';
+        const tekT=c?.tekibin?'摘':'';
+
+        if(isSleep){
+          // 睡眠帯：2×2の4マスグリッド
+          const slpNum=c?.sleep?String(c.sleep):'';
+          // 左上：睡眠数字（色付き）
+          const slpColor=c?.sleep===1?'#166534':c?.sleep===2?'#92400e':c?.sleep===3?'#be123c':'#9ca3af';
+          const topLeft=slpNum
+            ?`<div style="display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(0,0,0,.12);border-bottom:1px solid rgba(0,0,0,.12);font-size:13px;font-weight:800;color:${slpColor};line-height:1">${slpNum}</div>`
+            :`<div style="border-right:1px solid rgba(0,0,0,.08);border-bottom:1px solid rgba(0,0,0,.08);"></div>`;
+          // 右上：排泄種類＋便量
+          const topRight=typeT
+            ?`<div style="display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(0,0,0,.12);font-size:12px;font-weight:700;gap:1px;line-height:1"><span>${typeT}</span>${amtT?`<span style="font-size:10px">${amtT}</span>`:''}</div>`
+            :`<div style="border-bottom:1px solid rgba(0,0,0,.08);"></div>`;
+          // 左下：空白
+          const btmLeft=`<div style="border-right:1px solid rgba(0,0,0,.08);"></div>`;
+          // 右下：ブリストル＋摘便
+          const btmRight=(briT||tekT)
+            ?`<div style="display:flex;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:700;line-height:1"><span style="color:#6d28d9">${briT}</span><span style="color:#0e7a7a">${tekT}</span></div>`
+            :`<div></div>`;
+
+          return`<td style="background:#fef9e7;border:1px solid #f59e0b;padding:2px" title="${hr}時（睡眠帯 1=良眠 2=浅眠 3=不眠）">
+            <div onclick="openExModal('${r.id}',${hr},'${date}')" style="width:${SCW}px;height:${SCH}px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;cursor:pointer;background:${type?bg:'#fef9e7'};border-radius:6px;border:2px solid ${type?bd2:'#f59e0b'};box-sizing:border-box;overflow:hidden" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+              ${topLeft}${topRight}${btmLeft}${btmRight}
+            </div>
+          </td>`;
+        } else {
+          // 通常セル：2段
+          // 上段：種類＋便量
+          const row1=typeT
+            ?`<div style="display:flex;align-items:center;justify-content:center;gap:2px;border-bottom:1px solid rgba(0,0,0,.1);flex:1;line-height:1"><span style="font-size:14px">${typeT}</span>${amtT?`<span style="font-size:12px;font-weight:700">${amtT}</span>`:''}</div>`
+            :`<div style="flex:1;border-bottom:1px solid rgba(0,0,0,.06)"></div>`;
+          // 下段：ブリストル＋摘便
+          const row2=(briT||tekT)
+            ?`<div style="display:flex;align-items:center;justify-content:center;gap:3px;flex:1;line-height:1"><span style="font-size:11px;font-weight:700;color:#6d28d9">${briT}</span><span style="font-size:11px;font-weight:700;color:#0e7a7a">${tekT}</span></div>`
+            :`<div style="flex:1"></div>`;
+
+          return`<td style="padding:2px" title="${hr}時">
+            <div onclick="openExModal('${r.id}',${hr},'${date}')" style="width:${CW}px;height:${CH}px;background:${bg};border:2px solid ${bd2};border-radius:7px;cursor:pointer;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;padding:2px" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+              ${row1}${row2}
+            </div>
+          </td>`;
+        }
+      }).join('')}
+      <td style="font-weight:700;${constipDay>=3?'color:#be123c':'color:var(--amber2)'};font-size:13px;text-align:center;white-space:nowrap">${sc||''}</td>
+    </tr>`;
+  });
+  document.getElementById('exw').innerHTML=h+'</tbody></table>';
+  autoSyncExToVit(date);
+  renderConstipationPanel(date,lastStool);
+}
+
+function renderConstipationPanel(date,lastStool){
+  const panel=document.getElementById('constipation-panel');
+  if(!panel)return;
+  const items=S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>{
+    const ls=lastStool[r.id];
+    const diff=ls?Math.floor((new Date(date)-new Date(ls))/(1000*60*60*24)):99;
+    return{r,diff,ls};
+  }).sort((a,b)=>b.diff-a.diff);
+  panel.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px">${items.map(({r,diff})=>{
+    const bg=diff>=5?'var(--rose3)':diff>=3?'var(--amber3)':'var(--green3)';
+    const color=diff>=5?'var(--rose2)':diff>=3?'var(--amber)':'var(--green)';
+    const label=diff===0?'✅ 本日排便':diff<99?`-${diff}日目`:'記録なし';
+    return`<div style="background:${bg};border-radius:8px;padding:8px 12px;min-width:110px">
+      <div style="font-weight:700;font-size:13px">${r.name}</div>
+      <div style="font-size:13px;color:${color};font-weight:600">${label}</div>
+      ${diff>=3?`<div style="font-size:11px;color:${color}">⚠️ 要確認</div>`:''}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function autoSyncExToVit(date){
+  const amtLabel={1:'少量',2:'中量',3:'多量'};
+  S.residents.filter(r=>!r.status||r.status==='入居中').forEach(r=>{
+    const d=(S.excretion[date]||{})[r.id]||{};
+    const entries=Object.entries(d).filter(([,v])=>v&&v.type);
+    if(!entries.length) return;
+
+    // バイタルに排泄回数を自動連動
+    const u=entries.filter(([,v])=>v.type==='U'||v.type==='B').length;
+    const s=entries.filter(([,v])=>v.type==='S'||v.type==='B').length;
+    const vitals=(S.vitals[r.id]||[]).filter(v=>v.date===date);
+    if(vitals.length){
+      vitals[vitals.length-1].uri=u>0?`${u}回`:'なし';
+      vitals[vitals.length-1].stl=s>0?`${s}回`:'なし';
+    }
+
+    // 日々の記録に排泄サマリーを連動
+    // 排泄ごとに時間・内容を文章化
+    const exLines=entries.sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([hr,v])=>{
+      const typeStr={U:'排尿',S:'排便',B:'排尿+排便',O:'オムツチェック',X:'なし'}[v.type]||'';
+      const amt=v.amt?amtLabel[v.amt]||''  :'';
+      const bri=v.bristol?`（ブリストル${v.bristol}）`:'';
+      const tek=v.tekibin?'・摘便実施':'';
+      return `${hr}時: ${typeStr}${amt?'・'+amt:''}${bri}${tek}`;
+    });
+    const sleepEntries=entries.filter(([hr,v])=>v.sleep&&[21,22,23,0,1,2,3,4,5,6].includes(parseInt(hr)));
+    const sleepLabel={1:'良眠',2:'浅眠',3:'不眠'};
+    const sleepLines=sleepEntries.map(([hr,v])=>`${hr}時帯: 睡眠${sleepLabel[v.sleep]||v.sleep}`);
+
+    // その日の日々の記録に反映
+    if(!S.daily[r.id]) S.daily[r.id]=[];
+    const existing=S.daily[r.id].filter(x=>x.date===date&&x._fromExcretion);
+    if(existing.length){
+      // 既存の排泄連動記録を更新
+      existing[0].observation=[...exLines,...sleepLines].join('\n');
+      existing[0].time=new Date().toTimeString().slice(0,5);
+    } else if(exLines.length){
+      // 新しい排泄連動記録を追加
+      S.daily[r.id].unshift({
+        id:'ex_'+r.id+'_'+date,
+        rid:r.id,
+        date,
+        time:new Date().toTimeString().slice(0,5),
+        author:'排泄チェック自動連動',
+        observation:[...exLines,...sleepLines].join('\n'),
+        _fromExcretion:true,
+        created:new Date().toISOString().slice(0,16)
+      });
+    }
+  });
+}
+
+// ════════════════════════════════════
+// 体重管理
+// ════════════════════════════════════
+let wMode='all';
+function setWMode(m){
+  wMode=m;
+  document.getElementById('wmode-all').classList.toggle('on',m==='all');
+  document.getElementById('wmode-ind').classList.toggle('on',m==='individual');
+  const sel=document.getElementById('w-res-sel');
+  sel.style.display=m==='individual'?'':'none';
+  renderWeight();
+}
+function populateWeightSel(){
+  const opts='<option value="">選択</option>'+S.residents.map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('');
+  ['w-res-sel','w-res'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+}
+function openWeightModal(rid){
+  const now=new Date();
+  document.getElementById('w-edit-id').value='';
+  document.getElementById('w-date').value=TODAY;
+  document.getElementById('w-val').value='';
+  document.getElementById('w-note').value='';
+  populateWeightSel();
+  if(rid) setTimeout(()=>{document.getElementById('w-res').value=rid;},40);
+  openM('mw');
+}
+async function saveWeight(){
+  const rid=document.getElementById('w-res').value;
+  if(!rid){toast('⚠ 利用者を選択してください');return;}
+  const val=document.getElementById('w-val').value;
+  if(!val){toast('⚠ 体重を入力してください');return;}
+  const editId=document.getElementById('w-edit-id').value;
+  const w={id:editId||rnd(),date:iv('w-date'),weight:val,note:iv('w-note')};
+  try{
+    if(editId){
+      await dbUpdate('weights',editId,{date:w.date,weight:w.weight,note:w.note});
+    } else {
+      const res=await dbInsert('weights',{resident_id:rid,date:w.date,weight:w.weight,note:w.note});
+      if(res&&res[0])w.id=String(res[0].id);
+    }
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('weight save error',e);showStatus('⚠️ ローカルのみ保存','red');}
+  if(!S.weights[rid])S.weights[rid]=[];
+  if(editId){const i=S.weights[rid].findIndex(x=>x.id===editId);if(i>=0)S.weights[rid][i]=w;}
+  else{S.weights[rid].push(w);S.weights[rid].sort((a,b)=>a.date.localeCompare(b.date));}
+  closeM('mw');renderWeight();toast('✅ 体重を保存しました');
+}
+async function delWeight(rid,id){
+  if(!confirm('削除しますか？'))return;
+  try{await dbDelete('weights',id);}catch(e){console.error(e);}
+  S.weights[rid]=(S.weights[rid]||[]).filter(x=>x.id!==id);
+  renderWeight();
+}
+function renderWeight(){
+  const el=document.getElementById('weight-content');
+  if(!el)return;
+  const activeRes=S.residents.filter(r=>r.status==='入居中'||r.status===''||r.status===undefined||r.status===null).filter(r=>!r.dischargeDate||r.dischargeDate==='');
+  if(wMode==='all'){
+    el.innerHTML=`
+      <div class="ch"><div class="ct">⚖️ 全利用者 最新体重一覧</div></div>
+      <div class="tw"><table class="vt">
+        <thead><tr><th>居室</th><th>氏名</th><th>最新体重</th><th>測定日</th><th>前回比</th><th>備考</th><th></th></tr></thead>
+        <tbody>${activeRes.map(r=>{
+          const ws=(S.weights[r.id]||[]).slice(-2);
+          const latest=ws[ws.length-1];
+          const prev=ws.length>=2?ws[ws.length-2]:null;
+          const diff=latest&&prev?(parseFloat(latest.weight)-parseFloat(prev.weight)).toFixed(1):null;
+          const diffColor=diff===null?'':parseFloat(diff)>1?'color:var(--rose2);font-weight:700':parseFloat(diff)<-1?'color:var(--blue);font-weight:700':'color:var(--green)';
+          return`<tr>
+            <td>${r.room}</td><td><strong>${r.name}</strong></td>
+            <td style="font-weight:700;font-size:15px">${latest?latest.weight+'kg':'-'}</td>
+            <td>${latest?latest.date:'-'}</td>
+            <td style="${diffColor}">${diff!==null?(parseFloat(diff)>0?'+':'')+diff+'kg':'-'}</td>
+            <td style="font-size:12px;color:var(--ink3)">${latest?.note||''}</td>
+            <td style="display:flex;gap:4px">
+              <button class="btn bb xs" onclick="openWeightModal('${r.id}')">＋入力</button>
+              ${latest?`<button class="btn bo xs" onclick="openWeightEdit('${r.id}','${latest.id}')">編集</button>`:''}
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`;
+  } else {
+    const rid=document.getElementById('w-res-sel').value;
+    if(!rid){el.innerHTML='<div style="text-align:center;color:var(--ink3);padding:40px">利用者を選択してください</div>';return;}
+    const r=S.residents.find(x=>x.id==rid);
+    const ws=(S.weights[rid]||[]).slice().reverse();
+    const graphData=ws.slice(0,10).reverse();
+    el.innerHTML=`
+      <div class="ch"><div class="ct">⚖️ ${r?.name} さんの体重推移</div>
+        <button class="btn bb sm" onclick="openWeightModal('${rid}')">＋ 体重入力</button>
+      </div>
+      ${graphData.length>=2?`<div style="margin-bottom:14px;padding:14px;background:var(--blue3);border-radius:var(--r2)">
+        <div style="font-size:13px;color:var(--ink3);margin-bottom:10px">📈 体重推移グラフ（直近10件）</div>
+        <div style="position:relative;height:120px;display:flex;align-items:flex-end;gap:4px;border-bottom:2px solid var(--bd);padding:0 4px 0">
+          ${(()=>{
+            const vals=graphData.map(w=>parseFloat(w.weight)).filter(v=>!isNaN(v));
+            const minV=Math.min(...vals),maxV=Math.max(...vals);
+            const range=maxV-minV||0.1;
+            const maxBarH=100;
+            return graphData.map(w=>{
+              const v=parseFloat(w.weight);
+              const barH=Math.max(6,Math.round((v-minV)/range*maxBarH));
+              return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
+                <div style="font-size:9px;color:var(--blue);font-weight:700;margin-bottom:2px">${w.weight}</div>
+                <div style="width:80%;height:${barH}px;background:var(--blue2);border-radius:3px 3px 0 0;min-height:6px"></div>
+                <div style="font-size:8px;color:var(--ink3);white-space:nowrap;margin-top:3px">${w.date.slice(5)}</div>
+              </div>`;
+            }).join('');
+          })()}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--ink3)">
+          <span>最小: ${Math.min(...graphData.map(w=>parseFloat(w.weight)))}kg</span>
+          <span>最大: ${Math.max(...graphData.map(w=>parseFloat(w.weight)))}kg</span>
+        </div>
+      </div>`:''}
+      <div class="tw"><table class="vt">
+        <thead><tr><th>日付</th><th>体重</th><th>前回比</th><th>備考</th><th></th></tr></thead>
+        <tbody>${ws.map((w,i)=>{
+          const prev=ws[i+1];
+          const diff=prev?(parseFloat(w.weight)-parseFloat(prev.weight)).toFixed(1):null;
+          const dc=diff===null?'':parseFloat(diff)>1?'color:var(--rose2);font-weight:700':parseFloat(diff)<-1?'color:var(--blue)':'color:var(--green)';
+          return`<tr>
+            <td>${w.date}</td>
+            <td style="font-weight:700;font-size:15px">${w.weight}kg</td>
+            <td style="${dc}">${diff!==null?(parseFloat(diff)>0?'+':'')+diff+'kg':'-'}</td>
+            <td style="font-size:12px;color:var(--ink3)">${w.note||''}</td>
+            <td style="white-space:nowrap">
+              <button class="btn bo xs" onclick="openWeightEdit('${rid}','${w.id}')">編集</button>
+              <button class="btn br xs" onclick="delWeight('${rid}','${w.id}')">削除</button>
+            </td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`;
+  }
+}
+
+function openWeightEdit(rid,id){
+  const w=(S.weights[rid]||[]).find(x=>x.id===id);if(!w)return;
+  document.getElementById('w-edit-id').value=id;
+  document.getElementById('w-date').value=w.date;
+  document.getElementById('w-val').value=w.weight;
+  document.getElementById('w-note').value=w.note||'';
+  populateWeightSel();
+  setTimeout(()=>{document.getElementById('w-res').value=rid;},40);
+  openM('mw');
+}
+
+// ════ 退居者管理 ════
+function renderDischarged(){
+  const filter=document.getElementById('dis-filter')?.value||'';
+  const list=S.residents.filter(r=>{
+    if(!r.status||r.status==='入居中')return false;
+    if(filter&&r.status!==filter)return false;
+    return true;
+  });
+  const el=document.getElementById('discharged-list');
+  if(!el)return;
+  if(!list.length){el.innerHTML='<div style="text-align:center;color:var(--ink3);padding:40px;font-size:14px">該当する退居者はいません</div>';return;}
+  el.innerHTML=list.map(r=>{
+    const age=calcAge(r.birth);
+    const disDate=r.dischargeDate?new Date(r.dischargeDate):null;
+    const fiveYearsLater=disDate?new Date(disDate.getFullYear()+5,disDate.getMonth(),disDate.getDate()):null;
+    const now=new Date();
+    const canDelete=fiveYearsLater&&now>=fiveYearsLater;
+    const daysLeft=fiveYearsLater?Math.ceil((fiveYearsLater-now)/(1000*60*60*24)):null;
+    const alertMsg=canDelete?'<span class="pl pr">🗑 削除可能（5年経過）</span>':daysLeft!==null&&daysLeft<=365?`<span class="pl pa">⏰ 削除まで${daysLeft}日</span>`:'';
+    const statusColor=r.status==='死亡'?'var(--ink3)':r.status==='退去'?'var(--blue)':'var(--amber)';
+    return`<div class="card" style="margin-bottom:12px;border-left:4px solid ${statusColor}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+            <strong style="font-size:15px">${r.name}</strong>
+            <span style="font-size:13px;color:var(--ink3)">${r.room}号室 ・ ${age}歳</span>
+            <span class="pl" style="color:${statusColor};background:#f5f5f5">${r.status}</span>
+            ${alertMsg}
+          </div>
+          <div style="font-size:13px;color:var(--ink3);display:flex;gap:12px;flex-wrap:wrap">
+            ${r.entryDate?`<span>入居日: ${r.entryDate}</span>`:''}
+            ${r.dischargeDate?`<span>退去日: ${r.dischargeDate}</span>`:''}
+            ${fiveYearsLater?`<span>保管期限: ${fiveYearsLater.toISOString().slice(0,10)}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn bo sm" onclick="S.cur='${r.id}';document.getElementById('ds2').value='${r.id}';gv('det')">📋 記録参照</button>
+          <button class="btn bo sm" onclick="editR('${r.id}')">✏️ 編集</button>
+          ${canDelete?`<button class="btn br sm" onclick="deleteDischargedResident('${r.id}')">🗑 データ削除</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function deleteDischargedResident(rid){
+  const r=S.residents.find(x=>x.id===rid);
+  if(!confirm(`${r?.name} さんのデータを完全に削除しますか？\nこの操作は取り消せません。`))return;
+  S.residents=S.residents.filter(x=>x.id!==rid);
+  delete S.vitals[rid];delete S.daily[rid];delete S.drugs[rid];delete S.weights[rid];
+  S.memos=S.memos.filter(m=>m.rid!==rid);
+  renderDischarged();toast('🗑 データを削除しました');
+}
+
+function syncEx(){autoSyncExToVit(document.getElementById('exd').value);toast('🔄 バイタルに自動連動済みです');}
+
+// ════════════════════════════════════
+// 日々の記録
+// ════════════════════════════════════
+function popDlySelects(){
+  const s1=document.getElementById('dly-res'),s2=document.getElementById('dly-res2');
+  const opts='<option value="">選択</option>'+S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('');
+  if(s1){const c=s1.value;s1.innerHTML=opts;if(c)s1.value=c;}
+  if(s2) s2.innerHTML=opts;
+}
+
+function openDailyModal(editRec){
+  const rid=document.getElementById('dly-res').value;
+  const date=document.getElementById('dly-date').value;
+  const now=new Date();
+  document.getElementById('dly-edit-id').value=editRec?editRec.id:'';
+  document.getElementById('dly-edit-rid').value=editRec?editRec.rid:'';
+  document.getElementById('mdly-title').textContent=editRec?'📓 日々の記録 編集':'📓 日々の記録入力';
+  document.getElementById('dly-d').value=editRec?editRec.date:(date||TODAY);
+  document.getElementById('dly-t').value=editRec?editRec.time:now.toTimeString().slice(0,5);
+  popDlySelects();
+  // フォーム設定
+  const sel=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+  if(editRec){
+    setTimeout(()=>{document.getElementById('dly-res2').value=editRec.rid;},50);
+    sel('dly-meal-mm',editRec.meal_mm);sel('dly-meal-ms',editRec.meal_ms);
+    sel('dly-meal-lm',editRec.meal_lm);sel('dly-meal-ls',editRec.meal_ls);
+    sel('dly-meal-em',editRec.meal_em);sel('dly-meal-es',editRec.meal_es);
+    sel('dly-meal-note',editRec.meal_note);sel('dly-bath',editRec.bath);
+    sel('dly-oral',editRec.oral);sel('dly-act',editRec.activity);
+    sel('dly-act-note',editRec.act_note);sel('dly-cond',editRec.condition);
+    sel('dly-mood',editRec.mood);sel('dly-obs',editRec.observation);
+    sel('dly-care',editRec.care);sel('dly-hand',editRec.handover);
+    sel('dly-au',editRec.author);
+  } else {
+    if(rid) setTimeout(()=>{document.getElementById('dly-res2').value=rid;},50);
+    ['dly-meal-mm','dly-meal-ms','dly-meal-lm','dly-meal-ls','dly-meal-em','dly-meal-es','dly-bath','dly-oral','dly-act','dly-cond','dly-mood'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['dly-meal-note','dly-act-note','dly-obs','dly-care','dly-hand','dly-au'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    // スタッフ名を自動セット
+    const dlySgEl=document.getElementById('dly-au');
+    if(dlySgEl&&currentStaff) dlySgEl.value=currentStaff;
+  }
+  openM('mdly');
+}
+
+async function saveDailyRecord(){
+  const rid=document.getElementById('dly-res2').value;
+  if(!rid){toast('⚠ 利用者を選択してください');return;}
+  const editId=document.getElementById('dly-edit-id').value;
+  const now=new Date().toISOString().slice(0,16);
+  const rec={
+    id:editId||rnd(),rid,
+    date:iv('dly-d'),time:iv('dly-t'),author:iv('dly-au')||'担当者',
+    meal_mm:iv('dly-meal-mm'),meal_ms:iv('dly-meal-ms'),
+    meal_lm:iv('dly-meal-lm'),meal_ls:iv('dly-meal-ls'),
+    meal_em:iv('dly-meal-em'),meal_es:iv('dly-meal-es'),
+    meal_note:iv('dly-meal-note'),
+    bath:iv('dly-bath'),oral:iv('dly-oral'),
+    activity:iv('dly-act'),act_note:iv('dly-act-note'),
+    condition:iv('dly-cond'),mood:iv('dly-mood'),observation:iv('dly-obs'),
+    care:iv('dly-care'),handover:iv('dly-hand'),
+    created:editId?(S.daily[rid]||[]).find(x=>x.id===editId)?.created||now:now
+  };
+  const dbData={
+    resident_id:rid,date:rec.date,time:rec.time,author:rec.author,
+    meal_mm:rec.meal_mm,meal_ms:rec.meal_ms,meal_lm:rec.meal_lm,meal_ls:rec.meal_ls,
+    meal_em:rec.meal_em,meal_es:rec.meal_es,meal_note:rec.meal_note,
+    bath:rec.bath,oral:rec.oral,activity:rec.activity,act_note:rec.act_note,
+    condition:rec.condition,mood:rec.mood,observation:rec.observation,
+    care:rec.care,handover:rec.handover
+  };
+  try{
+    if(editId){
+      await dbUpdate('daily_records',editId,dbData);
+    } else {
+      const res=await dbInsert('daily_records',dbData);
+      if(res&&res[0])rec.id=String(res[0].id);
+    }
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('daily save error',e);showStatus('⚠️ ローカルのみ保存','red');}
+  if(!S.daily[rid]) S.daily[rid]=[];
+  if(editId){
+    const idx=S.daily[rid].findIndex(x=>x.id===editId);
+    if(idx>=0)S.daily[rid][idx]=rec;
+  } else {
+    S.daily[rid].unshift(rec);
+    if(rec.handover.trim()){
+      const hoTime=rec.date+'T'+(rec.time||new Date().toTimeString().slice(0,5));
+      const ho={id:rnd(),date:rec.date,shift:getCurrentShift(),author:rec.author,urgent:'',ops:'',next:'',residents:{[rid]:rec.handover},created:hoTime};
+      try{
+        const hres=await dbInsert('handovers',{date:ho.date,shift:ho.shift,author:ho.author,urgent:'',ops:'',next:'',residents_json:JSON.stringify(ho.residents)});
+        if(hres&&hres[0])ho.id=String(hres[0].id);
+      }catch(e){console.error('handover save error',e);}
+      S.handovers.unshift(ho);
+      if(S.view==='handover') renderHandover();
+    }
+  }
+  closeM('mdly');
+  loadDaily();
+  if(S.view==='dash') renderDash();
+  toast(editId?'✅ 日々の記録を更新しました':'✅ 日々の記録を保存しました');
+}
+
+function loadDaily(){
+  const rid=document.getElementById('dly-res').value;
+  const date=document.getElementById('dly-date').value;
+  const r=S.residents.find(x=>x.id==rid);
+  document.getElementById('daily-title').textContent=`📓 ${r?r.name+'さんの':'全利用者の'}日々の記録`;
+  let recs=[];
+  if(rid){recs=S.daily[rid]||[];}
+  else{S.residents.forEach(res=>{recs=recs.concat((S.daily[res.id]||[]).map(r=>({...r,_resName:res.name,_resRoom:res.room})));});}
+  if(date) recs=recs.filter(r=>r.date===date);
+  recs.sort((a,b)=>b.date.localeCompare(a.date)||b.time.localeCompare(a.time));
+
+  // サマリーカード
+  const todayRecs=recs.filter(r=>r.date===TODAY);
+  document.getElementById('daily-summary').innerHTML=todayRecs.length?`
+    <div class="ch" style="border:none;padding:0;margin-bottom:10px"><div class="ct">📋 本日の記録サマリー（${todayRecs.length}件）</div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${todayRecs.map(r=>{
+        const res=S.residents.find(x=>x.id==r.rid);
+        return`<div style="background:var(--sf2);border-radius:var(--r2);padding:8px 12px;min-width:160px">
+          <div style="font-weight:700;font-size:12px;margin-bottom:4px">${res?.name||''}</div>
+          <div style="font-size:11px;color:var(--ink3)">
+            ${r.meal_mm||r.meal_lm||r.meal_em?`🍽️ 朝主${r.meal_mm||'-'} 昼主${r.meal_lm||'-'} 夕主${r.meal_em||'-'}<br>`:''}
+            ${r.bath?`🛁 ${r.bath}<br>`:''}
+            ${r.condition?`🩺 ${r.condition}`:''}</div>
+        </div>`;
+      }).join('')}
+    </div>`:'<div style="color:var(--ink3);font-size:13px;padding:8px 0">本日の記録はまだありません</div>';
+
+  // 記録一覧
+  const list=document.getElementById('daily-list');
+  if(!recs.length){list.innerHTML='<div style="text-align:center;color:var(--ink3);padding:30px">記録がありません</div>';return;}
+  list.innerHTML=recs.map(rec=>{
+    const res=S.residents.find(x=>x.id==rec.rid);
+    const condColor=rec.condition==='良好'?'var(--green)':rec.condition==='急変あり'?'var(--rose2)':rec.condition==='不良'?'var(--amber2)':'var(--ink3)';
+    const isExSync=rec._fromExcretion;
+    const borderColor=isExSync?'#0d9488':'var(--blue2)';
+    const bgColor=isExSync?'#f0fdfa':'var(--sf2)';
+    return`<div style="border-left:4px solid ${borderColor};background:${bgColor};border-radius:0 var(--r2) var(--r2) 0;padding:12px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <strong style="font-size:13px">${res?.name||rec._resName||''}</strong>
+          <span style="font-size:11px;color:var(--ink3)">${rec.date} ${rec.time}</span>
+          ${isExSync?'<span class="pl pt">🚿 排泄連動</span>':''}
+          ${rec.condition?`<span class="pl" style="background:#f0f0f0;color:${condColor}">${rec.condition}</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:var(--ink3)">${rec.author}</span>
+          ${!isExSync?`<button class="btn bo xs" onclick="editDailyRecord('${rec.rid}','${rec.id}')">編集</button>`:''}
+          <button class="btn br xs" onclick="delDailyRecord('${rec.rid}','${rec.id}')">削除</button>
+        </div>
+      </div>
+      ${!isExSync?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;font-size:12px">
+        ${(rec.meal_mm||rec.meal_ms||rec.meal_lm||rec.meal_ls||rec.meal_em||rec.meal_es)?`<div><span style="color:var(--amber);font-weight:600">🍽️ 食事</span><br>
+          🌅朝 主:${rec.meal_mm||'-'} 副:${rec.meal_ms||'-'}<br>
+          ☀️昼 主:${rec.meal_lm||'-'} 副:${rec.meal_ls||'-'}<br>
+          🌙夕 主:${rec.meal_em||'-'} 副:${rec.meal_es||'-'}
+          ${rec.meal_note?`<br><span style="color:var(--ink3)">${rec.meal_note}</span>`:''}
+        </div>`:''}
+        ${rec.bath?`<div><span style="color:var(--blue);font-weight:600">🛁 入浴</span><br>${rec.bath}${rec.oral?` / 口腔:${rec.oral}`:''}</div>`:''}
+        ${rec.activity?`<div><span style="color:var(--green);font-weight:600">🏃 活動</span><br>${rec.activity}${rec.act_note?`<br><span style="color:var(--ink3)">${rec.act_note}</span>`:''}</div>`:''}
+        ${rec.mood?`<div><span style="color:var(--teal);font-weight:600">😊 表情</span><br>${rec.mood}</div>`:''}
+      </div>`:''}
+      ${rec.observation?`<div style="margin-top:8px;padding:8px;background:#fff;border-radius:6px;font-size:12px;line-height:1.8;white-space:pre-wrap"><span style="color:var(--teal);font-weight:600">${isExSync?'🚿 排泄記録：':'🩺 様子観察：'}</span>${rec.observation}</div>`:''}
+      ${rec.care?`<div style="margin-top:6px;padding:8px;background:#fff;border-radius:6px;font-size:12px"><span style="color:var(--violet);font-weight:600">💉 ケア実施：</span>${rec.care}</div>`:''}
+      ${rec.handover?`<div style="margin-top:6px;padding:8px;background:var(--amber3);border-radius:6px;font-size:12px;border-left:3px solid var(--amber2)"><span style="color:var(--amber);font-weight:600">⚠️ 申し送り：</span>${rec.handover}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function editDailyRecord(rid,id){
+  const rec=(S.daily[rid]||[]).find(x=>x.id===id);if(!rec)return;
+  popDlySelects();openDailyModal(rec);
+}
+function delDailyRecord(rid,id){
+  if(!confirm('この記録を削除しますか？'))return;
+  S.daily[rid]=(S.daily[rid]||[]).filter(r=>r.id!==id);
+  loadDaily();
+  toast('🗑 削除しました');
+}
+
+// ════════════════════════════════════
+// 申し送り
+// ════════════════════════════════════
+const SHIFTS=[
+  {val:'早番',ic:'🌅',color:'#f59e0b',bg:'#fffbeb'},
+  {val:'日勤',ic:'☀️',color:'#2563b0',bg:'#eff6ff'},
+  {val:'遅番',ic:'🌆',color:'#7c3aed',bg:'#f5f3ff'},
+  {val:'夜勤',ic:'🌙',color:'#0f766e',bg:'#f0fdfa'},
+];
+
+// 現在時刻からシフトを自動判定
+function getCurrentShift(){
+  const h=new Date().getHours();
+  // 日勤: 8:30〜17:30 → 8〜17時台
+  if(h>=8&&h<17) return '日勤';
+  // 夜勤: 16:00〜翌9:00 → 16〜23、0〜8時台
+  if(h>=16||h<9) return '夜勤';
+  // 早番: 6〜9時台（夜勤明け〜日勤前）
+  if(h>=6&&h<9) return '早番';
+  // 遅番: 17〜22時台
+  return '遅番';
+}
+
+// ダッシュボード用：今の出勤シフトと前のシフトの申し送りを表示
+function getRelevantHandovers(){
+  const now=new Date();
+  const h=now.getHours();
+  const todayStr=TODAY;
+  const yest=new Date(now);yest.setDate(yest.getDate()-1);
+  const yesterdayStr=yest.toISOString().split('T')[0];
+
+  // 夜勤帯（0〜9時）は前日の夜勤＋当日の夜勤を表示
+  if(h>=0&&h<9){
+    return S.handovers.filter(ho=>
+      (ho.date===yesterdayStr&&ho.shift==='夜勤')||
+      (ho.date===todayStr)
+    );
+  }
+  // 日勤帯（9〜17時）は当日のみ
+  return S.handovers.filter(ho=>ho.date===todayStr);
+}
+
+function openHandoverModal(){
+  const now=new Date();
+  document.getElementById('ho-d').value=TODAY;
+  document.getElementById('ho-au').value='';
+  document.getElementById('ho-urgent').value='';
+  document.getElementById('ho-ops').value='';
+  document.getElementById('ho-next').value='';
+  // 現在時刻からシフトを自動設定
+  document.getElementById('ho-s').value=getCurrentShift();
+  const area=document.getElementById('ho-res-inputs');
+  area.innerHTML=S.residents.map(r=>`
+    <div style="margin-bottom:10px;background:#fff;border-radius:8px;padding:10px;border-left:3px solid var(--bd)">
+      <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">${r.room}号室　${r.name}</div>
+      <textarea id="ho-r-${r.id}" rows="2" placeholder="申し送り内容（なければ空欄でOK）"
+        style="width:100%;padding:8px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;background:var(--sf2)"></textarea>
+    </div>`).join('');
+  openM('mho');
+}
+
+async function saveHandover(){
+  const shift=document.getElementById('ho-s').value;
+  const ho={
+    id:rnd(),
+    date:iv('ho-d'),shift,
+    author:iv('ho-au')||'担当者',
+    urgent:iv('ho-urgent'),ops:iv('ho-ops'),next:iv('ho-next'),
+    residents:{},
+    created:new Date().toISOString().slice(0,16)
+  };
+  S.residents.forEach(r=>{
+    const val=document.getElementById(`ho-r-${r.id}`)?.value?.trim();
+    if(val) ho.residents[r.id]=val;
+  });
+  try{
+    const res=await dbInsert('handovers',{
+      date:ho.date,shift:ho.shift,author:ho.author,
+      urgent:ho.urgent,ops:ho.ops,next:ho.next,
+      residents_json:JSON.stringify(ho.residents)
+    });
+    if(res&&res[0])ho.id=String(res[0].id);
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('handover save error',e);showStatus('⚠️ ローカルのみ保存','red');}
+  S.handovers.unshift(ho);
+  if(ho.urgent.trim()){
+    const memoRes=await dbInsert('memos',{resident_id:'',tag:'urg',author:`${ho.shift} ${ho.author}`,content:`【申し送り緊急】${ho.urgent}`}).catch(e=>null);
+    const memoId=memoRes&&memoRes[0]?memoRes[0].id:rnd();
+    S.memos.unshift({id:memoId,rid:'',tag:'urg',au:`${ho.shift} ${ho.author}`,tx:`【申し送り緊急】${ho.urgent}`,t:ho.created});
+    updNB();
+  }
+  closeM('mho');
+  renderHandover();
+  if(S.view==='dash') renderDash();
+  toast(`✅ ${shift}の申し送りを保存しました`);
+}
+
+function renderHandover(){
+  const date=document.getElementById('ho-date').value||TODAY;
+  const shiftFilter=document.getElementById('ho-shift').value;
+
+  // バイタル警告
+  const alertRes=S.residents.filter(r=>{
+    const v=(S.vitals[r.id]||[]).filter(x=>x.date===date);
+    if(!v.length) return false;
+    const lv=v[v.length-1];
+    return parseFloat(lv.temp)>=37.5||parseInt(lv.bph)>=160||parseInt(lv.spo)<95;
+  });
+  const alertEl=document.getElementById('ho-vitalalert');
+  if(alertRes.length){
+    alertEl.innerHTML=`<div class="ch" style="border-color:var(--rose3)"><div class="ct" style="color:var(--rose2)">⚠️ バイタル要注意（${date}）</div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">${alertRes.map(r=>{
+        const lv=(S.vitals[r.id]||[]).filter(x=>x.date===date).slice(-1)[0];
+        const warns=[];
+        if(parseFloat(lv.temp)>=37.5) warns.push(`体温${lv.temp}℃`);
+        if(parseInt(lv.bph)>=160) warns.push(`血圧${lv.bph}/${lv.bpl}`);
+        if(parseInt(lv.spo)<95) warns.push(`SpO₂${lv.spo}%`);
+        return`<div style="background:var(--rose3);border-radius:8px;padding:8px 12px;border-left:3px solid var(--rose2)">
+          <strong style="font-size:14px">${r.name}</strong>
+          <div style="font-size:13px;color:var(--rose2);font-weight:600">${warns.join('　')}</div>
+        </div>`;
+      }).join('')}</div>`;
+  } else {
+    alertEl.innerHTML=`<div style="color:var(--green);font-size:14px;display:flex;align-items:center;gap:8px"><span style="font-size:18px">✅</span>${date}のバイタル：全員異常なし</div>`;
+  }
+
+  // 申し送り一覧
+  let list=S.handovers.filter(h=>h.date===date);
+  if(shiftFilter) list=list.filter(h=>h.shift===shiftFilter);
+  const el=document.getElementById('ho-list');
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;color:var(--ink3);padding:40px;font-size:15px">この日の申し送りはまだありません</div>';
+    return;
+  }
+  // シフト順に並べる
+  const shiftOrder=['早番','日勤','遅番','夜勤'];
+  list.sort((a,b)=>shiftOrder.indexOf(a.shift)-shiftOrder.indexOf(b.shift));
+  el.innerHTML=list.map(ho=>{
+    const sh=SHIFTS.find(s=>s.val===ho.shift)||{ic:'📋',color:'var(--ink)',bg:'var(--sf2)'};
+    const resEntries=Object.entries(ho.residents);
+    return`<div class="card" style="margin-bottom:14px;border-left:5px solid ${sh.color}">
+      <div class="ch" style="border-color:${sh.color}33">
+        <div class="ct" style="color:${sh.color}">${sh.ic} ${ho.shift}　<span style="font-size:14px;font-weight:400;color:var(--ink3)">${(ho.created||'').replace('T',' ')}　${ho.author}</span></div>
+        <button class="btn br xs" onclick="delHandover('${ho.id}')">削除</button>
+      </div>
+      ${ho.urgent?`<div style="background:var(--rose3);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid var(--rose2)">
+        <div style="font-size:13px;font-weight:700;color:var(--rose2);margin-bottom:4px">⚠️ 要注意・緊急</div>
+        <div style="font-size:14px;white-space:pre-wrap">${ho.urgent}</div>
+      </div>`:''}
+      ${resEntries.length?`<div style="margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--ink3);margin-bottom:8px">👤 利用者別</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${resEntries.map(([rid,tx])=>{
+            const r=S.residents.find(x=>x.id==rid);
+            return`<div style="background:var(--sf2);border-radius:8px;padding:9px 12px;display:flex;gap:10px;align-items:flex-start">
+              <span style="font-weight:700;font-size:14px;white-space:nowrap;color:var(--blue);min-width:80px">${r?`${r.room}号室<br>${r.name}`:rid}</span>
+              <span style="font-size:14px;line-height:1.6;white-space:pre-wrap">${tx}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`:''}
+      ${ho.ops?`<div style="background:var(--teal3);border-radius:8px;padding:9px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--teal)">📋 業務連絡：</span>
+        <span style="font-size:14px">${ho.ops}</span>
+      </div>`:''}
+      ${ho.next?`<div style="background:var(--amber3);border-radius:8px;padding:9px">
+        <span style="font-size:13px;font-weight:700;color:var(--amber)">➡️ 次シフトへのお願い：</span>
+        <span style="font-size:14px">${ho.next}</span>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function delHandover(id){
+  if(!confirm('この申し送りを削除しますか？'))return;
+  S.handovers=S.handovers.filter(h=>h.id!==id);
+  renderHandover();
+  toast('🗑 削除しました');
+}
+
+
+// ADL
+const ADL=[
+  {k:'eating',l:'食事',o:[{v:0,l:'全介助'},{v:5,l:'要介助'},{v:10,l:'自立'}]},
+  {k:'transfer',l:'移乗',o:[{v:0,l:'不可'},{v:5,l:'大介助'},{v:10,l:'軽介助'},{v:15,l:'自立'}]},
+  {k:'grooming',l:'整容',o:[{v:0,l:'要介助'},{v:5,l:'自立'}]},
+  {k:'toilet',l:'トイレ動作',o:[{v:0,l:'全介助'},{v:5,l:'要介助'},{v:10,l:'自立'}]},
+  {k:'bathing',l:'入浴',o:[{v:0,l:'要介助'},{v:5,l:'自立'}]},
+  {k:'walking',l:'歩行',o:[{v:0,l:'不可'},{v:5,l:'車椅子'},{v:10,l:'要介助'},{v:15,l:'自立'}]},
+  {k:'stairs',l:'階段',o:[{v:0,l:'不可'},{v:5,l:'要介助'},{v:10,l:'自立'}]},
+  {k:'dressing',l:'更衣',o:[{v:0,l:'全介助'},{v:5,l:'要介助'},{v:10,l:'自立'}]},
+  {k:'bowel',l:'排便管理',o:[{v:0,l:'失禁'},{v:5,l:'要介助'},{v:10,l:'自立'}]},
+  {k:'bladder',l:'排尿管理',o:[{v:0,l:'失禁'},{v:5,l:'要介助'},{v:10,l:'自立'}]},
+];
+function renderADL(rid){
+  const g=document.getElementById(`ag-${rid}`),t=document.getElementById(`at-${rid}`);if(!g)return;
+  const a=S.adl[rid]||{};
+  g.innerHTML=ADL.map(item=>`
+    <div class="ar">
+      <div class="al2">${item.l}</div>
+      <div class="ao" style="margin-bottom:6px">${item.o.map(o=>`<button class="aob ${a[item.k]===o.v?'on':''}" onclick="setADL('${rid}','${item.k}',${o.v})">${o.l}</button>`).join('')}</div>
+      <input type="text" value="${a[item.k+'_note']||''}" placeholder="備考（詳細を記入）"
+        style="width:100%;padding:5px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:12px;font-family:inherit;background:#fff"
+        oninput="setADLNote('${rid}','${item.k}',this.value)">
+    </div>`).join('');
+  const tot=Object.values(a).filter((v,k)=>typeof v==='number').reduce((s,v)=>s+(typeof v==='number'?v:0),0);
+  const numVals=Object.entries(a).filter(([k,v])=>typeof v==='number'&&!k.endsWith('_note')).map(([,v])=>v);
+  const totalScore=numVals.reduce((s,v)=>s+v,0);
+  if(t)t.textContent=`バーセルインデックス: ${totalScore}/100点${totalScore<=40?' (重度依存)':totalScore<=60?' (中等度)':totalScore<=80?' (軽度依存)':' (自立)'}`;
+}
+function setADL(rid,k,v){if(!S.adl[rid])S.adl[rid]={};S.adl[rid][k]=v;renderADL(rid);}
+function setADLNote(rid,k,v){if(!S.adl[rid])S.adl[rid]={};S.adl[rid][k+'_note']=v;}
+
+// DRUGS
+function dtHTML(rid){
+  const d=S.drugs[rid]||[];
+  if(!d.length) return'<div style="text-align:center;color:var(--ink3);padding:18px;font-size:14px">薬情データなし</div>';
+  return`<div class="tw"><table class="dt">
+    <thead><tr><th>薬品名</th><th>用量</th><th>タイミング</th><th>目的・注意</th><th>写真</th><th></th></tr></thead>
+    <tbody>${d.map((x,i)=>`<tr>
+      <td><strong>${x.name}</strong></td>
+      <td>${x.dose||''}</td>
+      <td><span class="pl pb">${x.timing||''}</span></td>
+      <td style="color:var(--ink3);font-size:12px">${x.note||''}</td>
+      <td style="text-align:center">${x.photoUrl?`<img src="${x.photoUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer" onclick="showDrugPhoto('${x.photoUrl}')" title="クリックで拡大">`:'-'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn bo xs" onclick="editDrug('${rid}',${i})">編集</button>
+        <button class="btn br xs" onclick="delDrug('${rid}',${i})">削除</button>
+      </td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+function editDrug(rid,idx){
+  const d=S.drugs[rid]?.[idx];if(!d)return;
+  document.getElementById('dnm').value=d.name||'';
+  document.getElementById('dds').value=d.dose||'';
+  document.getElementById('dtm').value=d.timing||'朝食後';
+  document.getElementById('dnt').value=d.note||'';
+  document.getElementById('drug-raw').value=d.raw||'';
+  document.getElementById('md').dataset.editIdx=idx;
+  toast('📝 内容を編集して「＋追加」を押してください');
+}
+
+function openDM(rid){
+  const r=S.residents.find(x=>x.id===rid);
+  document.getElementById('md').dataset.rid=rid;
+  delete document.getElementById('md').dataset.editIdx;
+  document.getElementById('mdtitle').textContent=`💊 ${r?.name} さんの薬情`;
+  document.getElementById('mdlist').innerHTML=dtHTML(rid);
+  ['dnm','dds','dnt','drug-raw'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const dtmEl=document.getElementById('dtm');if(dtmEl)dtmEl.value='朝食後';
+  const prev=document.getElementById('drug-photo-preview');if(prev)prev.style.display='none';
+  const btn=document.getElementById('drug-read-btn');if(btn)btn.style.display='none';
+  const alert=document.getElementById('drug-allergy-alert');if(alert)alert.style.display='none';
+  const status=document.getElementById('drug-read-status');if(status)status.textContent='写真を参考に下の入力欄に薬品名・用量・服用タイミングを入力してください';
+  openM('md');
+}
+
+const ALLERGY_MAP={
+  'ペニシリン':['アモキシシリン','アンピシリン','ピペラシリン'],
+  'セフェム':['セファレキシン','セフジニル','セフカペン','セフジトレン'],
+  'アスピリン':['アスピリン','アセチルサリチル酸'],
+  '卵':['インフルエンザワクチン'],
+  '造影剤':['ヨード','ガドリニウム'],
+  'キノロン':['レボフロキサシン','シプロフロキサシン','モキシフロキサシン'],
+  'スルホンアミド':['スルファメトキサゾール','バクタ','ST合剤'],
+};
+
+function showDrugPhoto(src){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+  ov.innerHTML=`<div style="text-align:center"><img src="${src}" style="max-width:92vw;max-height:85vh;border-radius:8px"><div style="color:#fff;margin-top:8px;font-size:14px">タップで閉じる</div></div>`;
+  ov.onclick=()=>ov.remove();
+  document.body.appendChild(ov);
+}
+
+// DETAIL
+function loadDet(){
+  const rid=document.getElementById('ds2').value;S.cur=rid;
+  const body=document.getElementById('detb');
+  if(!rid){body.innerHTML='<div style="text-align:center;padding:60px;color:var(--ink3)">利用者を選択してください</div>';return;}
+  const r=S.residents.find(x=>x.id===rid);if(!r)return;
+  // タブをリセット（基本情報に戻す）
+  S.detTab='info';
+  const age=calcAge(r.birth),vits=S.vitals[rid]||[],lv=vits.slice(-1)[0],memos=S.memos.filter(m=>m.rid===rid),drugs=S.drugs[rid]||[];
+  body.innerHTML=`
+    <div class="card" style="margin-bottom:13px">
+      <div style="display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap">
+        <div class="av" style="width:56px;height:56px;font-size:21px;flex-shrink:0">${r.name.charAt(0)}</div>
+        <div style="flex:1;min-width:150px">
+          <div style="font-size:19px;font-weight:700;color:var(--blue);margin-bottom:2px">${r.name}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-bottom:7px">${r.kana} ・ ${age}歳 ・ ${r.gender} ・ ${r.room}号室</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            <span class="pl pb">${r.careLevel}</span>
+            ${r.allergy&&r.allergy!=='なし'?`<span class="pl pr">🚫 ${r.allergy}</span>`:''}
+            ${r.notes?`<span class="pl pa">📌 注意あり</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn bb sm" onclick="qVFromDet('${rid}')">＋ バイタル</button>
+          <button class="btn bt sm" onclick="openMemoFor('${rid}')">＋ メモ</button>
+          <button class="btn ba sm" onclick="openDM('${rid}')">💊 薬情</button>
+          <button class="btn bo sm" onclick="editR('${rid}')">✏️ 編集</button>
+        </div>
+      </div>
+    </div>
+    <div class="tabs" id="dtabs">
+      <button class="tab on" onclick="swTab('info',this)">📋 基本情報</button>
+      <button class="tab" onclick="swTab('vh',this)">📊 バイタル(${vits.length})</button>
+      <button class="tab" onclick="swTab('adl',this)">🏃 ADL</button>
+      <button class="tab" onclick="swTab('ddly',this)">📓 日々の記録(${(S.daily[rid]||[]).length})</button>
+      <button class="tab" onclick="swTab('md2',this)">📝 メモ(${memos.length})</button>
+    </div>
+    <!-- INFO -->
+    <div id="ti">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+        <div class="card">
+          <div class="ch"><div class="ct">👤 基本情報</div></div>
+          ${[
+            ['入居日',r.entryDate||'-'],
+            ['状態',r.status||'入居中'],
+            r.dischargeDate?['退去日',r.dischargeDate]:null,
+            ['訪問診療先',r.doctor||'-'],
+            ['担当ケアマネ',r.careManager||'-'],
+            ['福祉用具業者',r.welfareVendor||'-'],
+            ['緊急連絡先',r.emergency||'-'],
+          ].filter(Boolean).map(([l,v])=>`<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px"><span style="color:var(--ink3);min-width:100px;flex-shrink:0">${l}</span><span>${v}</span></div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct">🏥 病歴・既往症</div></div>
+          <div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${r.history||'記録なし'}</div>
+          ${r.notes?`<div style="margin-top:10px;padding:9px;background:var(--amber3);border-radius:7px;font-size:13px;color:var(--amber)">📌 ${r.notes}</div>`:''}
+        </div>
+      </div>
+      ${lv?`<div class="card" style="margin-top:13px"><div class="ch"><div class="ct">📈 最新バイタル（${lv.date} ${lv.time}）</div></div><div class="mvr">
+        <div class="mv"><span class="mvi">🌡️</span><div><div class="mvv ${parseFloat(lv.temp)>=37.5?'al':''}">${lv.temp}℃</div><div class="mvl">体温</div></div></div>
+        <div class="mv"><span class="mvi">💓</span><div><div class="mvv">${lv.pls}</div><div class="mvl">脈拍</div></div></div>
+        <div class="mv"><span class="mvi">🩸</span><div><div class="mvv ${parseInt(lv.bph)>=160?'al':parseInt(lv.bph)>=140?'wn':''}">${lv.bph}/${lv.bpl}</div><div class="mvl">血圧</div></div></div>
+        <div class="mv"><span class="mvi">💨</span><div><div class="mvv ${parseInt(lv.spo)<93?'al':parseInt(lv.spo)<96?'wn':''}">${lv.spo}%</div><div class="mvl">SpO₂</div></div></div>
+        <div class="mv"><span class="mvi">🫁</span><div><div class="mvv">${lv.rsp}</div><div class="mvl">呼吸</div></div></div>
+      </div></div>`:''}
+    </div>
+    <!-- VITALS H -->
+    <div id="tvh" class="h"><div class="card"><div class="ch"><div class="ct">📊 バイタル履歴（直近20件）</div></div>
+      <div class="tw"><table class="vt"><thead><tr><th>日付</th><th>時間</th><th>体温</th><th>脈拍</th><th>血圧</th><th>SpO₂</th><th>呼吸</th><th>記録者</th><th>特記</th></tr></thead>
+      <tbody>${vits.slice(-20).reverse().map(v=>`<tr><td>${v.date}</td><td>${v.time}</td><td class="${parseFloat(v.temp)>=37.5?'al':''}">${v.temp}℃</td><td>${v.pls}</td><td class="${parseInt(v.bph)>=160?'al':parseInt(v.bph)>=140?'wn':''}">${v.bph}/${v.bpl}</td><td class="${parseInt(v.spo)<93?'al':''}">${v.spo}%</td><td>${v.rsp}</td><td style="font-size:12px">${v.sg||'-'}</td><td style="font-size:12px;color:var(--ink3)">${v.nt||''}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div></div>
+    <!-- ADL -->
+    <div id="tadl" class="h"><div class="card"><div class="ch"><div class="ct">🏃 ADL評価（バーセルインデックス準拠）</div><button class="btn bb sm" onclick="toast('✅ ADL評価を保存しました')">💾 保存</button></div>
+      <div class="ag" id="ag-${rid}"></div>
+      <div id="at-${rid}" style="margin-top:10px;padding:9px;background:var(--blue3);border-radius:7px;font-weight:700;color:var(--blue);font-size:13px;text-align:center"></div>
+    </div></div>
+    <!-- DAILY RECORDS in DETAIL -->
+    <div id="tddly" class="h">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn bb sm" onclick="openDailyModal();document.getElementById('dly-res2').value='${rid}'">＋ 日々の記録追加</button>
+      </div>
+      <div>
+        ${(S.daily[rid]||[]).slice(0,10).map(rec=>`
+          <div style="border-left:4px solid var(--blue2);background:var(--sf2);border-radius:0 var(--r2) var(--r2) 0;padding:12px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+              <span style="font-size:13px;color:var(--ink3)">${rec.date} ${rec.time} ／ ${rec.author}</span>
+              <div style="display:flex;gap:5px">
+                <button class="btn bo xs" onclick="editDailyRecord('${rid}','${rec.id}')">編集</button>
+                <button class="btn br xs" onclick="delDailyRecord('${rid}','${rec.id}')">削除</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px;font-size:13px">
+              ${rec.meal_mm||rec.meal_lm||rec.meal_em?`<div><span style="color:var(--amber);font-weight:600">🍽️食事</span><br>朝主${rec.meal_mm||'-'} 昼主${rec.meal_lm||'-'} 夕主${rec.meal_em||'-'}</div>`:''}
+              ${rec.bath?`<div><span style="color:var(--blue);font-weight:600">🛁入浴</span><br>${rec.bath}</div>`:''}
+              ${rec.activity?`<div><span style="color:var(--green);font-weight:600">🏃活動</span><br>${rec.activity}</div>`:''}
+              ${rec.condition?`<div><span style="color:var(--teal);font-weight:600">🩺状態</span><br>${rec.condition}</div>`:''}
+            </div>
+            ${rec.observation?`<div style="margin-top:7px;font-size:13px;color:var(--ink3)">${rec.observation}</div>`:''}
+            ${rec.handover?`<div style="margin-top:6px;padding:7px;background:var(--amber3);border-radius:6px;font-size:13px"><span style="color:var(--amber);font-weight:600">⚠️申し送り：</span>${rec.handover}</div>`:''}
+          </div>`).join('')||'<div style="text-align:center;color:var(--ink3);padding:30px">記録なし</div>'}
+      </div>
+    </div>
+    <!-- MEMOS -->
+    <div id="tmd2" class="h">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn bb sm" onclick="openMemoFor('${rid}')">＋ メモ追加</button></div>
+      ${memos.length?memos.sort((a,b)=>b.t.localeCompare(a.t)).map(m=>miHTML(m)).join(''):'<div style="text-align:center;color:var(--ink3);padding:30px">メモなし</div>'}
+    </div>
+    <!-- DRUGS -->
+    `;
+  renderADL(rid);
+}
+function swTab(id,btn){
+  // 個別記録のタブコンテンツのみ切り替え
+  // 実際のID: ti(基本情報), tvh(バイタル), tadl(ADL), tddly(日々), tmd2(メモ), tdrg(薬情), tw2(体重)
+  const tabMap={info:'ti', vh:'tvh', adl:'tadl', ddly:'tddly', md2:'tmd2', w2:'tw2'};
+  const allTabIds=['ti','tvh','tadl','tddly','tmd2','tw2'];
+  allTabIds.forEach(tid=>{
+    const el=document.getElementById(tid);
+    if(el) el.classList.add('h');
+  });
+  document.querySelectorAll('#dtabs .tab').forEach(e=>e.classList.remove('on'));
+  const targetId=tabMap[id]||('t'+id);
+  const target=document.getElementById(targetId);
+  if(target) target.classList.remove('h');
+  if(btn) btn.classList.add('on');
+  if(id==='adl') renderADL(S.cur);
+}
+function prepVFor(rid){document.getElementById('vs').value=rid;openM('mv');}
+
+// MEMOS
+const TM={gen:{l:'一般',p:'pa'},med:{l:'医療',p:'pb'},care:{l:'ケア',p:'pt'},urg:{l:'緊急',p:'pr'}};
+function tl(t){return TM[t]?.l||t;}function tp(t){return TM[t]?.p||'pa';}
+function mc(t){return t==='urg'?'urg':t==='med'?'med':t==='care'?'care':'';}
+function miHTML(m){
+  const r=S.residents.find(x=>x.id===m.rid);
+  return`<div class="mi ${mc(m.tag)}">
+    <div class="mm">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+        <span class="pl ${tp(m.tag)}">${tl(m.tag)}</span>
+        ${r?`<strong style="font-size:12px">${r.name}</strong><span style="font-size:11px;color:var(--ink3)">${r.room}号室</span>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-size:11px;color:var(--ink3)">${m.au} ・ ${m.t.replace('T',' ')}</span>
+        <button class="btn bo xs" onclick="editMemo('${m.id}')">編集</button>
+        <button class="btn br xs" onclick="delMemo('${m.id}')">削除</button>
+      </div>
+    </div>
+    <div class="mt2">${m.tx}</div>
+  </div>`;
+}
+function renderMemos(){
+  const rid=document.getElementById('mfr').value;
+  const tag=document.getElementById('mft').value;
+  const period=parseInt(document.getElementById('mfperiod')?.value||'0');
+  let list=[...S.memos];
+  if(rid) list=list.filter(m=>m.rid===rid);
+  if(tag) list=list.filter(m=>m.tag===tag);
+  if(period>0){
+    const cutoff=new Date();cutoff.setDate(cutoff.getDate()-period);
+    const cutoffStr=cutoff.toISOString().slice(0,10);
+    list=list.filter(m=>m.t>=cutoffStr);
+  }
+  list.sort((a,b)=>b.t.localeCompare(a.t));
+  const el=document.getElementById('ml');
+  el.innerHTML=list.length?list.map(m=>miHTML(m)).join(''):'<div style="text-align:center;color:var(--ink3);padding:40px">該当するメモがありません</div>';
+}
+
+// 表示期間クイック設定
+function setMemoDateRange(days){
+  const start=document.getElementById('mm-start');
+  const end=document.getElementById('mm-end');
+  if(!start||!end) return;
+  if(days===0){start.value='';end.value='';return;}
+  const today=new Date();
+  const endDate=new Date(today);
+  endDate.setDate(endDate.getDate()+days-1);
+  start.value=TODAY;
+  end.value=endDate.toISOString().split('T')[0];
+}
+function checkMemoDuplicate(){
+  const rid=iv('mmr'),tag=iv('mmt'),tx=iv('mmtx').trim();
+  const alertEl=document.getElementById('mm-dup-alert');
+  if(!alertEl||!tx||tx.length<5){alertEl.style.display='none';return;}
+  // 同じ利用者・同じカテゴリで直近7日以内の類似メモを検索
+  const recent=S.memos.filter(m=>{
+    if(m.rid!==rid||m.tag!==tag) return false;
+    const diff=Math.floor((new Date()-new Date(m.t))/(1000*60*60*24));
+    if(diff>7) return false;
+    // 簡易類似チェック：先頭10文字が一致
+    return m.tx.slice(0,10)===tx.slice(0,10)||m.tx.includes(tx.slice(0,8));
+  });
+  if(recent.length){
+    alertEl.style.display='block';
+    alertEl.innerHTML=`⚠️ 類似のメモが${recent.length}件あります（直近7日以内）<br>`+
+      recent.slice(0,2).map(m=>`<div style="font-size:12px;margin-top:4px;color:var(--ink2)">・${m.t.replace('T',' ')} ${m.au}: ${m.tx.slice(0,40)}…</div>`).join('');
+  } else {
+    alertEl.style.display='none';
+  }
+}
+
+function openMemoFor(rid){
+  document.getElementById('mm-edit-id').value='';
+  document.getElementById('mm-title').textContent='📝 共有メモ追加';
+  document.getElementById('mm-save-btn').textContent='💾 保存';
+  document.getElementById('mmtx').value='';
+  // スタッフ名を自動セット
+  const mmaEl=document.getElementById('mma');
+  if(mmaEl) mmaEl.value=currentStaff||'';
+  document.getElementById('mm-dup-alert').style.display='none';
+  // デフォルト：今日から3日間
+  setMemoDateRange(3);
+  openM('mm');popMM();setTimeout(()=>{document.getElementById('mmr').value=rid;},40);
+}
+function editMemo(id){
+  const m=S.memos.find(x=>x.id==id);if(!m)return;
+  document.getElementById('mm-edit-id').value=id;
+  document.getElementById('mm-title').textContent='📝 共有メモ編集';
+  document.getElementById('mm-save-btn').textContent='💾 更新';
+  document.getElementById('mm-dup-alert').style.display='none';
+  popMM();
+  setTimeout(()=>{
+    document.getElementById('mmr').value=m.rid||'';
+    document.getElementById('mmt').value=m.tag;
+    document.getElementById('mma').value=m.au;
+    document.getElementById('mmtx').value=m.tx;
+    document.getElementById('mm-start').value=m.startDate||TODAY;
+    document.getElementById('mm-end').value=m.expiry||'';
+  },40);
+  openM('mm');
+}
+async function saveMemo(){
+  const tx=document.getElementById('mmtx').value.trim();if(!tx){toast('⚠ 内容を入力してください');return;}
+  const editId=document.getElementById('mm-edit-id').value;
+  const startDate=iv('mm-start')||TODAY;
+  const expiry=iv('mm-end')||null;
+  const now=new Date().toISOString().slice(0,16);
+  const memo={
+    id:editId||rnd(),rid:iv('mmr'),tag:iv('mmt'),au:iv('mma')||'担当者',
+    tx,startDate,expiry,
+    t:editId?S.memos.find(x=>x.id==editId)?.t||now:now
+  };
+  try{
+    if(editId){
+      await dbUpdate('memos',editId,{resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
+      const idx=S.memos.findIndex(x=>x.id==editId);if(idx>=0)S.memos[idx]=memo;
+    } else {
+      const res=await dbInsert('memos',{resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
+      if(res&&res[0])memo.id=res[0].id;
+      S.memos.unshift(memo);
+    }
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('memo save error',e);showStatus('⚠️ ローカルのみ保存','red');}
+  document.getElementById('mmtx').value='';closeM('mm');updNB();
+  if(S.view==='memo')renderMemos();if(S.view==='dash')renderDash();if(S.view==='det')loadDet();
+  toast(editId?'📝 メモを更新しました':'📝 メモを保存しました');
+}
+async function delMemo(id){if(!confirm('削除しますか？'))return;try{await dbDelete('memos',id);showStatus('🗑 削除しました','green');}catch(e){console.error(e);}S.memos=S.memos.filter(m=>m.id!==id);updNB();if(S.view==='memo')renderMemos();if(S.view==='det')loadDet();}
+function updNB(){const n=S.memos.filter(m=>m.tag==='urg').length;const el=document.getElementById('nb');el.textContent=n||'';el.classList.toggle('h',!n);}
+
+// RESIDENT
+async function saveRes(){
+  const nm=document.getElementById('rnm').value.trim();if(!nm){toast('⚠ 氏名を入力してください');return;}
+  const eid=document.getElementById('mr').dataset.editId;
+  const prevNotes=eid?(S.residents.find(x=>x.id===eid)?.notes||''):'';
+  const newNotes=iv('rnt');
+  const notesUpdated=eid&&prevNotes!==newNotes&&newNotes.trim()!=='';
+  const r={
+    id:eid||'r'+rnd(),name:nm,kana:iv('rkn'),room:iv('rrm'),gender:iv('rgd'),birth:iv('rbd'),
+    careLevel:iv('rcl'),status:iv('rst')||'入居中',
+    entryDate:iv('red'),dischargeDate:iv('rdis'),
+    doctor:iv('rdoc'),careManager:iv('rcm'),welfareVendor:iv('rwl'),
+    history:iv('rhx'),allergy:iv('ral')||'なし',emergency:iv('rec'),notes:newNotes,
+    notesUpdatedAt:notesUpdated?new Date().toISOString().slice(0,10):(eid?(S.residents.find(x=>x.id===eid)?.notesUpdatedAt||''):'')
+  };
+  const dbData={name:r.name,kana:r.kana,room:r.room,gender:r.gender,birth:r.birth,care_level:r.careLevel,entry_date:r.entryDate,history:r.history,allergy:r.allergy,emergency:r.emergency,notes:r.notes};
+  try{
+    if(eid){await dbUpdate('residents',eid,dbData);}
+    else{const res=await dbInsert('residents',dbData);if(res&&res[0])r.id=res[0].id;}
+    showStatus('✅ クラウドに保存','green');
+  }catch(e){console.error('resident save error',e);showStatus('⚠️ ローカルのみ保存','red');}
+  if(eid){const i=S.residents.findIndex(x=>x.id===eid);if(i>=0)S.residents[i]=r;}
+  else{S.residents.push(r);S.vitals[r.id]=[];}
+  // 基準値を保存
+  if(!S.vitalRef) S.vitalRef={};
+  S.vitalRef[r.id]={
+    tempMin:parseFloat(document.getElementById('ref-tempMin')?.value)||null,
+    tempMax:parseFloat(document.getElementById('ref-tempMax')?.value)||null,
+    plsMin:parseInt(document.getElementById('ref-plsMin')?.value)||null,
+    plsMax:parseInt(document.getElementById('ref-plsMax')?.value)||null,
+    bphMin:parseInt(document.getElementById('ref-bphMin')?.value)||null,
+    bphMax:parseInt(document.getElementById('ref-bphMax')?.value)||null,
+    bplMin:parseInt(document.getElementById('ref-bplMin')?.value)||null,
+    bplMax:parseInt(document.getElementById('ref-bplMax')?.value)||null,
+    spoMin:parseInt(document.getElementById('ref-spoMin')?.value)||null,
+    rspMin:parseInt(document.getElementById('ref-rspMin')?.value)||null,
+    rspMax:parseInt(document.getElementById('ref-rspMax')?.value)||null,
+  };
+  delete document.getElementById('mr').dataset.editId;
+  closeM('mr');populateSels();renderRG();
+  if(S.view==='dash')renderDash();
+  toast('✅ 利用者情報を保存しました');
+}
+function editR(rid){
+  const r=S.residents.find(x=>x.id===rid);if(!r)return;
+  document.getElementById('mr').dataset.editId=rid;
+  document.getElementById('mr-title').textContent='👤 利用者情報編集';
+  document.getElementById('mr-save-btn').textContent='💾 更新';
+  const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+  setV('rnm',r.name);setV('rkn',r.kana);setV('rrm',r.room);setV('rgd',r.gender);
+  setV('rbd',r.birth);setV('rcl',r.careLevel);setV('rst',r.status||'入居中');
+  setV('red',r.entryDate);setV('rdis',r.dischargeDate);
+  setV('rdoc',r.doctor);setV('rcm',r.careManager);setV('rwl',r.welfareVendor);
+  setV('rhx',r.history);setV('ral',r.allergy);setV('rec',r.emergency);setV('rnt',r.notes);
+  // 基準値を読み込む
+  const ref=S.vitalRef?.[rid]||{};
+  ['tempMin','tempMax','plsMin','plsMax','bphMin','bphMax','bplMin','bplMax','spoMin','rspMin','rspMax'].forEach(k=>{
+    const el=document.getElementById('ref-'+k);
+    if(el) el.value=ref[k]||'';
+  });
+  openM('mr');
+}
+
+// GLOBAL SEARCH
+// 薬情写真プレビュー
+// 薬情写真拡大表示
+// 薬情写真削除
+// 個人記録ページから薬情を開いた時に既存写真を表示
+function gSearch(q){
+  const box=document.getElementById('sr');q=q.trim();
+  if(!q){box.classList.add('h');return;}
+  const res=[];
+  const ql=q.toLowerCase();
+  // 利用者情報
+  S.residents.forEach(r=>{
+    const fields=[r.name,r.kana,r.history,r.allergy,r.notes,r.emergency,r.doctor,r.careManager].filter(Boolean).join(' ').toLowerCase();
+    if(fields.includes(ql))res.push({type:'res',ic:'👤',title:r.name,sub:`${r.room}号室 ・ ${r.careLevel} ・ ${(r.history||'').slice(0,30)}`,id:r.id});
+  });
+  // バイタル特記
+  S.residents.forEach(r=>{(S.vitals[r.id]||[]).forEach(v=>{
+    if(((v.nt||'')+(v.tr||'')).toLowerCase().includes(ql))
+      res.push({type:'vit',ic:'📊',title:`${r.name}のバイタル`,sub:`${v.date} ${v.time} ・ ${(v.nt||'').slice(0,40)}`,id:r.id});
+  });});
+  // 共有メモ
+  S.memos.forEach(m=>{
+    if((m.tx||'').toLowerCase().includes(ql)||(m.au||'').toLowerCase().includes(ql)){
+      const r=S.residents.find(x=>x.id===m.rid);
+      res.push({type:'memo',ic:'📝',title:`${r?.name||''}のメモ`,sub:(m.tx||'').slice(0,50),id:m.rid,tag:m.tag});
+    }
+  });
+  // 日々の記録
+  Object.entries(S.daily||{}).forEach(([rid,recs])=>{
+    (recs||[]).forEach(rec=>{
+      const searchText=[rec.observation,rec.care,rec.handover,rec.act_note,rec.meal_note,rec.author].filter(Boolean).join(' ').toLowerCase();
+      if(searchText.includes(ql)){
+        const r=S.residents.find(x=>x.id==rid);
+        res.push({type:'daily',ic:'📓',title:`${r?.name||''}の日々の記録`,sub:`${rec.date} ${rec.condition||''} ${(rec.observation||'').slice(0,40)}`,id:rid});
+      }
+    });
+  });
+  // 薬情
+  Object.entries(S.drugs||{}).forEach(([rid,drugs])=>{
+    (drugs||[]).forEach(d=>{
+      if(((d.name||'')+(d.note||'')).toLowerCase().includes(ql)){
+        const r=S.residents.find(x=>x.id===rid);
+        res.push({type:'drug',ic:'💊',title:`${r?.name||''}の薬情`,sub:`${d.name} ${d.timing} ${d.note}`,id:rid});
+      }
+    });
+  });
+  // 申し送り
+  (S.handovers||[]).forEach(h=>{
+    if(((h.content||'')+(h.author||'')).toLowerCase().includes(ql))
+      res.push({type:'handover',ic:'📋',title:'申し送り',sub:`${h.date} ${(h.content||'').slice(0,50)}`,id:null});
+  });
+  // 体重
+  Object.entries(S.weights||{}).forEach(([rid,ws])=>{
+    (ws||[]).forEach(w=>{
+      if(((w.note||'')).toLowerCase().includes(ql)){
+        const r=S.residents.find(x=>x.id===rid);
+        res.push({type:'weight',ic:'⚖️',title:`${r?.name||''}の体重記録`,sub:`${w.date} ${w.weight}kg ${w.note}`,id:rid});
+      }
+    });
+  });
+  if(!res.length){
+    box.innerHTML=`<div style="padding:13px;color:var(--ink3);font-size:13px;text-align:center">「${q}」に関する記録が見つかりませんでした</div>`;
+    box.classList.remove('h');return;
+  }
+  box.innerHTML=res.slice(0,12).map(r=>`<div class="sri" onclick="goRes('${r.id}','${r.type}')"><div class="sn">${r.ic} ${r.title}</div><div class="sd">${r.sub}</div></div>`).join('');
+  box.classList.remove('h');
+}
+function goRes(rid,type){
+  document.getElementById('gsearch').value='';document.getElementById('sr').classList.add('h');
+  S.cur=rid;
+  if(type==='memo'){gv('memo');setTimeout(()=>{document.getElementById('mfr').value=rid;renderMemos();},60);}
+  else if(type==='daily'){gv('daily');setTimeout(()=>{document.getElementById('dly-res').value=rid;loadDaily();},60);}
+  else{document.getElementById('ds2').value=rid;gv('det');}
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#hs'))document.getElementById('sr').classList.add('h');});
+
+// SELECTS
+function populateSels(){popS('vs');popS('ds2');popMF();popMM();}
+function popS(id){
+  const el=document.getElementById(id);if(!el)return;
+  const c=el.value;
+  if(id==='ds2'){
+    const active=S.residents.filter(r=>!r.status||r.status==='入居中');
+    const discharged=S.residents.filter(r=>r.status&&r.status!=='入居中');
+    let opts='<option value="">選択</option>';
+    if(active.length) opts+='<optgroup label="入居中">'+active.map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('')+'</optgroup>';
+    if(discharged.length) opts+='<optgroup label="退居者">'+discharged.map(r=>`<option value="${r.id}">[${r.status}] ${r.name}</option>`).join('')+'</optgroup>';
+    el.innerHTML=opts;
+  } else {
+    el.innerHTML='<option value="">選択</option>'+S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('');
+  }
+  if(c)el.value=c;
+}
+function popMF(){const el=document.getElementById('mfr');if(!el)return;const c=el.value;el.innerHTML='<option value="">全利用者</option>'+S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('');if(c)el.value=c;}
+function popMM(){const el=document.getElementById('mmr');if(!el)return;el.innerHTML='<option value="">全体連絡</option>'+S.residents.filter(r=>!r.status||r.status==='入居中').map(r=>`<option value="${r.id}">${r.room}号室 ${r.name}</option>`).join('');}
+
+function calcAge(b){if(!b)return'?';const d=new Date(b),n=new Date();let a=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;return a;}
+function rnd(){return Math.random().toString(36).slice(2,10);}
+function iv(id){const el=document.getElementById(id);return el?el.value:'';}
+function openM(id){document.getElementById(id).classList.remove('h');}
+function closeM(id){document.getElementById(id).classList.add('h');}
+document.querySelectorAll('.ov').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.add('h');});});
+let tTimer;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(tTimer);tTimer=setTimeout(()=>el.classList.remove('show'),2600);}
+function toggleMenu(){document.getElementById('sb').classList.toggle('open');}
+function checkMobile(){const btn=document.getElementById('menu-btn');if(btn)btn.style.display=window.innerWidth<=900?'block':'none';}
+window.addEventListener('resize',checkMobile);
+document.addEventListener('click',e=>{if(window.innerWidth<=900&&!e.target.closest('#sb')&&!e.target.closest('#menu-btn'))document.getElementById('sb').classList.remove('open');});
+</script>
+</body>
+</html>
