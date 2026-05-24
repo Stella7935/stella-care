@@ -1854,7 +1854,7 @@ async function saveAllVitals(){
     S.vitals[r.id].push(entry);
     S.vitals[r.id].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
     saved++;
-    try{await dbPost('vitals',{resident_id:r.id,date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg});}
+    try{await dbPost('vitals',{id:rnd(),resident_id:r.id,date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg});}
     catch(e){console.error('vital save:',r.name,e);}
   }
   if(saved===0){toast('⚠ 入力データがありません');return;}
@@ -1941,7 +1941,7 @@ async function saveIndivVital(){
     if(!S.vitals[rid]) S.vitals[rid]=[];
     S.vitals[rid].push(entry);
     S.vitals[rid].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
-    try{ await dbPost('vitals',{resident_id:rid,date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg}); }
+    try{ await dbPost('vitals',{id:rnd(),resident_id:rid,date,time,temp:temp||null,pls:pls||null,bph:bph||null,bpl:bpl||null,spo:spo||null,rsp:rsp||null,nt,tr,sg}); }
     catch(e){ console.error('vital save:',e); }
     toast('✅ バイタルを保存しました');
   }
@@ -2283,7 +2283,7 @@ async function saveExDetail(){
   try{
     const cur=S.excretion[date][rid][hour];
     const bArr=Array.isArray(cur?.bristol)?cur.bristol:(cur?.bristol?[cur.bristol]:[]);
-    const dbData={resident_id:rid,date,hour:String(hour),type:cur?.type||'',amount:cur?.amt||'',bristol:bArr.join(','),tekibin:cur?.tekibin?'1':'',sleep:cur?.sleep||''};
+    const dbData={id:rnd(),resident_id:rid,date,hour:String(hour),type:cur?.type||'',amount:cur?.amt||'',bristol:bArr.join(','),tekibin:cur?.tekibin?'1':'',sleep:cur?.sleep||''};
     if(prev?.id){
       if(cur)await dbUpdate('excretion',prev.id,dbData);
       else await dbDelete('excretion',prev.id);
@@ -2517,7 +2517,7 @@ async function saveWeight(){
     if(editId){
       await dbUpdate('weights',editId,{date:w.date,weight:w.weight,note:w.note});
     } else {
-      const res=await dbInsert('weights',{resident_id:rid,date:w.date,weight:w.weight,note:w.note});
+      const res=await dbInsert('weights',{id:rnd(),resident_id:rid,date:w.date,weight:w.weight,note:w.note});
       if(res&&res[0])w.id=String(res[0].id);
     }
     showStatus('✅ クラウドに保存','green');
@@ -2745,7 +2745,7 @@ async function saveDailyRecord(){
     created:editId?(S.daily[rid]||[]).find(x=>x.id===editId)?.created||now:now
   };
   const dbData={
-    resident_id:rid,date:rec.date,time:rec.time,author:rec.author,
+    id:rec.id||rnd(),resident_id:rid,date:rec.date,time:rec.time,author:rec.author,
     meal_mm:rec.meal_mm,meal_ms:rec.meal_ms,meal_lm:rec.meal_lm,meal_ls:rec.meal_ls,
     meal_em:rec.meal_em,meal_es:rec.meal_es,meal_note:rec.meal_note,
     bath:rec.bath,oral:rec.oral,activity:rec.activity,act_note:rec.act_note,
@@ -2771,7 +2771,7 @@ async function saveDailyRecord(){
       const hoTime=rec.date+'T'+(rec.time||new Date().toTimeString().slice(0,5));
       const ho={id:rnd(),date:rec.date,shift:getCurrentShift(),author:rec.author,urgent:'',ops:'',next:'',residents:{[rid]:rec.handover},created:hoTime};
       try{
-        const hres=await dbInsert('handovers',{date:ho.date,shift:ho.shift,author:ho.author,urgent:'',ops:'',next:'',residents_json:JSON.stringify(ho.residents)});
+        const hres=await dbInsert('handovers',{id:rnd(),date:ho.date,shift:ho.shift,author:ho.author,urgent:'',ops:'',next:'',residents_json:JSON.stringify(ho.residents)});
         if(hres&&hres[0])ho.id=String(hres[0].id);
       }catch(e){console.error('handover save error',e);}
       S.handovers.unshift(ho);
@@ -2941,7 +2941,7 @@ async function saveHandover(){
   });
   try{
     const res=await dbInsert('handovers',{
-      date:ho.date,shift:ho.shift,author:ho.author,
+      id:ho.id||rnd(),date:ho.date,shift:ho.shift,author:ho.author,
       urgent:ho.urgent,ops:ho.ops,next:ho.next,
       residents_json:JSON.stringify(ho.residents)
     });
@@ -2950,7 +2950,7 @@ async function saveHandover(){
   }catch(e){console.error('handover save error',e);showStatus('⚠️ ローカルのみ保存','red');}
   S.handovers.unshift(ho);
   if(ho.urgent.trim()){
-    const memoRes=await dbInsert('memos',{resident_id:'',tag:'urg',author:`${ho.shift} ${ho.author}`,content:`【申し送り緊急】${ho.urgent}`}).catch(e=>null);
+    const memoRes=await dbInsert('memos',{id:rnd(),resident_id:'',tag:'urg',author:`${ho.shift} ${ho.author}`,content:`【申し送り緊急】${ho.urgent}`}).catch(e=>null);
     const memoId=memoRes&&memoRes[0]?memoRes[0].id:rnd();
     S.memos.unshift({id:memoId,rid:'',tag:'urg',au:`${ho.shift} ${ho.author}`,tx:`【申し送り緊急】${ho.urgent}`,t:ho.created});
     updNB();
@@ -3388,7 +3388,7 @@ async function saveMemo(){
       await dbUpdate('memos',editId,{resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
       const idx=S.memos.findIndex(x=>x.id==editId);if(idx>=0)S.memos[idx]=memo;
     } else {
-      const res=await dbInsert('memos',{resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
+      const res=await dbInsert('memos',{id:rnd(),resident_id:memo.rid,tag:memo.tag,author:memo.au,content:memo.tx});
       if(res&&res[0])memo.id=res[0].id;
       S.memos.unshift(memo);
     }
