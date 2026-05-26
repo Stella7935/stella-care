@@ -295,7 +295,7 @@ input,select,textarea{font-family:inherit}
   <div id="vt-history" class="h">
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="vh-sel" onchange="initIndivForm();loadVHistory()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff;font-family:inherit;min-width:160px"></select>
+        <select id="vh-sel" onchange="loadVHistory()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff;font-family:inherit;min-width:160px"></select>
         <input type="date" id="vh-date" onchange="loadVHistory()" style="padding:6px 9px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:14px;background:#fff">
         <span style="font-size:12px;color:var(--ink3)">※日付未選択で全履歴表示</span>
       </div>
@@ -561,7 +561,7 @@ input,select,textarea{font-family:inherit}
       <button class="btn bb" onclick="openM('mm')">＋ メモ追加</button>
     </div>
   </div>
-  <div id="ml"></div>
+  <div id="ml" style="padding:10px 0;"></div>
 </div>
 </main>
 </div>
@@ -2300,7 +2300,7 @@ async function saveExDetail(){
   if(!S.excretion[date])S.excretion[date]={};
   if(!S.excretion[date][rid])S.excretion[date][rid]={};
   const prev=S.excretion[date][rid][hour];
-  if(!data.type){delete S.excretion[date][rid][hour];}
+  if(!data.type&&!data.sleep){delete S.excretion[date][rid][hour];}
   else{S.excretion[date][rid][hour]={...prev,...data};}
   // クラウド保存
   try{
@@ -3484,7 +3484,7 @@ function gSearch(q){
 function goRes(rid,type,date){
   document.getElementById('gsearch').value='';document.getElementById('sr').classList.add('h');
   S.cur=rid;
-  if(type==='memo'){gv('memo');setTimeout(()=>{document.getElementById('mfr').value=rid;renderMemos();},60);}
+  if(type==='memo'){gv('memo');setTimeout(()=>{const mfr=document.getElementById('mfr');if(mfr){popMF();mfr.value=rid||'';}renderMemos();},60);}
   else if(type==='daily'){
     // 当日に上書きしないよう先に日付をセット
     S._searchDate=date||null;
