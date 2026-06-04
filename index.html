@@ -2256,7 +2256,7 @@ function updateExModalUI(){
   // 排便量・ブリストル表示
   document.getElementById('mex-stool-area').style.display=hasStool?'':'none';
   document.getElementById('mex-bristol-area').style.display=hasStool?'':'none';
-  document.getElementById('mex-tekibin-area').style.display=hasStool?'':'none';
+  document.getElementById('mex-tekibin-area').style.display='';
   // 排便量ボタン
   [1,2,3].forEach(a=>{
     const el=document.getElementById(`mex-a${a}`);
