@@ -927,10 +927,18 @@ input,select,textarea{font-family:inherit}
     <div style="background:var(--sf2);border-radius:var(--r2);padding:12px;margin-bottom:10px">
       <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">🏃 活動・リハビリ</div>
       <div class="fr">
-        <div class="fg"><label>活動内容</label>
-          <select id="dly-act" style="padding:6px;border:1.5px solid var(--bd);border-radius:var(--r2);font-size:13px;background:#fff">
-            <option value="">-</option><option>訪問リハビリ</option><option>マッサージ</option><option>可動域訓練</option><option>車椅子離床</option><option>外出・散歩</option><option>居室安静</option><option>面会あり</option><option>その他</option>
-          </select>
+        <div class="fg"><label>活動内容（複数選択可）</label>
+          <div id="dly-act-btns" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">
+            <input type="hidden" id="dly-act" value="">
+            <button type="button" class="act-btn" data-val="訪問リハビリ" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">訪問リハビリ</button>
+            <button type="button" class="act-btn" data-val="マッサージ" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">マッサージ</button>
+            <button type="button" class="act-btn" data-val="可動域訓練" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">可動域訓練</button>
+            <button type="button" class="act-btn" data-val="車椅子離床" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">車椅子離床</button>
+            <button type="button" class="act-btn" data-val="外出・散歩" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">外出・散歩</button>
+            <button type="button" class="act-btn" data-val="居室安静" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">居室安静</button>
+            <button type="button" class="act-btn" data-val="面会あり" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">面会あり</button>
+            <button type="button" class="act-btn" data-val="その他" onclick="toggleActBtn(this)" style="padding:4px 10px;border:1.5px solid var(--bd);border-radius:20px;font-size:12px;background:#fff;cursor:pointer">その他</button>
+          </div>
         </div>
         <div class="fg"><label>活動詳細</label><input type="text" id="dly-act-note" placeholder="内容・参加状況等"></div>
       </div>
@@ -2292,6 +2300,18 @@ function setExBristol(b){
   arr.sort((a,z)=>a-z);
   updateExModalUI();
 }
+function toggleActBtn(btn){
+  btn.classList.toggle('act-on');
+  const on = btn.classList.contains('act-on');
+  btn.style.background = on ? 'var(--green)' : '#fff';
+  btn.style.color = on ? '#fff' : '';
+  btn.style.borderColor = on ? 'var(--green)' : 'var(--bd)';
+  // hidden inputに選択値をカンマ区切りで反映
+  const vals = [...document.querySelectorAll('#dly-act-btns .act-btn.act-on')]
+    .map(b => b.dataset.val);
+  document.getElementById('dly-act').value = vals.join('、');
+}
+
 function toggleTekibin(){exModal.data.tekibin=!exModal.data.tekibin;updateExModalUI();}
 function setExSleep(s){exModal.data.sleep=s===0?null:s;updateExModalUI();}
 
@@ -2733,15 +2753,28 @@ function openDailyModal(editRec){
     sel('dly-meal-lm',editRec.meal_lm);sel('dly-meal-ls',editRec.meal_ls);
     sel('dly-meal-em',editRec.meal_em);sel('dly-meal-es',editRec.meal_es);
     sel('dly-meal-note',editRec.meal_note);sel('dly-bath',editRec.bath);
-    sel('dly-oral',editRec.oral);sel('dly-act',editRec.activity);
+    sel('dly-oral',editRec.oral);// 活動ボタン復元
+document.querySelectorAll('#dly-act-btns .act-btn').forEach(b=>{
+  b.classList.remove('act-on');b.style.background='#fff';b.style.color='';b.style.borderColor='var(--bd)';
+});
+if(editRec.activity){
+  editRec.activity.split('、').forEach(v=>{
+    const btn=document.querySelector(`#dly-act-btns .act-btn[data-val="${v.trim()}"]`);
+    if(btn){btn.classList.add('act-on');btn.style.background='var(--green)';btn.style.color='#fff';btn.style.borderColor='var(--green)';}
+  });
+  document.getElementById('dly-act').value=editRec.activity;
+}
     sel('dly-act-note',editRec.act_note);sel('dly-cond',editRec.condition);
     sel('dly-mood',editRec.mood);sel('dly-obs',editRec.observation);
     sel('dly-care',editRec.care);sel('dly-hand',editRec.handover);
     sel('dly-au',editRec.author);
   } else {
     if(rid) setTimeout(()=>{document.getElementById('dly-res2').value=rid;},50);
-    ['dly-meal-mm','dly-meal-ms','dly-meal-lm','dly-meal-ls','dly-meal-em','dly-meal-es','dly-bath','dly-oral','dly-act','dly-cond','dly-mood'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    ['dly-meal-note','dly-act-note','dly-obs','dly-care','dly-hand','dly-au'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['dly-meal-mm','dly-meal-ms','dly-meal-lm','dly-meal-ls','dly-meal-em','dly-meal-es','dly-bath','dly-oral','dly-cond','dly-mood'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    // 活動ボタンリセット
+document.querySelectorAll('#dly-act-btns .act-btn').forEach(b=>{b.classList.remove('act-on');b.style.background='#fff';b.style.color='';b.style.borderColor='var(--bd)';});
+document.getElementById('dly-act').value='';
+  ['dly-meal-note','dly-act-note','dly-obs','dly-care','dly-hand','dly-au'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     // スタッフ名を自動セット
     const dlySgEl=document.getElementById('dly-au');
     if(dlySgEl&&currentStaff) dlySgEl.value=currentStaff;
