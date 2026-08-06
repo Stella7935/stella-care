@@ -600,7 +600,9 @@ function supraArtSVG(uid, colorA, colorB, awakened){
       <path d="${body}" fill="url(#${fillId})" stroke="${line}" stroke-width="2" stroke-linejoin="round"/>
       <path d="${rearGlass}" fill="url(#${glassId})"/>
       <path d="${doorGlass}" fill="url(#${glassId})"/>
-      <path d="M46,55.6 L214,62.4" stroke="#00000030" stroke-width="1.6"/>
+      <rect x="17" y="66.4" width="178" height="3.9" fill="#00000030"/>
+      <path d="M17,66.6 L195,66.6" stroke="#ffffff" stroke-width="0.8" opacity=".13"/>
+      <path d="M17,67.4 L195,67.4 M17,68.6 L195,68.6 M17,69.8 L195,69.8" stroke="#00000060" stroke-width="1"/>
       <path d="M${RWx-WR-2},${axleY+4} A${WR+2.5},${WR+2.5} 0 0 1 ${RWx+WR+2},${axleY+4}" fill="none" stroke="#00000038" stroke-width="2"/>
       <path d="M${FWx-WR-2},${axleY+4} A${WR+2.5},${WR+2.5} 0 0 1 ${FWx+WR+2},${axleY+4}" fill="none" stroke="#00000038" stroke-width="2"/>
       <rect x="17.5" y="57.8" width="6" height="7.4" rx="1" fill="${tailC}" stroke="${line}" stroke-width="1"/>
@@ -612,12 +614,12 @@ function supraArtSVG(uid, colorA, colorB, awakened){
       ${awakened
         /* raised pop-up pod: a box that stands proud of the bonnet with the lens
            on its leading face, throwing light forward — not a lit panel lying flat */
-        ? `<path d="M200.6,59.6 L202.8,49.4 L218.4,51.8 L217.4,62.2 Z" fill="#14151a" stroke="#000000" stroke-width="1.2" stroke-linejoin="round"/>
-           <path d="M212.4,50.9 L218.2,51.7 L217.3,61.9 L211.8,61.1 Z" fill="${lampC}" stroke="#0a0a0d" stroke-width="1"/>
-           <path d="M213.6,52.6 L216.9,53.1 L216.2,59.9 L213,59.4 Z" fill="#fffdf4"/>
-           <path d="M218.3,52.6 L240,45 L240,68 L217.6,61.2 Z" fill="url(#${beamId})"/>
-           <ellipse cx="219" cy="56.5" rx="11" ry="8" fill="url(#${beamId}h)"/>
-           <path d="M199.6,59.4 L211.4,61.1" stroke="#00000060" stroke-width="1.8" stroke-linecap="round"/>`
+        ? `<path d="M199.4,60.8 C206,57 212,52.4 218.6,48.6 L217.9,62.8 Z" fill="#14151a" stroke="#000000" stroke-width="1.2" stroke-linejoin="round"/>
+           <path d="M213.9,51.4 L218.5,48.8 L217.9,62.6 L213.5,61.8 Z" fill="${lampC}" stroke="#0a0a0d" stroke-width="1"/>
+           <path d="M215.1,53.2 L217.4,51.9 L216.9,60.6 L214.8,60.1 Z" fill="#fffdf4"/>
+           <path d="M218.6,50 L240,44 L240,68 L217.9,62.4 Z" fill="url(#${beamId})"/>
+           <ellipse cx="219" cy="55.5" rx="11" ry="9" fill="url(#${beamId}h)"/>
+           <path d="M198.4,60.6 L212.6,62.2" stroke="#00000060" stroke-width="1.8" stroke-linecap="round"/>`
         /* closed: the lid is flush with the bonnet, so all that shows is its seam */
         : `<path d="M201.6,59.1 L219,62.9 L218.6,65.7 L201.2,61.9 Z" fill="none" stroke="#00000048" stroke-width="1.3" stroke-linejoin="round"/>`}
       <rect x="118" y="57.5" width="7" height="2" rx="1" fill="#00000038"/>
@@ -635,56 +637,79 @@ function supraArtSVG(uid, colorA, colorB, awakened){
     </g>
   </svg>`;
 }
-/* CB350FOUR, drawn to the real bike's proportions rather than the generic bike
-   template — the shared template stretched the wheelbase to ~3.1x wheel diameter,
-   which is chopper territory; a stock UJM of this era sits at ~2.15x. */
+/* CB350FOUR, traced against the period advert rather than the generic bike
+   template. Three things the template got wrong and this fixes: the exhaust is
+   two slim tapered mufflers on this side (a 4-into-4 shows two per side), not
+   four pipes fanned out; there is a teardrop side cover under the seat carrying
+   the "Four" badge, which was missing entirely; and the tank badge is HONDA,
+   with the crankcase showing its two big round chrome covers. */
 function cb350ArtSVG(uid, colorA, colorB, awakened){
-  const W=240, Ht=120, ground=96;
+  const W=240, Ht=120, ground=96, DROP=19;
   const fillId='f'+uid, glowId='g'+uid;
   const WR=26, RWx=64, FWx=176;              // 2.15x wheelbase-to-diameter
   const axleY = ground-WR;
-  const rimC   = awakened ? '#1b2634' : '#221c18';
+  const tyre   = awakened ? '#15171e' : '#191a20';
   const chrome = awakened ? '#f2ede0' : '#8d8a82';
-  const dark   = awakened ? '#2a2f42' : '#1b1e28';
-  const line   = awakened ? '#00000038' : '#00000055';
-  const Hx=157, Hy=35;                        // steering head
-  const spoke = cx => [0,45,90,135].map(d=>{
+  const engineC= awakened ? '#9aa0ad' : '#5f636e';
+  const seatC  = awakened ? '#24262f' : '#191b22';
+  const line   = awakened ? '#00000040' : '#00000060';
+  const Hx=160, Hy=36;
+  const spoke = cx => Array.from({length:6},(_,i)=>i*30).map(d=>{
     const r=d*Math.PI/180, dx=Math.cos(r)*(WR-4), dy=Math.sin(r)*(WR-4);
-    return `<line x1="${(cx-dx).toFixed(1)}" y1="${(axleY-dy).toFixed(1)}" x2="${(cx+dx).toFixed(1)}" y2="${(axleY+dy).toFixed(1)}" stroke="${chrome}" stroke-width="1.2" opacity=".55"/>`;
+    return `<line x1="${(cx-dx).toFixed(1)}" y1="${(axleY-dy).toFixed(1)}" x2="${(cx+dx).toFixed(1)}" y2="${(axleY+dy).toFixed(1)}" stroke="${chrome}" stroke-width="1.1" opacity=".5"/>`;
   }).join('');
-  // shallow crown fender that hugs the tyre, not a full half-dome over it
-  const fender = cx => `<path d="M${cx-WR*0.86},${axleY-WR*0.5} A${WR+3.5},${WR+3.5} 0 0 1 ${cx+WR*0.86},${axleY-WR*0.5}" fill="none" stroke="${chrome}" stroke-width="3.6" stroke-linecap="round"/>`;
-  // 4-into-4: pipes leave the head, sweep down past the cases and run back low
-  const pipes = [0,1,2,3].map(n=>
-    `<path d="M${138-n*2.5},${59+n*1.6} C${122-n*2.5},${71+n*1.5} ${98-n*1.5},${75+n*1.4} ${58},${76+n*2.1}"
-       fill="none" stroke="${chrome}" stroke-width="${2.9-n*0.2}" stroke-linecap="round" opacity="${1-n*0.06}"/>`).join('');
+  const fender = cx => `<path d="M${cx-WR*0.88},${axleY-WR*0.48} A${WR+3.5},${WR+3.5} 0 0 1 ${cx+WR*0.88},${axleY-WR*0.48}" fill="none" stroke="${chrome}" stroke-width="3.4" stroke-linecap="round"/>`;
+  // four headers sweep down off the front of the head and collect into the mufflers
+  const headers = [0,1,2,3].map(n=>
+    `<path d="M${139+n*2.4},53.5 C${149+n*2},58 ${151+n*1.4},65 ${149+n*0.5},72"
+       fill="none" stroke="${chrome}" stroke-width="2.6" stroke-linecap="round" opacity="${1-n*0.07}"/>`).join('');
+  // this side carries two mufflers, slim and near-horizontal, tips past the axle
+  const muffler = (yF,yT)=>`
+    <path d="M149,${yF} C118,${yF-0.8} 78,${yF-5.6} 43,${yT} L44,${yT+3.9}
+             C78,${yF-1.8} 118,${yF+2.8} 150,${yF+2.1} Z" fill="${chrome}" stroke="${line}" stroke-width="0.8" stroke-linejoin="round"/>
+    <path d="M144,${yF+0.6} C112,${yF-2.4} 76,${yF-6} 47,${yT+1.8}" fill="none" stroke="#ffffff" stroke-width="0.8" opacity=".4"/>`;
   return `<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="xMidYMax meet">
     <defs>${artGrad(fillId,colorA,colorB)}
       <filter id="${glowId}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6" result="bl"/><feMerge><feMergeNode in="bl"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     </defs>
-    <ellipse cx="120" cy="${ground+12}" rx="86" ry="7" fill="#000" opacity=".25"/>
-    <circle cx="${RWx}" cy="${axleY}" r="${WR}" fill="${rimC}"/><circle cx="${RWx}" cy="${axleY}" r="${WR*0.62}" fill="none" stroke="${chrome}" stroke-width="2.5"/>${spoke(RWx)}<circle cx="${RWx}" cy="${axleY}" r="4" fill="${chrome}"/>
-    <circle cx="${FWx}" cy="${axleY}" r="${WR}" fill="${rimC}"/><circle cx="${FWx}" cy="${axleY}" r="${WR*0.62}" fill="none" stroke="${chrome}" stroke-width="2.5"/>${spoke(FWx)}<circle cx="${FWx}" cy="${axleY}" r="4" fill="${chrome}"/>
+    <g transform="translate(0,${DROP})">
+    <ellipse cx="112" cy="${ground+3}" rx="88" ry="6" fill="#000" opacity=".25"/>
+    ${[RWx,FWx].map(cx=>`
+      <circle cx="${cx}" cy="${axleY}" r="${WR}" fill="${tyre}"/>
+      <circle cx="${cx}" cy="${axleY}" r="${WR*0.62}" fill="none" stroke="${chrome}" stroke-width="2.4"/>
+      ${spoke(cx)}<circle cx="${cx}" cy="${axleY}" r="3.6" fill="${chrome}"/>`).join('')}
     ${fender(RWx)}${fender(FWx)}
     <g ${awakened?`filter="url(#${glowId})"`:''}>
-      ${pipes}
-      <path d="M${Hx-2},${Hy+4} L${FWx-3},${axleY-3}" stroke="${chrome}" stroke-width="6" stroke-linecap="round"/>
-      <path d="M${Hx+3},${Hy+6} L${FWx+3},${axleY-2}" stroke="${chrome}" stroke-width="5" stroke-linecap="round" opacity=".8"/>
-      <path d="M110,44 L${Hx-6},${Hy+8}" stroke="${colorA}" stroke-width="6" stroke-linecap="round"/>
-      <path d="M104,48 C112,58 122,62 136,60" stroke="${colorA}" stroke-width="5" fill="none" stroke-linecap="round"/>
-      <path d="M100,46 L${RWx+6},${axleY-4}" stroke="${colorA}" stroke-width="5.5" stroke-linecap="round"/>
-      <path d="M${RWx+10},${axleY-16} L${RWx+4},${axleY+2}" stroke="${chrome}" stroke-width="4" stroke-linecap="round"/>
-      <rect x="99" y="55" width="42" height="21" rx="5" fill="url(#${fillId})" stroke="${line}" stroke-width="1.5"/>
-      ${[0,1,2,3].map(n=>`<line x1="102" y1="${59+n*4}" x2="138" y2="${59+n*4}" stroke="#00000030" stroke-width="1.6"/>`).join('')}
-      <path d="M104,44 C112,36 132,33 148,36 C152,37 152,45 146,48 C130,52 112,51 104,48 Z" fill="url(#${fillId})" stroke="${line}" stroke-width="1.5"/>
-      <ellipse cx="124" cy="39.5" rx="13" ry="3.4" fill="#ffffff" opacity="${awakened?.30:.12}"/>
-      <path d="M70,46 L108,45 L108,50 L70,51 Z" fill="${dark}" stroke="${line}" stroke-width="1.2"/>
-      <path d="M66,46 L74,44 L74,50 L66,50 Z" fill="${dark}"/>
-      <circle cx="${Hx-4}" cy="${Hy+5}" r="9.5" fill="${awakened?'#fff4d2':'#b9b4a4'}" stroke="${colorB}" stroke-width="3"/>
-      <circle cx="${Hx-9}" cy="${Hy-8}" r="5" fill="${dark}" stroke="${chrome}" stroke-width="2"/>
-      <circle cx="${Hx+2}" cy="${Hy-9}" r="5" fill="${dark}" stroke="${chrome}" stroke-width="2"/>
-      <path d="M${Hx-3},${Hy-3} C${Hx-14},${Hy-13} ${Hx-24},${Hy-15} ${Hx-32},${Hy-14}" stroke="${chrome}" stroke-width="4" fill="none" stroke-linecap="round"/>
-      ${!awakened?`<path d="M112,42 L128,40" stroke="#00000050" stroke-width="2" stroke-linecap="round"/>`:''}
+      <path d="M98,71 L${RWx+4},${axleY+1}" stroke="${engineC}" stroke-width="6" stroke-linecap="round"/>
+      <path d="M84,50 L70,66" stroke="${chrome}" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M${Hx-4},${Hy+6} L108,46" stroke="${engineC}" stroke-width="5" stroke-linecap="round"/>
+      <path d="M${Hx-2},${Hy+8} C154,50 148,58 144,64" stroke="${engineC}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M${Hx-3},${Hy+4} L${FWx-4},${axleY-3}" stroke="${chrome}" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M${Hx+3},${Hy+6} L${FWx+3},${axleY-2}" stroke="${colorB}" stroke-width="3.6" stroke-linecap="round" opacity=".9"/>
+      <rect x="100" y="64" width="50" height="16" rx="6" fill="${engineC}" stroke="${line}" stroke-width="1.2"/>
+      <circle cx="112" cy="73" r="7" fill="${chrome}" stroke="${line}" stroke-width="1.2"/>
+      <circle cx="132" cy="73" r="7" fill="${chrome}" stroke="${line}" stroke-width="1.2"/>
+      <rect x="106" y="51.5" width="40" height="15" rx="3" fill="${engineC}" stroke="${line}" stroke-width="1.2"/>
+      ${[0,1,2,3].map(n=>`<line x1="109" y1="${54.5+n*3}" x2="143" y2="${54.5+n*3}" stroke="#00000038" stroke-width="1.5"/>`).join('')}
+      ${headers}
+      ${muffler(72,62.6)}${muffler(76,67)}
+      <path d="M78,53.4 C85,51.6 95,52 100.5,54.2 C104.2,55.8 104.2,61.6 101,63.8 C95,66.4 84,66 79,63.6
+               C76,62 75.8,55 78,53.4 Z" fill="url(#${fillId})" stroke="${line}" stroke-width="1.3"/>
+      <text x="89.5" y="60.4" font-size="6.2" font-style="italic" text-anchor="middle" fill="${awakened?'#ffe9b0':'#c8bb92'}" font-family="serif">Four</text>
+      <path d="M110,52.6 C110,44 121,38.6 137,38.4 C149,38.3 156,41.4 156.5,45.6
+               C157,50 152.5,52.8 146,53.2 L112,53.4 Z" fill="url(#${fillId})" stroke="${line}" stroke-width="1.4"/>
+      <path d="M116,50.6 C117,45.4 126,42 137,41.8 C145,41.7 151,43.4 152,46" fill="none" stroke="${awakened?'#ffe9b0':'#bfae86'}" stroke-width="1.2" opacity=".9"/>
+      <text x="134" y="48.4" font-size="5.4" font-weight="700" text-anchor="middle" fill="${awakened?'#fff6e2':'#d8cba8'}" letter-spacing="0.6">HONDA</text>
+      <ellipse cx="128" cy="42.6" rx="11" ry="2.6" fill="#ffffff" opacity="${awakened?.3:.12}"/>
+      <path d="M68,45.6 C68,43.8 70,43.2 74,43.2 L110,43 L111,50.4 L68,51.4 Z" fill="${seatC}" stroke="${line}" stroke-width="1.2"/>
+      <path d="M69,46.6 L109,46" stroke="#ffffff" stroke-width="0.8" opacity=".14"/>
+      <circle cx="${Hx+2}" cy="43.5" r="8.4" fill="${awakened?'#fff4d2':'#b9b4a4'}" stroke="${chrome}" stroke-width="2.6"/>
+      <circle cx="${Hx-10}" cy="28.6" r="3.4" fill="${seatC}" stroke="${chrome}" stroke-width="1.6"/>
+      <circle cx="${Hx-2.5}" cy="29.8" r="3.4" fill="${seatC}" stroke="${chrome}" stroke-width="1.6"/>
+      <path d="M${Hx-1},${Hy-2} C${Hx-13},${Hy-11} ${Hx-24},${Hy-13} ${Hx-33},${Hy-12}" stroke="${chrome}" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+      <circle cx="${Hx+11}" cy="38" r="2.4" fill="${awakened?'#ffb45e':'#8f6b3e'}"/>
+      ${!awakened?`<path d="M118,44.5 L132,43" stroke="#00000050" stroke-width="1.8" stroke-linecap="round"/>`:''}
+    </g>
     </g>
   </svg>`;
 }
