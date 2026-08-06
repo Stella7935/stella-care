@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ガレージ・オブ・ソウル - 車・バイク擬人化育成レース(プロトタイプ)</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=DM+Mono:wght@400;500&display=swap');
 :root{
   --bg:#12141c;--bg2:#181b26;--panel:#1e2230;--panel2:#262b3d;
   --ink:#eef1fb;--ink2:#aab2c8;--ink3:#6b7390;
@@ -17,12 +16,12 @@
   --hw:64px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Noto Sans JP',sans-serif;background:
+body{font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN",BlinkMacSystemFont,"Yu Gothic",sans-serif;background:
     radial-gradient(1200px 600px at 15% -10%, #1c2a3a 0%, transparent 60%),
     radial-gradient(1000px 500px at 100% 0%, #2a1c30 0%, transparent 55%),
     var(--bg);
   color:var(--ink);font-size:15px;line-height:1.65;min-height:100vh}
-h1,h2,h3,.disp{font-family:'Zen Kaku Gothic New',sans-serif}
+h1,h2,h3,.disp{font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN",BlinkMacSystemFont,"Yu Gothic",sans-serif;font-weight:900}
 button{font-family:inherit;cursor:pointer}
 select,input{font-family:inherit}
 ::-webkit-scrollbar{width:6px;height:6px}
@@ -30,9 +29,9 @@ select,input{font-family:inherit}
 
 /* HEADER */
 #hdr{position:fixed;top:0;left:0;right:0;height:var(--hw);background:linear-gradient(90deg,#1a1d29,#20182a);display:flex;align-items:center;gap:16px;padding:0 18px;z-index:300;border-bottom:1px solid var(--bd);box-shadow:0 4px 20px rgba(0,0,0,.4)}
-.logo{font-family:'Zen Kaku Gothic New';font-weight:900;font-size:19px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo{font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN',BlinkMacSystemFont,'Yu Gothic',sans-serif;font-weight:900;font-size:19px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;white-space:nowrap}
 .logo .em{font-size:22px}
-.logo small{display:block;font-family:'Noto Sans JP';font-weight:400;font-size:10px;color:var(--ink3);letter-spacing:1px}
+.logo small{display:block;font-weight:400;font-size:10px;color:var(--ink3);letter-spacing:1px}
 #mech-badge{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--ink2)}
 .mstat{display:flex;flex-direction:column;gap:2px;min-width:110px}
 .mstat .lbl{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px}
@@ -54,7 +53,7 @@ select,input{font-family:inherit}
 .view.on{display:block;animation:fadeIn .25s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-.section-title{font-family:'Zen Kaku Gothic New';font-weight:900;font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.section-title{font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN',BlinkMacSystemFont,'Yu Gothic',sans-serif;font-weight:900;font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .section-sub{color:var(--ink3);font-size:13px;margin-bottom:18px}
 
 /* GARAGE GRID */
@@ -90,7 +89,7 @@ select,input{font-family:inherit}
 .statrow .sname{width:56px;color:var(--ink3);flex-shrink:0}
 .statbar{flex:1;height:9px;background:var(--panel2);border-radius:5px;overflow:hidden;border:1px solid var(--bd)}
 .statbar i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan))}
-.statval{width:34px;text-align:right;color:var(--ink2);font-family:'DM Mono',monospace}
+.statval{width:34px;text-align:right;color:var(--ink2);font-family:ui-monospace,'SF Mono',monospace;font-variant-numeric:tabular-nums}
 .statplus{width:20px;height:20px;border-radius:5px;background:var(--panel2);border:1px solid var(--bd);color:var(--amber2);font-weight:700;font-size:13px;flex-shrink:0}
 .statplus:disabled{opacity:.3;cursor:not-allowed}
 .ability-card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
@@ -133,7 +132,7 @@ select,input{font-family:inherit}
 .logline.win{border-color:var(--green)}
 .logline.info{border-color:var(--violet)}
 .logline b{color:var(--amber2)}
-.result-banner{margin-top:14px;padding:16px;border-radius:12px;text-align:center;font-weight:900;font-size:20px;font-family:'Zen Kaku Gothic New'}
+.result-banner{margin-top:14px;padding:16px;border-radius:12px;text-align:center;font-weight:900;font-size:20px;font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN',BlinkMacSystemFont,'Yu Gothic',sans-serif}
 .result-banner.win{background:linear-gradient(135deg,#1c3a2a,#0f271c);color:var(--green);border:1px solid var(--green)}
 .result-banner.lose{background:linear-gradient(135deg,#3a1c22,#271014);color:var(--rose);border:1px solid var(--rose)}
 .leg-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
