@@ -452,6 +452,10 @@ function carArtSVG(arch, uid, colorA, colorB, awakened){
   if(a.extra==='popup'){
     // pop-up headlight sits at the front (bx1 side, same side as the headlight block)
     extra += `<rect x="${bx1-30}" y="${bodyTop-10}" width="16" height="10" rx="2" fill="url(#${fillId})"/>`;
+    // targa/T-bar roof panel + A70-style quad round tail lights on the rear panel
+    const tailC = awakened ? '#ff6b6b' : '#7a4040';
+    extra += `<rect x="${cx0+14}" y="${cabinTop+1}" width="${Math.max(10,(cx1-a.roofRake)-(cx0+14))}" height="5" rx="2" fill="#00000050"/>`;
+    extra += [0,1,2].map(n=>`<circle cx="${bx0+8+n*7}" cy="${ground-15}" r="2.6" fill="${tailC}"/>`).join('');
   }
   const scratches = !awakened ? `
     <path d="M${bx0+30},${bodyTop+8} L${bx0+55},${bodyTop+18}" stroke="#00000055" stroke-width="2" stroke-linecap="round"/>
@@ -509,7 +513,13 @@ function bikeArtSVG(kind, uid, colorA, colorB, awakened){
     bar = `<path d="M${Hx-2},${Hy-2} Q${Hx-12},${Hy-12} ${Hx-22},${Hy-13}" stroke="${frameStroke}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
     headlight = `<circle cx="${Hx-2}" cy="${Hy-1}" r="9" fill="${chromeC}" stroke="url(#${fillId})" stroke-width="4"/>`;
   }
-  const exhaust = `<rect x="${rearX-8}" y="${ground-10}" width="34" height="9" rx="4" fill="${chromeC}"/>`;
+  const exhaust = kind==='classic-bike'
+    ? [0,1,2,3].map(n=>`<rect x="${rearX-6+n*2}" y="${ground-14+n*3.4}" width="${30-n*2}" height="5.5" rx="2.5" fill="${chromeC}" opacity="${1-n*0.08}"/>`).join('')
+    : `<rect x="${rearX-8}" y="${ground-10}" width="34" height="9" rx="4" fill="${chromeC}"/>`;
+  const fenders = kind==='classic-bike' ? [rearX,frontX].map(cx=>
+    `<path d="M${cx-b.wheelR-2},${ground-10} Q${cx},${ground-b.wheelR-13} ${cx+b.wheelR+2},${ground-10}" fill="none" stroke="${chromeC}" stroke-width="4" stroke-linecap="round"/>`).join('') : '';
+  const gauges = kind==='classic-bike'
+    ? `<circle cx="${Hx-10}" cy="${Hy-18}" r="5" fill="${awakened?'#20242f':'#181a22'}" stroke="${chromeC}" stroke-width="2"/><circle cx="${Hx+1}" cy="${Hy-19}" r="5" fill="${awakened?'#20242f':'#181a22'}" stroke="${chromeC}" stroke-width="2"/>` : '';
   const tankCap = `<circle cx="122" cy="${ground-54}" r="3" fill="#00000044"/>`;
   const spokes = kind==='classic-bike' ? [rearX,frontX].map(cx=>`
     <line x1="${cx}" y1="${ground-b.wheelR+3}" x2="${cx}" y2="${ground+b.wheelR-3}" stroke="#00000044" stroke-width="1.5"/>
@@ -523,9 +533,9 @@ function bikeArtSVG(kind, uid, colorA, colorB, awakened){
     <ellipse cx="${(rearX+frontX)/2+8}" cy="${ground+16}" rx="${(frontX-rearX)/2+20}" ry="7" fill="#000" opacity=".25"/>
     <circle cx="${rearX}" cy="${ground}" r="${b.wheelR}" fill="${rimC}"/><circle cx="${rearX}" cy="${ground}" r="${b.wheelR*0.42}" fill="${awakened?colorA:'#555'}"/>
     <circle cx="${frontX}" cy="${ground}" r="${b.wheelR}" fill="${rimC}"/><circle cx="${frontX}" cy="${ground}" r="${b.wheelR*0.42}" fill="${awakened?colorA:'#555'}"/>
-    ${spokes}${exhaust}
+    ${spokes}${fenders}${exhaust}
     <g ${awakened?`filter="url(#${glowId})"`:''}>
-      ${swingarm}${spine}${fork}${downtube}${engine}${engineFins}${tank}${tankCap}${seat}${fairing}${bar}${headlight}${scratches}${shine}
+      ${swingarm}${spine}${fork}${downtube}${engine}${engineFins}${tank}${tankCap}${seat}${fairing}${bar}${headlight}${gauges}${scratches}${shine}
     </g>
   </svg>`;
 }
