@@ -450,12 +450,16 @@ function carArtSVG(arch, uid, colorA, colorB, awakened){
     extra += `<rect x="${bx0+6}" y="${bodyTop}" width="${cx0-bx0-10}" height="${a.bodyH-6}" fill="none" stroke="url(#${fillId})" stroke-width="4"/>`;
   }
   if(a.extra==='popup'){
-    // pop-up headlight sits low on the hood surface (bx1 side, same side as the headlight block)
-    extra += `<rect x="${bx1-32}" y="${bodyTop-5}" width="16" height="9" rx="2" fill="url(#${fillId})"/>`;
-    // targa/T-bar roof panel + A70-style quad round tail lights on the rear panel
+    // pop-up headlight raised in the "open" position — sits proud above the hood line,
+    // glass-colored (not body-colored) so it actually reads as a lamp, not a body panel
+    const lampC = awakened ? '#fff6d8' : '#c8c2b0';
+    extra += `<rect x="${bx1-34}" y="${bodyTop-13}" width="15" height="13" rx="1.5" fill="${lampC}" stroke="${awakened?'#00000033':'#00000055'}" stroke-width="1.5"/>`;
+    extra += `<rect x="${bx1-16}" y="${ground-15}" width="7" height="5" rx="1.5" fill="${awakened?'#ffb066':'#8a6a40'}"/>`; // amber turn signal at the bumper
+    // targa/T-bar roof panel + A70-style wide segmented tail light cluster at the rear corner
     const tailC = awakened ? '#ff6b6b' : '#7a4040';
     extra += `<rect x="${cx0+14}" y="${cabinTop+1}" width="${Math.max(10,(cx1-a.roofRake)-(cx0+14))}" height="5" rx="2" fill="#00000050"/>`;
-    extra += [0,1,2].map(n=>`<circle cx="${bx0+8+n*7}" cy="${ground-15}" r="2.6" fill="${tailC}"/>`).join('');
+    extra += `<rect x="${bx0+4}" y="${ground-19}" width="20" height="9" rx="1.5" fill="${tailC}"/>`;
+    extra += `<line x1="${bx0+11}" y1="${ground-19}" x2="${bx0+11}" y2="${ground-10}" stroke="#00000055" stroke-width="1.5"/><line x1="${bx0+18}" y1="${ground-19}" x2="${bx0+18}" y2="${ground-10}" stroke="#00000055" stroke-width="1.5"/>`;
   }
   const scratches = !awakened ? `
     <path d="M${bx0+30},${bodyTop+8} L${bx0+55},${bodyTop+18}" stroke="#00000055" stroke-width="2" stroke-linecap="round"/>
@@ -469,8 +473,8 @@ function carArtSVG(arch, uid, colorA, colorB, awakened){
     <g ${awakened?`filter="url(#${glowId})"`:''}>
       <path d="M${bx0},${ground} L${bx0},${bodyTop+14} Q${bx0},${bodyTop} ${bx0+16},${bodyTop} L${cx0},${bodyTop} L${cx0+8},${cabinTop+6} Q${cx0+14},${cabinTop} ${cx0+24},${cabinTop} L${cx1-a.roofRake},${cabinTop} Q${cx1-a.roofRake+10},${cabinTop} ${cx1},${cabinTop+10} L${cx1+6},${bodyTop} L${bx1-14},${bodyTop} Q${bx1},${bodyTop} ${bx1},${bodyTop+14} L${bx1},${ground} Z" fill="url(#${fillId})" stroke="${awakened?'#00000033':'#00000055'}" stroke-width="2"/>
       ${extra}
-      <rect x="${bx1-14}" y="${ground-18}" width="8" height="6" rx="2" fill="${awakened?'#fff6d8':'#8a8578'}"/>
-      <rect x="${bx0+6}" y="${ground-16}" width="6" height="5" rx="1" fill="${awakened?'#ff8a8a':'#7a5858'}"/>
+      ${a.extra==='popup' ? '' : `<rect x="${bx1-14}" y="${ground-18}" width="8" height="6" rx="2" fill="${awakened?'#fff6d8':'#8a8578'}"/>`}
+      ${a.extra==='popup' ? '' : `<rect x="${bx0+6}" y="${ground-16}" width="6" height="5" rx="1" fill="${awakened?'#ff8a8a':'#7a5858'}"/>`}
       ${scratches}${shine}
     </g>
     <circle cx="${wr}" cy="${ground}" r="${a.wheelR}" fill="${rimC}"/><circle cx="${wr}" cy="${ground}" r="${a.wheelR*0.5}" fill="${awakened?colorA:'#555'}"/>
