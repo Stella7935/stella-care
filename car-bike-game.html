@@ -4,6 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ガレージ・オブ・ソウル - 車・バイク擬人化育成レース(プロトタイプ)</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ソウルガレージ">
+<meta name="theme-color" content="#12141c">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAkFBMVEX/t2n4rWTBt4dPzMDmkkrnkEbikk3AmWNMyr5Lw7lHu7FCqaFAlZLfjEfaiUbThkbMhEbKgELAe0GwdkOhbERxdV07iok6goI1dHSbZ0CVYjuMYEB7Wz9xUDhZQDEvYWIyUlIuQkQ/MSwjMDcsJikhJTUiICcbIy4aHysZHCcZGyYZGSEVGCITFR4TExwMERwjcX9kAAACRElEQVR42mWT2ZajMAxETZMAgbCaNQaSAMZAs/z/303JpGdOnyke67osS4K1bVM/HpXWQ9RN07bdMEilpmWZIaZ9UaWkqhJ1TUTfS0gRweCLisdxHMVxkvD0AaLrhnFZJikJgJ8mcRSSojjhCAExjOO8rFIuM8P9SRwGge/7QRCCSAUBFDGvuIU9BIfvnwrC6NGkgupEAhC5sKqKI/gXkh/4Yjs6q/4BVjmxKqWAyynfH9bx4FarqyRAaUAHXPH5l/ZYj4j9BqITuFwtAFY7CKYTJrzxd8L1y7oGF2YwQ1An1DRNywegGq7Wl2naQRRYCccz3mgm2g0Abfi8wjK//DBKqtQy2jfUkyQTuk/UhKuNPiQ8MhhLX1n2eoF596wWXHcyoEaGSWIxZmQpIPv5JAbDqvjPLOIkJCfLDKOqjawsgdA0K86TJKZh0nGelTZrjqOz86J8PmkfsA2cFOO4lWVZYRvTMu2ZRwTr2qYReqUQj+Pw87vRHvty97x7UbKuw9JRCuItUWvf8+zX+35zPWSwgYi2rRHPmyZ7lgV892aa5g3EPWfjAARMZNTgXhpwCXCcm+sSIE+kQ/+7NwDc4N4cBxEg7nc2y+9xBEPq/wHmX2BR2zc0kmT//h9Y1b5BBC0KEboGfYVzArtct4/Wie44X+E45Hs5gPmMIGBW/acI9wbRI3K27WreP8iqdAR1yiXBL9i+72radq0NEShTExD5JQG4hRZwmpTqKQJIkcMscgycnWdXWnL8zEqeRAmmoGm//gAQcmDskCLL0AAAAABJRU5ErkJggg==">
+<link rel="manifest" id="pwa-manifest">
+<script>
+(function(){
+  var manifest = {
+    name: "ガレージ・オブ・ソウル",
+    short_name: "ソウルガレージ",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#12141c",
+    theme_color: "#12141c",
+    icons: [{ src: "data:image/png;base64,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", sizes: "180x180", type: "image/png" }]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type: "application/manifest+json"});
+  document.getElementById("pwa-manifest").href = URL.createObjectURL(blob);
+})();
+</script>
 <style>
 :root{
   --bg:#12141c;--bg2:#181b26;--panel:#1e2230;--panel2:#262b3d;
@@ -62,6 +85,11 @@ select,input{font-family:inherit}
 .ccard:hover{border-color:var(--amber);transform:translateY(-2px);box-shadow:var(--sh)}
 .ccard.awakened{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset,0 0 24px rgba(79,209,197,.15)}
 .ccard .avatar{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.avatar-plate{width:100%;height:80px;border-radius:12px;margin-bottom:10px;position:relative;overflow:hidden;background:var(--bg2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.avatar-plate::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 65% at 50% 100%, var(--c1), transparent 72%);opacity:.26;transition:opacity .3s}
+.avatar-plate.awakened::before{opacity:.42}
+.avatar-plate svg{position:relative;width:100%;height:100%;display:block}
+.avatar-plate.lg{width:108px;height:86px;flex-shrink:0;margin-bottom:0}
 .ccard .cname{font-weight:700;font-size:16px;display:flex;align-items:center;gap:6px}
 .ccard .ctype{font-size:11px;color:var(--ink3);margin-bottom:8px}
 .awaken-badge{position:absolute;top:10px;right:10px;font-size:11px;background:var(--cyan3);color:var(--cyan2);border:1px solid var(--cyan);padding:2px 7px;border-radius:20px;font-weight:700}
@@ -142,6 +170,31 @@ select,input{font-family:inherit}
 .leg-table .losetag{color:var(--rose)}
 .warn-box{background:var(--amber3);border:1px solid var(--amber);color:var(--amber2);padding:14px;border-radius:10px;font-size:13px}
 
+/* RACE TRACK ANIMATION */
+.track-scene{position:relative;background:linear-gradient(180deg,#0c1119,#151926);border:1px solid var(--bd);border-radius:12px;overflow:hidden;padding:34px 0 12px}
+.track-weather{position:absolute;inset:0;pointer-events:none;z-index:1}
+.track-weather.rain{background-image:repeating-linear-gradient(115deg, rgba(180,210,255,.28) 0 2px, transparent 2px 20px);animation:rainfall .45s linear infinite}
+.track-weather.sun{background:radial-gradient(circle at 82% 8%, rgba(255,190,110,.20), transparent 55%)}
+.track-weather.cloud{background:linear-gradient(180deg, rgba(150,160,180,.09), transparent 60%)}
+@keyframes rainfall{from{background-position:0 0}to{background-position:-42px 64px}}
+.track-weatherlabel{position:absolute;top:8px;right:12px;font-size:11px;color:var(--ink3);z-index:6;background:rgba(0,0,0,.25);padding:2px 9px;border-radius:20px;border:1px solid var(--bd)}
+.track-cp{position:absolute;top:26px;bottom:8px;width:1px;background:rgba(255,255,255,.09);z-index:2}
+.track-cp span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--ink3);white-space:nowrap}
+.track-finish{position:absolute;right:0;top:26px;bottom:8px;width:7px;background:repeating-linear-gradient(45deg,#e8e8e8 0 5px,#20222c 5px 10px);z-index:2;opacity:.9}
+.track-lane{position:relative;height:76px;margin:0 0 6px}
+.track-lane:last-child{margin-bottom:0}
+.track-lane .lane-tag{position:absolute;top:2px;left:8px;font-size:10px;color:var(--ink3);z-index:6;font-weight:600}
+.track-road{position:absolute;left:0;right:0;bottom:14px;height:2px;background:repeating-linear-gradient(90deg,var(--bd2) 0 12px,transparent 12px 24px);opacity:.55}
+.track-road.scrolling{animation:roadmove .55s linear infinite}
+@keyframes roadmove{from{background-position-x:0}to{background-position-x:-36px}}
+.pmarker,.rmarker{position:absolute;bottom:12px;width:62px;height:38px;left:0%;transform:translateX(-6px);transition:left var(--dur,850ms) cubic-bezier(.32,.62,.3,1);z-index:4}
+.pmarker svg,.rmarker svg{width:100%;height:100%;display:block}
+.rmarker{opacity:.5;filter:saturate(.5)}
+.ability-pop{position:absolute;bottom:56px;transform:translateX(-50%);background:var(--amber3);color:var(--amber2);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;border:1px solid var(--amber);opacity:0;animation:popfloat 1.2s ease forwards;z-index:7}
+@keyframes popfloat{0%{opacity:0;transform:translate(-50%,6px)}18%{opacity:1;transform:translate(-50%,-4px)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-22px)}}
+.leadtag{position:absolute;bottom:54px;transform:translateX(-50%);font-size:15px;z-index:7;animation:leadpop .5s ease}
+@keyframes leadpop{0%{transform:translate(-50%,6px) scale(.5);opacity:0}60%{transform:translate(-50%,-2px) scale(1.15);opacity:1}100%{transform:translate(-50%,0) scale(1);opacity:1}}
+
 /* INTRO */
 #intro .modal{max-width:520px}
 #intro .modal-body{font-size:13px;color:var(--ink2)}
@@ -193,6 +246,7 @@ select,input{font-family:inherit}
     <div class="section-sub">編成した5台でライバルチームと勝負。天候・絆・アビリティ・シナジーが結果を左右します。</div>
     <div id="race-panel">
       <div id="race-pre"></div>
+      <div id="race-track"></div>
       <div id="race-log"></div>
     </div>
   </div>
@@ -231,6 +285,7 @@ const CHARACTERS = [
   {
     id:'hayate', name:'疾風(ハヤテ)', type:'bike', typeLabel:'ネイキッドバイク', emoji:'🏍️',
     era:'90s', eraLabel:'90年代', garage:'谷口オートバイ店', hue:'linear-gradient(135deg,#e8934a,#ffb066)',
+    art:{arch:'naked-bike', c1:'#e8934a', c2:'#ffb066'},
     background:'廃業したバイク店の店主が最後まで手放さなかった一台。峠を攻めるのが生きがいだった元オーナーの記憶が、彼を「まだ走れる」と信じさせている。',
     personality:'元気で人懐っこい後輩キャラ。負けん気は強いが素直。',
     base:{speed:62,corner:78,accel:74,durability:50},
@@ -242,6 +297,7 @@ const CHARACTERS = [
   {
     id:'ai', name:'藍(アイ)', type:'bike', typeLabel:'レーサーレプリカ', emoji:'🏍️',
     era:'2000s', eraLabel:'2000年代', garage:'谷口オートバイ店', hue:'linear-gradient(135deg,#4fd1c5,#2a6f8a)',
+    art:{arch:'sport-bike', c1:'#4fd1c5', c2:'#2a6f8a'},
     background:'サーキットでの事故以来、倉庫の奥に置き去りにされていた元レース仕様車。無口だが、走ることへの渇望は誰よりも強い。',
     personality:'クールで寡黙。感情を表に出さないが、内に秘めた闘志は強い。',
     base:{speed:80,corner:70,accel:66,durability:48},
@@ -253,6 +309,7 @@ const CHARACTERS = [
   {
     id:'minica', name:'ミニカ', type:'car', typeLabel:'軽自動車', emoji:'🚗',
     era:'90s', eraLabel:'90年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#ffd77a,#ff9e7a)',
+    art:{arch:'kei', c1:'#ffd77a', c2:'#ff9e7a'},
     background:'スーパーで買い物帰りのおばあちゃんを何十年も支えた軽自動車。廃車寸前で工場に運び込まれたが、目を覚ますなり驚くほど陽気だった。',
     personality:'天真爛漫なムードメーカー。誰にでも愛される親しみやすさが持ち味。',
     base:{speed:40,corner:55,accel:50,durability:70},
@@ -264,6 +321,7 @@ const CHARACTERS = [
   {
     id:'ginji', name:'銀次', type:'car', typeLabel:'旧型セダン', emoji:'🚙',
     era:'80s', eraLabel:'80年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#9aa5c9,#4a5578)',
+    art:{arch:'sedan', c1:'#9aa5c9', c2:'#4a5578'},
     background:'かつて社長を乗せて全国を走った旧いセダン。会社の倒産とともに置き去りにされたが、後輩を導く兄貴分としての誇りは失っていない。',
     personality:'渋くて頼れる兄貴分。口数は少ないが後輩の面倒見がいい。',
     base:{speed:58,corner:48,accel:45,durability:82},
@@ -275,6 +333,7 @@ const CHARACTERS = [
   {
     id:'ao', name:'碧', type:'car', typeLabel:'ホットハッチ', emoji:'🚗',
     era:'2000s', eraLabel:'2000年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#5fd485,#2a9d90)',
+    art:{arch:'hothatch', c1:'#5fd485', c2:'#2a9d90'},
     background:'デビュー当時は「最速のホットハッチ」と呼ばれた一台。事故で心を閉ざしていたが、負けず嫌いな性格だけは変わっていない。',
     personality:'負けず嫌いな妹分。ツンとした態度の裏に強い向上心を秘めている。',
     base:{speed:66,corner:64,accel:60,durability:56},
@@ -286,6 +345,7 @@ const CHARACTERS = [
   {
     id:'gou', name:'剛', type:'car', typeLabel:'旧型ピックアップ', emoji:'🚚',
     era:'80s', eraLabel:'80年代', garage:'丸信運送', hue:'linear-gradient(135deg,#8b7cf6,#4a3a8a)',
+    art:{arch:'pickup', c1:'#8b7cf6', c2:'#4a3a8a'},
     background:'廃業した運送会社の最後の一台だった旧いピックアップトラック。無口で不器用だが、仲間を最後まで背負って走り抜く覚悟がある。',
     personality:'寡黙で不器用な力持ち。仲間を最後まで守り抜く責任感が強い。',
     base:{speed:44,corner:40,accel:38,durability:95},
@@ -297,6 +357,7 @@ const CHARACTERS = [
   {
     id:'cb350four', name:'CB350FOUR', type:'bike', typeLabel:'並列4気筒ネイキッド', emoji:'🏍️',
     era:'70s', eraLabel:'1970年代', garage:'谷口オートバイ店', hue:'linear-gradient(135deg,#c9c9c9,#75797f)',
+    art:{arch:'classic-bike', c1:'#c9c9c9', c2:'#75797f'},
     background:'1972年、ホンダは大ヒットした「CB750FOUR」の弟分として、より手に入れやすい並列四気筒モデル「CB350FOUR」を送り出した。しかし2年後に登場した後継機「CB400FOUR」の人気があまりに大きく、その存在は歴史の陰に隠れがちだった。峠道を愛したオーナーの手を離れてからは、長らく倉庫の奥で眠っていたが、四気筒特有の甲高いエンジンサウンドへの憧れだけは失っていない。',
     personality:'有名になれなかった悔しさを抱えながらも、負けん気と誠実さを兼ね備えた性格。口は悪いが根は真面目な努力家。',
     base:{speed:58,corner:82,accel:72,durability:50},
@@ -308,6 +369,7 @@ const CHARACTERS = [
   {
     id:'supra70', name:'70スープラ', type:'car', typeLabel:'ターボGTクーペ', emoji:'🏎️',
     era:'80s', eraLabel:'1980年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#d64550,#2b2d42)',
+    art:{arch:'coupe', c1:'#d64550', c2:'#2b2d42'},
     background:'1986年、トヨタは「セリカXX」の後継として、セリカから独立した単独ブランドの三代目スープラ(通称・70スープラ)を送り出した。ポップアップヘッドライトと直列6気筒ターボエンジンを備えた、バブル期日本を代表するハイテクスポーツだった。しかし1993年に登場した伝説的な四代目・80スープラの陰に隠れ、今ではその名を知る者も少なくなった。持ち主が手放してからは、薄暗いガレージの奥で静かに眠り続けていた。',
     personality:'伝説と呼ばれる後継機と比較され続けてきた複雑な想いを抱えつつも、誇り高く紳士的な佇まいを崩さない「元祖」としての貫禄。',
     base:{speed:72,corner:54,accel:58,durability:80},
@@ -328,6 +390,134 @@ const SLOTS = [
   {key:'anchor',label:'アンカー',rec:'車推奨・耐久力で締める'},
 ];
 const RIVAL_TEAMS = ['峠の伏兵チーム','絆なきスピードスターズ','元プロ整備士のガレージ','名もなき挑戦者たち','伝説の廃車回収軍団','流れ者レーシング'];
+
+/* ============ VEHICLE ART (procedural SVG, no external assets) ============ */
+const CAR_ARCHETYPES = {
+  sedan:    {len:200,bodyH:34,bodyY:0,cabinX0:.30,cabinX1:.68,cabinH:30,roofRake:10,wheelR:19,wheelXf:.78,wheelXr:.22,extra:'trunk'},
+  kei:      {len:150,bodyH:36,bodyY:0,cabinX0:.14,cabinX1:.86,cabinH:38,roofRake:6, wheelR:18,wheelXf:.80,wheelXr:.20,extra:''},
+  hothatch: {len:190,bodyH:33,bodyY:0,cabinX0:.28,cabinX1:.80,cabinH:31,roofRake:14,wheelR:19,wheelXf:.80,wheelXr:.20,extra:'spoiler'},
+  pickup:   {len:210,bodyH:34,bodyY:0,cabinX0:.14,cabinX1:.46,cabinH:32,roofRake:8, wheelR:20,wheelXf:.82,wheelXr:.20,extra:'bed'},
+  coupe:    {len:220,bodyH:26,bodyY:4,cabinX0:.42,cabinX1:.74,cabinH:22,roofRake:20,wheelR:19,wheelXf:.84,wheelXr:.18,extra:'popup'},
+};
+const BIKE_ARCHETYPES = {
+  'naked-bike':   {wheelR:22},
+  'sport-bike':   {wheelR:21},
+  'classic-bike': {wheelR:23},
+};
+let ART_UID = 0;
+function artGrad(id,c1,c2){
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;
+}
+function carArtSVG(arch, uid, colorA, colorB, awakened){
+  const a = CAR_ARCHETYPES[arch];
+  const W=240,Ht=120,ground=96;
+  const bx0=20, bx1=20+a.len;
+  const bodyTop = ground - a.bodyH - a.bodyY;
+  const cx0 = bx0 + a.len*a.cabinX0, cx1 = bx0 + a.len*a.cabinX1;
+  const cabinTop = bodyTop - a.cabinH;
+  const wf = bx0 + a.len*a.wheelXf, wr = bx0 + a.len*a.wheelXr;
+  const rimC = awakened ? '#1a2530':'#221c18';
+  const fillId = 'f'+uid, glowId='g'+uid;
+  let extra='';
+  if(a.extra==='trunk'){
+    extra += `<path d="M${cx1},${bodyTop} L${bx1-8},${bodyTop+6} L${bx1-8},${bodyTop+a.cabinH*0.55} L${cx1-6},${bodyTop+a.cabinH*0.4} Z" fill="url(#${fillId})"/>`;
+  }
+  if(a.extra==='spoiler'){
+    extra += `<rect x="${cx1-6}" y="${cabinTop-10}" width="26" height="6" rx="2" fill="url(#${fillId})"/><rect x="${cx1-2}" y="${cabinTop-10}" width="4" height="12" fill="url(#${fillId})"/>`;
+  }
+  if(a.extra==='bed'){
+    extra += `<rect x="${cx1+4}" y="${bodyTop}" width="${bx1-cx1-10}" height="${a.bodyH-6}" fill="none" stroke="url(#${fillId})" stroke-width="4"/>`;
+  }
+  if(a.extra==='popup'){
+    extra += `<rect x="${bx1-30}" y="${bodyTop-10}" width="16" height="10" rx="2" fill="url(#${fillId})"/>`;
+  }
+  const scratches = !awakened ? `
+    <path d="M${bx0+30},${bodyTop+8} L${bx0+55},${bodyTop+18}" stroke="#00000055" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${cx0+10},${cabinTop+8} L${cx0+22},${cabinTop+2}" stroke="#00000055" stroke-width="2" stroke-linecap="round"/>` : '';
+  const shine = awakened ? `<path d="M${bx0+10},${bodyTop+4} L${bx0+40},${bodyTop-2} L${bx0+34},${bodyTop+10} L${bx0+8},${bodyTop+14} Z" fill="#ffffff" opacity=".25"/>` : '';
+  return `<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="xMidYMax meet">
+    <defs>${artGrad(fillId,colorA,colorB)}
+      <filter id="${glowId}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <ellipse cx="${(bx0+bx1)/2}" cy="${ground+10}" rx="${a.len/2}" ry="7" fill="#000" opacity=".25"/>
+    <g ${awakened?`filter="url(#${glowId})"`:''}>
+      <path d="M${bx0},${ground} L${bx0},${bodyTop+14} Q${bx0},${bodyTop} ${bx0+16},${bodyTop} L${cx0},${bodyTop} L${cx0+8},${cabinTop+6} Q${cx0+14},${cabinTop} ${cx0+24},${cabinTop} L${cx1-a.roofRake},${cabinTop} Q${cx1-a.roofRake+10},${cabinTop} ${cx1},${cabinTop+10} L${cx1+6},${bodyTop} L${bx1-14},${bodyTop} Q${bx1},${bodyTop} ${bx1},${bodyTop+14} L${bx1},${ground} Z" fill="url(#${fillId})" stroke="${awakened?'#00000033':'#00000055'}" stroke-width="2"/>
+      ${extra}
+      <rect x="${bx1-14}" y="${ground-18}" width="8" height="6" rx="2" fill="${awakened?'#fff6d8':'#8a8578'}"/>
+      <rect x="${bx0+6}" y="${ground-16}" width="6" height="5" rx="1" fill="${awakened?'#ff8a8a':'#7a5858'}"/>
+      ${scratches}${shine}
+    </g>
+    <circle cx="${wr}" cy="${ground}" r="${a.wheelR}" fill="${rimC}"/><circle cx="${wr}" cy="${ground}" r="${a.wheelR*0.5}" fill="${awakened?colorA:'#555'}"/>
+    <circle cx="${wf}" cy="${ground}" r="${a.wheelR}" fill="${rimC}"/><circle cx="${wf}" cy="${ground}" r="${a.wheelR*0.5}" fill="${awakened?colorA:'#555'}"/>
+  </svg>`;
+}
+function bikeArtSVG(kind, uid, colorA, colorB, awakened){
+  const b = BIKE_ARCHETYPES[kind];
+  const W=240,Ht=120,ground=90;
+  const rearX=48, frontX=192;
+  const fillId='f'+uid, glowId='g'+uid;
+  const rimC = awakened ? '#1a2530':'#221c18';
+  const chromeC = awakened ? '#fff6d8':'#8a8578';
+  const frameStroke = awakened ? colorA : '#555c78';
+  const Hx = frontX-42, Hy = ground-56;
+  const Px = rearX+30, Py = ground-30;
+  const spine = kind==='classic-bike'
+    ? `<path d="M${Px},${Py} L${Hx},${Hy}" stroke="${frameStroke}" stroke-width="7" stroke-linecap="round"/><path d="M${Px-2},${Py+8} L${Hx-4},${Hy+10}" stroke="${frameStroke}" stroke-width="4" stroke-linecap="round" opacity=".7"/>`
+    : `<path d="M${Px},${Py} L${Hx},${Hy}" stroke="${frameStroke}" stroke-width="7" stroke-linecap="round"/>`;
+  const fork = `<path d="M${Hx},${Hy} L${frontX},${ground}" stroke="${frameStroke}" stroke-width="7" stroke-linecap="round"/>`;
+  const swingarm = kind==='classic-bike'
+    ? `<path d="M${Px},${Py} L${rearX+2},${ground-2}" stroke="${chromeC}" stroke-width="3" stroke-linecap="round"/><path d="M${Px+6},${Py+2} L${rearX+8},${ground-4}" stroke="${chromeC}" stroke-width="3" stroke-linecap="round"/>`
+    : `<path d="M${Px},${Py} L${rearX+2},${ground-2}" stroke="${frameStroke}" stroke-width="6" stroke-linecap="round"/>`;
+  const downtube = `<path d="M${Hx},${Hy} L${frontX-48},${ground-24}" stroke="${frameStroke}" stroke-width="4" stroke-linecap="round" opacity=".85"/>`;
+  const tank = kind==='sport-bike'
+    ? `<ellipse cx="126" cy="${ground-42}" rx="22" ry="10" fill="url(#${fillId})"/>`
+    : `<ellipse cx="124" cy="${ground-52}" rx="23" ry="13" fill="url(#${fillId})"/>`;
+  const seat = `<rect x="${rearX+14}" y="${Py-9}" width="34" height="9" rx="4" fill="${awakened?'#2a2f42':'#1c1f2c'}"/>`;
+  const engine = `<rect x="${rearX+28}" y="${ground-26}" width="68" height="20" rx="6" fill="url(#${fillId})"/>`;
+  const engineFins = `<line x1="${rearX+38}" y1="${ground-20}" x2="${rearX+80}" y2="${ground-20}" stroke="#00000033" stroke-width="2"/><line x1="${rearX+38}" y1="${ground-14}" x2="${rearX+80}" y2="${ground-14}" stroke="#00000033" stroke-width="2"/>`;
+  let bar, headlight, fairing='';
+  if(kind==='sport-bike'){
+    bar = `<path d="M${Hx-4},${Hy-2} Q${Hx+2},${Hy+6} ${Hx+8},${Hy+11}" stroke="${frameStroke}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    fairing = `<path d="M${Hx-2},${Hy-8} L${frontX-20},${ground-30} L${frontX-14},${ground-14} L${Hx-14},${Hy+8} Z" fill="url(#${fillId})" opacity=".92"/>`;
+    headlight = `<ellipse cx="${frontX-30}" cy="${ground-22}" rx="7" ry="5" fill="${chromeC}"/>`;
+  } else if(kind==='classic-bike'){
+    bar = `<path d="M${Hx-2},${Hy-2} Q${Hx-16},${Hy-14} ${Hx-28},${Hy-16}" stroke="${chromeC}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    headlight = `<circle cx="${Hx-2}" cy="${Hy-2}" r="13" fill="${chromeC}" stroke="url(#${fillId})" stroke-width="4"/>`;
+  } else {
+    bar = `<path d="M${Hx-2},${Hy-2} Q${Hx-12},${Hy-12} ${Hx-22},${Hy-13}" stroke="${frameStroke}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    headlight = `<circle cx="${Hx-2}" cy="${Hy-1}" r="9" fill="${chromeC}" stroke="url(#${fillId})" stroke-width="4"/>`;
+  }
+  const exhaust = `<rect x="${rearX-8}" y="${ground-10}" width="34" height="9" rx="4" fill="${chromeC}"/>`;
+  const tankCap = `<circle cx="122" cy="${ground-54}" r="3" fill="#00000044"/>`;
+  const spokes = kind==='classic-bike' ? [rearX,frontX].map(cx=>`
+    <line x1="${cx}" y1="${ground-b.wheelR+3}" x2="${cx}" y2="${ground+b.wheelR-3}" stroke="#00000044" stroke-width="1.5"/>
+    <line x1="${cx-b.wheelR+3}" y1="${ground}" x2="${cx+b.wheelR-3}" y2="${ground}" stroke="#00000044" stroke-width="1.5"/>`).join('') : '';
+  const scratches = !awakened ? `<path d="M${rearX+50},${ground-46} L${rearX+66},${ground-40}" stroke="#00000055" stroke-width="2" stroke-linecap="round"/>` : '';
+  const shine = awakened ? `<ellipse cx="112" cy="${ground-56}" rx="9" ry="4" fill="#ffffff" opacity=".28"/>` : '';
+  return `<svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="xMidYMax meet">
+    <defs>${artGrad(fillId,colorA,colorB)}
+      <filter id="${glowId}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6" result="bl"/><feMerge><feMergeNode in="bl"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <ellipse cx="${(rearX+frontX)/2+8}" cy="${ground+16}" rx="${(frontX-rearX)/2+20}" ry="7" fill="#000" opacity=".25"/>
+    <circle cx="${rearX}" cy="${ground}" r="${b.wheelR}" fill="${rimC}"/><circle cx="${rearX}" cy="${ground}" r="${b.wheelR*0.42}" fill="${awakened?colorA:'#555'}"/>
+    <circle cx="${frontX}" cy="${ground}" r="${b.wheelR}" fill="${rimC}"/><circle cx="${frontX}" cy="${ground}" r="${b.wheelR*0.42}" fill="${awakened?colorA:'#555'}"/>
+    ${spokes}${exhaust}
+    <g ${awakened?`filter="url(#${glowId})"`:''}>
+      ${swingarm}${spine}${fork}${downtube}${engine}${engineFins}${tank}${tankCap}${seat}${fairing}${bar}${headlight}${scratches}${shine}
+    </g>
+  </svg>`;
+}
+function vehicleIcon(charId){
+  const def = CHAR_MAP[charId];
+  const awakened = STATE.chars[charId] ? STATE.chars[charId].awakened : false;
+  const uid = 'u'+(ART_UID++);
+  return def.type==='bike'
+    ? bikeArtSVG(def.art.arch, uid, def.art.c1, def.art.c2, awakened)
+    : carArtSVG(def.art.arch, uid, def.art.c1, def.art.c2, awakened);
+}
+function rivalIcon(){
+  return carArtSVG('hothatch', 'rival'+(ART_UID++), '#7d8399', '#454b63', false);
+}
 
 /* ============ STATE ============ */
 const SAVE_KEY = 'soulGarageState_v1';
@@ -458,7 +648,7 @@ function renderGarage(){
     const st = STATE.chars[def.id];
     return `<div class="ccard ${st.awakened?'awakened':''}" data-id="${def.id}">
       ${st.awakened?'<div class="awaken-badge">✨覚醒済</div>':''}
-      <div class="avatar" style="background:${def.hue}">${def.emoji}</div>
+      <div class="avatar-plate ${st.awakened?'awakened':''}" style="--c1:${def.art.c1};--c2:${def.art.c2}">${vehicleIcon(def.id)}</div>
       <div class="cname">${def.name}</div>
       <div class="ctype">${def.typeLabel} / ${def.eraLabel}</div>
       <div class="bond-wrap">
@@ -493,7 +683,7 @@ function renderCharModal(id){
   const modal = document.getElementById('char-modal');
   modal.innerHTML = `
     <div class="modal-hd">
-      <div class="avatar" style="background:${def.hue}">${def.emoji}</div>
+      <div class="avatar-plate lg ${st.awakened?'awakened':''}" style="--c1:${def.art.c1};--c2:${def.art.c2}">${vehicleIcon(def.id)}</div>
       <div>
         <h2>${def.name} ${st.awakened?'<span style="color:var(--cyan2);font-size:13px">✨覚醒</span>':''}</h2>
         <div class="sub">${def.typeLabel} ・ ${def.eraLabel} ・ ${def.garage}</div>
@@ -629,10 +819,83 @@ function renderRacePre(){
   document.getElementById('race-start').addEventListener('click', runRace);
 }
 
-function runRace(){
+function wait(ms){ return new Promise(res=>setTimeout(res,ms)); }
+function nextFrame(){ return new Promise(res=>requestAnimationFrame(()=>requestAnimationFrame(res))); }
+
+const TRACK_BOUNDS = [0,20,40,60,80,100];
+
+function trackSceneHTML(weather, rivalName){
+  const weatherClass = weather==='雨' ? 'rain' : (weather==='晴れ' ? 'sun' : 'cloud');
+  let cps = '';
+  for(let i=1;i<=4;i++){
+    cps += `<div class="track-cp" style="left:${TRACK_BOUNDS[i]}%"><span>${SLOTS[i].label}</span></div>`;
+  }
+  return `
+    <div class="track-scene" id="track-scene">
+      <div class="track-weather ${weatherClass}"></div>
+      <div class="track-weatherlabel">${weather==='雨'?'🌧️':weather==='晴れ'?'☀️':'☁️'} ${weather}</div>
+      ${cps}
+      <div class="track-finish"></div>
+      <div class="track-lane" id="lane-player">
+        <div class="lane-tag">🔧 自チーム</div>
+        <div class="track-road scrolling"></div>
+        <div class="pmarker" id="pmarker"></div>
+      </div>
+      <div class="track-lane" id="lane-rival">
+        <div class="lane-tag">🚩 ${rivalName}</div>
+        <div class="track-road scrolling"></div>
+        <div class="rmarker" id="rmarker">${rivalIcon()}</div>
+      </div>
+    </div>`;
+}
+
+async function playLeg(leg, idx){
+  const pmarker = document.getElementById('pmarker');
+  const rmarker = document.getElementById('rmarker');
+  pmarker.style.transition = 'none';
+  rmarker.style.transition = 'none';
+  pmarker.style.left = TRACK_BOUNDS[idx]+'%';
+  rmarker.style.left = TRACK_BOUNDS[idx]+'%';
+  pmarker.innerHTML = vehicleIcon(leg.id);
+  await nextFrame();
+  pmarker.style.transition = '';
+  rmarker.style.transition = '';
+  const avg = (leg.playerScore+leg.rivalScore)/2 || 1;
+  const pDur = Math.max(420, Math.min(1500, 820*(avg/leg.playerScore)));
+  const rDur = Math.max(420, Math.min(1500, 820*(avg/leg.rivalScore)));
+  pmarker.style.setProperty('--dur', pDur+'ms');
+  rmarker.style.setProperty('--dur', rDur+'ms');
+  pmarker.style.left = TRACK_BOUNDS[idx+1]+'%';
+  rmarker.style.left = TRACK_BOUNDS[idx+1]+'%';
+
+  if(leg.triggered.length){
+    setTimeout(()=>{
+      const pop = document.createElement('div');
+      pop.className = 'ability-pop';
+      pop.style.left = ((TRACK_BOUNDS[idx]+TRACK_BOUNDS[idx+1])/2)+'%';
+      pop.textContent = leg.triggered.join('・')+' 発動!';
+      document.getElementById('lane-player').appendChild(pop);
+      setTimeout(()=>pop.remove(), 1200);
+    }, Math.min(pDur,rDur)*0.35);
+  }
+  await wait(Math.max(pDur,rDur));
+  const legWin = leg.playerScore >= leg.rivalScore;
+  const tag = document.createElement('div');
+  tag.className = 'leadtag';
+  tag.style.left = TRACK_BOUNDS[idx+1]+'%';
+  tag.textContent = legWin ? '⚡' : '…';
+  document.getElementById(legWin?'lane-player':'lane-rival').appendChild(tag);
+  setTimeout(()=>tag.remove(), 550);
+  await wait(280);
+}
+
+async function runRace(){
   const filled = SLOTS.every(s=>STATE.formation[s.key]);
   if(!filled) return;
+  const startBtn = document.getElementById('race-start');
+  if(startBtn) startBtn.disabled = true;
   const logEl = document.getElementById('race-log');
+  const trackEl = document.getElementById('race-track');
   logEl.innerHTML = '';
   const weather = ['晴れ','雨','曇り'][Math.floor(Math.random()*3)];
   const weatherKey = weather==='雨' ? 'rain' : 'clear';
@@ -657,33 +920,31 @@ function runRace(){
     rivalTotal += rivalScore;
   });
 
-  const lines = [];
-  lines.push({cls:'info', html:`天候: <b>${weather}</b> ／ 対戦相手: <b>${rivalName}</b>`});
-  legs.forEach(l=>{
-    const def = CHAR_MAP[l.id];
-    const legWin = l.playerScore >= l.rivalScore;
-    const abilityText = l.triggered.length ? `（${l.triggered.join('・')} 発動！）` : '';
-    lines.push({cls: legWin?'win':'', html:`【${l.slot.label}】${def.name} ${abilityText} — ${legWin?'区間リード':'区間で後れを取る'}`});
-  });
   const win = playerTotal >= rivalTotal;
   const legsWon = legs.filter(l=>l.playerScore>=l.rivalScore).length;
 
-  let i=0;
-  function step(){
-    if(i<lines.length){
-      const l = lines[i];
-      const div = document.createElement('div');
-      div.className = 'logline ' + (l.cls||'');
-      div.innerHTML = l.html;
-      logEl.appendChild(div);
-      logEl.scrollTop = logEl.scrollHeight;
-      i++;
-      setTimeout(step, 260);
-    } else {
-      finishRace();
-    }
+  trackEl.innerHTML = trackSceneHTML(weather, rivalName);
+  const infoLine = document.createElement('div');
+  infoLine.className = 'logline info';
+  infoLine.innerHTML = `天候: <b>${weather}</b> ／ 対戦相手: <b>${rivalName}</b>`;
+  logEl.appendChild(infoLine);
+
+  for(let idx=0; idx<legs.length; idx++){
+    const l = legs[idx];
+    await playLeg(l, idx);
+    const def = CHAR_MAP[l.id];
+    const legWin = l.playerScore >= l.rivalScore;
+    const abilityText = l.triggered.length ? `（${l.triggered.join('・')} 発動！）` : '';
+    const div = document.createElement('div');
+    div.className = 'logline ' + (legWin?'win':'');
+    div.innerHTML = `【${l.slot.label}】${def.name} ${abilityText} — ${legWin?'区間リード':'区間で後れを取る'}`;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
   }
-  step();
+  document.querySelectorAll('#track-scene .track-road').forEach(r=>r.classList.remove('scrolling'));
+  if(startBtn) startBtn.disabled = false;
+
+  finishRace();
 
   function finishRace(){
     const bondGainBase = win ? 8 : 3;
