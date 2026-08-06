@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ガレージ・オブ・ソウル - 車・バイク擬人化育成レース(プロトタイプ)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#12141c;--bg2:#181b26;--panel:#1e2230;--panel2:#262b3d;
+  --ink:#eef1fb;--ink2:#aab2c8;--ink3:#6b7390;
+  --amber:#e8934a;--amber2:#ffb066;--amber3:#3a2a1c;
+  --cyan:#4fd1c5;--cyan2:#7ee8dd;--cyan3:#173432;
+  --rose:#e15b7a;--violet:#8b7cf6;--green:#5fd485;
+  --bd:#323852;--bd2:#404a6b;
+  --r:16px;--r2:10px;--sh:0 2px 10px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.25);
+  --hw:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans JP',sans-serif;background:
+    radial-gradient(1200px 600px at 15% -10%, #1c2a3a 0%, transparent 60%),
+    radial-gradient(1000px 500px at 100% 0%, #2a1c30 0%, transparent 55%),
+    var(--bg);
+  color:var(--ink);font-size:15px;line-height:1.65;min-height:100vh}
+h1,h2,h3,.disp{font-family:'Zen Kaku Gothic New',sans-serif}
+button{font-family:inherit;cursor:pointer}
+select,input{font-family:inherit}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+/* HEADER */
+#hdr{position:fixed;top:0;left:0;right:0;height:var(--hw);background:linear-gradient(90deg,#1a1d29,#20182a);display:flex;align-items:center;gap:16px;padding:0 18px;z-index:300;border-bottom:1px solid var(--bd);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.logo{font-family:'Zen Kaku Gothic New';font-weight:900;font-size:19px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo .em{font-size:22px}
+.logo small{display:block;font-family:'Noto Sans JP';font-weight:400;font-size:10px;color:var(--ink3);letter-spacing:1px}
+#mech-badge{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--ink2)}
+.mstat{display:flex;flex-direction:column;gap:2px;min-width:110px}
+.mstat .lbl{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px}
+.expbar{width:110px;height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;border:1px solid var(--bd)}
+.expbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--cyan2))}
+.chip{padding:4px 10px;border-radius:20px;background:var(--panel2);border:1px solid var(--bd);font-size:12px;color:var(--ink2);white-space:nowrap}
+#help-btn{width:30px;height:30px;border-radius:50%;background:var(--panel2);border:1px solid var(--bd);color:var(--ink2);font-weight:700}
+#reset-btn{background:transparent;border:1px solid var(--bd);color:var(--ink3);border-radius:8px;padding:5px 10px;font-size:12px}
+#reset-btn:hover{color:var(--rose);border-color:var(--rose)}
+
+/* TABS */
+#tabs{position:fixed;top:var(--hw);left:0;right:0;height:50px;background:var(--bg2);display:flex;gap:4px;padding:0 14px;z-index:290;border-bottom:1px solid var(--bd);overflow-x:auto}
+.tab{padding:0 18px;height:100%;display:flex;align-items:center;gap:6px;color:var(--ink3);font-weight:700;font-size:14px;border-bottom:3px solid transparent;white-space:nowrap}
+.tab.on{color:var(--amber2);border-color:var(--amber)}
+.tab:hover{color:var(--ink)}
+
+#main{margin-top:calc(var(--hw) + 50px);padding:22px 22px 60px;max-width:1180px;margin-left:auto;margin-right:auto}
+.view{display:none}
+.view.on{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.section-title{font-family:'Zen Kaku Gothic New';font-weight:900;font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.section-sub{color:var(--ink3);font-size:13px;margin-bottom:18px}
+
+/* GARAGE GRID */
+#garage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.ccard{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:.16s;position:relative;overflow:hidden}
+.ccard:hover{border-color:var(--amber);transform:translateY(-2px);box-shadow:var(--sh)}
+.ccard.awakened{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset,0 0 24px rgba(79,209,197,.15)}
+.ccard .avatar{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.ccard .cname{font-weight:700;font-size:16px;display:flex;align-items:center;gap:6px}
+.ccard .ctype{font-size:11px;color:var(--ink3);margin-bottom:8px}
+.awaken-badge{position:absolute;top:10px;right:10px;font-size:11px;background:var(--cyan3);color:var(--cyan2);border:1px solid var(--cyan);padding:2px 7px;border-radius:20px;font-weight:700}
+.bond-wrap{margin-top:8px}
+.bond-label{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:3px}
+.bondbar{height:7px;border-radius:5px;background:var(--panel2);overflow:hidden;border:1px solid var(--bd)}
+.bondbar i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--amber))}
+.ccard.awakened .bondbar i{background:linear-gradient(90deg,var(--cyan),var(--cyan2))}
+.tagrow{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--panel2);border:1px solid var(--bd);color:var(--ink3)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(8,9,14,.72);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.overlay.on{display:flex}
+.modal{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r);max-width:640px;width:100%;box-shadow:var(--sh);animation:fadeIn .2s ease}
+.modal-hd{display:flex;align-items:center;gap:14px;padding:20px;border-bottom:1px solid var(--bd);background:linear-gradient(160deg,var(--panel2),var(--panel))}
+.modal-hd .avatar{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0}
+.modal-hd h2{font-size:20px}
+.modal-hd .sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.modal-close{margin-left:auto;background:transparent;border:none;color:var(--ink3);font-size:22px;line-height:1}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:18px}
+.bg-text{font-size:13px;color:var(--ink2);background:var(--bg2);border-left:3px solid var(--amber);padding:10px 14px;border-radius:6px}
+.statrow{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px}
+.statrow .sname{width:56px;color:var(--ink3);flex-shrink:0}
+.statbar{flex:1;height:9px;background:var(--panel2);border-radius:5px;overflow:hidden;border:1px solid var(--bd)}
+.statbar i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan))}
+.statval{width:34px;text-align:right;color:var(--ink2);font-family:'DM Mono',monospace}
+.statplus{width:20px;height:20px;border-radius:5px;background:var(--panel2);border:1px solid var(--bd);color:var(--amber2);font-weight:700;font-size:13px;flex-shrink:0}
+.statplus:disabled{opacity:.3;cursor:not-allowed}
+.ability-card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.ability-card.locked{opacity:.4}
+.ability-card .an{font-weight:700;font-size:13px;color:var(--amber2);display:flex;justify-content:space-between}
+.ability-card.post .an{color:var(--cyan2)}
+.ability-card .ad{font-size:12px;color:var(--ink3);margin-top:3px}
+.leader-card{background:linear-gradient(140deg,var(--amber3),var(--panel2));border:1px solid var(--amber);border-radius:10px;padding:10px 12px}
+.leader-card .an{color:var(--amber2);font-weight:700;font-size:13px}
+.quote-box{font-size:13px;font-style:italic;color:var(--ink2);min-height:20px}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{padding:9px 16px;border-radius:10px;border:none;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px;transition:.14s}
+.btn-amber{background:linear-gradient(135deg,var(--amber),#c96f2e);color:#241207}
+.btn-amber:hover{filter:brightness(1.1)}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),#2a9d90);color:#04211d}
+.btn-cyan:hover{filter:brightness(1.1)}
+.btn-ghost{background:var(--panel2);border:1px solid var(--bd);color:var(--ink2)}
+.btn-ghost:hover{border-color:var(--ink3)}
+.btn:disabled{opacity:.35;cursor:not-allowed;filter:none}
+.pool-note{font-size:11px;color:var(--ink3)}
+
+/* TEAM VIEW */
+#slots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+.slot{background:var(--panel);border:1.5px dashed var(--bd2);border-radius:var(--r2);padding:12px;min-height:150px;display:flex;flex-direction:column;gap:8px}
+.slot .slabel{font-size:11px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.slot .srec{font-size:10px;color:var(--ink3)}
+.slot select{width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:7px;color:var(--ink);padding:7px 8px;font-size:13px}
+.slot .sinfo{margin-top:auto;font-size:11px;color:var(--ink2);display:flex;flex-direction:column;gap:3px}
+.slot.leader{border-color:var(--amber)}
+.slot.leader .slabel{color:var(--amber2)}
+.leader-flag{font-size:10px;color:var(--amber2)}
+.synergy-box{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r2);padding:14px;display:flex;gap:20px;flex-wrap:wrap;font-size:13px}
+.synergy-box .item{display:flex;flex-direction:column;gap:2px}
+.synergy-box .item b{color:var(--cyan2)}
+
+/* RACE VIEW */
+#race-panel{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r);padding:20px}
+#race-log{margin-top:16px;display:flex;flex-direction:column;gap:8px;font-size:13px;max-height:420px;overflow-y:auto}
+.logline{padding:9px 12px;background:var(--bg2);border-left:3px solid var(--bd2);border-radius:6px;animation:fadeIn .25s ease}
+.logline.win{border-color:var(--green)}
+.logline.info{border-color:var(--violet)}
+.logline b{color:var(--amber2)}
+.result-banner{margin-top:14px;padding:16px;border-radius:12px;text-align:center;font-weight:900;font-size:20px;font-family:'Zen Kaku Gothic New'}
+.result-banner.win{background:linear-gradient(135deg,#1c3a2a,#0f271c);color:var(--green);border:1px solid var(--green)}
+.result-banner.lose{background:linear-gradient(135deg,#3a1c22,#271014);color:var(--rose);border:1px solid var(--rose)}
+.leg-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
+.leg-table th{color:var(--ink3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);font-weight:600}
+.leg-table td{padding:7px 8px;border-bottom:1px solid var(--bd)}
+.leg-table .wintag{color:var(--green);font-weight:700}
+.leg-table .losetag{color:var(--rose)}
+.warn-box{background:var(--amber3);border:1px solid var(--amber);color:var(--amber2);padding:14px;border-radius:10px;font-size:13px}
+
+/* INTRO */
+#intro .modal{max-width:520px}
+#intro .modal-body{font-size:13px;color:var(--ink2)}
+#intro .modal-body p{margin-bottom:10px}
+
+@media (max-width:760px){
+  #slots{grid-template-columns:repeat(2,1fr)}
+  #mech-badge{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="logo"><span class="em">🔧</span><div>ガレージ・オブ・ソウル<small>CAR & BIKE SOUL GARAGE — prototype</small></div></div>
+  <div id="mech-badge">
+    <div class="mstat"><span class="lbl">メカニックランク</span><b id="mech-rank">Lv.1</b></div>
+    <div class="mstat"><span class="lbl">EXP</span><div class="expbar"><i id="mech-exp-bar" style="width:0%"></i></div></div>
+    <div class="chip">🔩 パーツP: <b id="parts-pool">0</b></div>
+    <div class="chip">✨ 覚醒: <b id="awaken-count">0</b>/6</div>
+  </div>
+  <button id="help-btn" title="遊び方">?</button>
+  <button id="reset-btn">初期化</button>
+</div>
+
+<div id="tabs">
+  <div class="tab on" data-view="garage">🏚️ ガレージ</div>
+  <div class="tab" data-view="team">🏁 編成</div>
+  <div class="tab" data-view="race">🏆 レース</div>
+</div>
+
+<div id="main">
+
+  <div class="view on" id="view-garage">
+    <div class="section-title">🏚️ 整備工場のガレージ</div>
+    <div class="section-sub">目を覚ましたばかりの相棒たち。整備をして信頼度(絆)を高めよう。カードをクリックすると詳細を見られます。</div>
+    <div id="garage-grid"></div>
+  </div>
+
+  <div class="view" id="view-team">
+    <div class="section-title">🏁 チーム編成</div>
+    <div class="section-sub">先頭(バイクで俊敏に切り込む)→中盤(車でペース維持)→アンカー(耐久力のある車)。先頭1台目のリーダースキルがチーム全体に常時効果を発揮します。</div>
+    <div id="slots"></div>
+    <div class="synergy-box" id="synergy-box"></div>
+  </div>
+
+  <div class="view" id="view-race">
+    <div class="section-title">🏆 レース</div>
+    <div class="section-sub">編成した5台でライバルチームと勝負。天候・絆・アビリティ・シナジーが結果を左右します。</div>
+    <div id="race-panel">
+      <div id="race-pre"></div>
+      <div id="race-log"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- character modal -->
+<div class="overlay" id="char-overlay">
+  <div class="modal" id="char-modal"></div>
+</div>
+
+<!-- intro modal -->
+<div class="overlay" id="intro">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="avatar" style="background:linear-gradient(135deg,#e8934a,#8b7cf6)">🔧</div>
+      <div><h2>ガレージへようこそ</h2><div class="sub">プロトタイプ版・遊び方</div></div>
+      <button class="modal-close" id="intro-close">×</button>
+    </div>
+    <div class="modal-body">
+      <p>廃車寸前・忘れられた車やバイクが、この場末の整備工場に辿り着くと"魂"を持って目を覚ます。目覚めたばかりの彼らは本来のスペックを発揮できないが、あなた(メカニック)との信頼関係を通じて少しずつ「本来の自分」を取り戻していく。</p>
+      <p>① <b>ガレージ</b>で相棒に「整備する」を行い、絆(信頼度)を高めよう。絆が80を超えると<b style="color:var(--cyan2)">覚醒</b>できる。</p>
+      <p>② <b>編成</b>タブで5台のチームを組もう。先頭1台目がチームのリーダーになる。</p>
+      <p>③ <b>レース</b>タブでライバルに挑戦。勝敗に応じて絆とメカニックEXP、パーツポイントを獲得できる。</p>
+      <p style="color:var(--ink3)">※本プロトタイプは個人利用を想定した架空の車種・バイクのみで構成しています。</p>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <button class="btn btn-amber" id="intro-start">整備工場に入る 🔧</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const CHARACTERS = [
+  {
+    id:'hayate', name:'疾風(ハヤテ)', type:'bike', typeLabel:'ネイキッドバイク', emoji:'🏍️',
+    era:'90s', eraLabel:'90年代', garage:'谷口オートバイ店', hue:'linear-gradient(135deg,#e8934a,#ffb066)',
+    background:'廃業したバイク店の店主が最後まで手放さなかった一台。峠を攻めるのが生きがいだった元オーナーの記憶が、彼を「まだ走れる」と信じさせている。',
+    personality:'元気で人懐っこい後輩キャラ。負けん気は強いが素直。',
+    base:{speed:62,corner:78,accel:74,durability:50},
+    abilityPre:{name:'追い風',desc:'先頭1番手に配置されると、レース序盤の加速力が上昇する。',zone:'start',effectPct:12},
+    abilityPost:{name:'独走モード',desc:'覚醒後、先頭区間でスピード・加速が大幅に上昇する。',zone:'vanguard',effectPct:25},
+    leaderSkill:{name:'チームの旗手',desc:'チーム全体の加速+4%',statPct:{accel:4}},
+    quotes:{low:['……ここ、あったかいな。','おれ、まだ走れるかな？'],mid:['お前と走ると、風が気持ちいいんだ。','次のレース、負けねぇぞ！'],high:['お前のおかげで、思い出した。走る理由を。','どこまでも一緒に行こうぜ！']}
+  },
+  {
+    id:'ai', name:'藍(アイ)', type:'bike', typeLabel:'レーサーレプリカ', emoji:'🏍️',
+    era:'2000s', eraLabel:'2000年代', garage:'谷口オートバイ店', hue:'linear-gradient(135deg,#4fd1c5,#2a6f8a)',
+    background:'サーキットでの事故以来、倉庫の奥に置き去りにされていた元レース仕様車。無口だが、走ることへの渇望は誰よりも強い。',
+    personality:'クールで寡黙。感情を表に出さないが、内に秘めた闘志は強い。',
+    base:{speed:80,corner:70,accel:66,durability:48},
+    abilityPre:{name:'冷静沈着',desc:'雨天時のスピード低下を軽減する。',zone:'rain',effectPct:10},
+    abilityPost:{name:'ラストスパート',desc:'覚醒後、アンカー区間でスピードが大幅に上昇する。',zone:'anchor',effectPct:22},
+    leaderSkill:{name:'静かな統率',desc:'チーム全体の信頼度上昇速度+10%',bondGainPct:10},
+    quotes:{low:['……。','触るな。'],mid:['……悪くない、整備の腕は。','走らせろ。それだけでいい。'],high:['あの日から、初めてだ。こんな気持ちになるのは。','お前になら、任せられる。']}
+  },
+  {
+    id:'minica', name:'ミニカ', type:'car', typeLabel:'軽自動車', emoji:'🚗',
+    era:'90s', eraLabel:'90年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#ffd77a,#ff9e7a)',
+    background:'スーパーで買い物帰りのおばあちゃんを何十年も支えた軽自動車。廃車寸前で工場に運び込まれたが、目を覚ますなり驚くほど陽気だった。',
+    personality:'天真爛漫なムードメーカー。誰にでも愛される親しみやすさが持ち味。',
+    base:{speed:40,corner:55,accel:50,durability:70},
+    abilityPre:{name:'がんばり屋',desc:'どんな区間でも一定の力を発揮する縁の下の力持ち。',zone:'always',effectPct:6},
+    abilityPost:{name:'みんなの元気玉',desc:'覚醒後、レース終了時にチーム全員の絆獲得量が上昇する。',zone:'raceEnd',bondGainPct:20},
+    leaderSkill:{name:'ムードメーカー',desc:'チーム全体の信頼度上昇速度+15%',bondGainPct:15},
+    quotes:{low:['よろしくね！','ここ、居心地いいかも！'],mid:['今日も一緒にがんばろうね！','わたし、まだまだ頑張れるよ！'],high:['あなたと出会えて、本当によかった！','みんなを笑顔にするのが、わたしの役目！']}
+  },
+  {
+    id:'ginji', name:'銀次', type:'car', typeLabel:'旧型セダン', emoji:'🚙',
+    era:'80s', eraLabel:'80年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#9aa5c9,#4a5578)',
+    background:'かつて社長を乗せて全国を走った旧いセダン。会社の倒産とともに置き去りにされたが、後輩を導く兄貴分としての誇りは失っていない。',
+    personality:'渋くて頼れる兄貴分。口数は少ないが後輩の面倒見がいい。',
+    base:{speed:58,corner:48,accel:45,durability:82},
+    abilityPre:{name:'ペース配分',desc:'中盤区間で速度と耐久が安定して上昇する。',zone:'mid',effectPct:14},
+    abilityPost:{name:'貫禄の走り',desc:'覚醒後、中盤区間の効果がさらに強化される。',zone:'mid',effectPct:26},
+    leaderSkill:{name:'兄貴の背中',desc:'チーム全体の耐久+6%',statPct:{durability:6}},
+    quotes:{low:['……世話になる。','まだ動けるとは、思わなかったな。'],mid:['お前の整備、悪くないぞ。','後輩たちのことは任せておけ。'],high:['お前になら、この身を預けられる。','昔の誇りを、思い出させてくれたな。']}
+  },
+  {
+    id:'ao', name:'碧', type:'car', typeLabel:'ホットハッチ', emoji:'🚗',
+    era:'2000s', eraLabel:'2000年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#5fd485,#2a9d90)',
+    background:'デビュー当時は「最速のホットハッチ」と呼ばれた一台。事故で心を閉ざしていたが、負けず嫌いな性格だけは変わっていない。',
+    personality:'負けず嫌いな妹分。ツンとした態度の裏に強い向上心を秘めている。',
+    base:{speed:66,corner:64,accel:60,durability:56},
+    abilityPre:{name:'意地っ張り',desc:'どんな区間でもわずかにスピードが上昇する。',zone:'always',effectPct:8},
+    abilityPost:{name:'かつての最速',desc:'覚醒後、全区間でスピードが上昇する。',zone:'always',effectPct:18},
+    leaderSkill:{name:'負けん気',desc:'チーム全体のスピード+5%',statPct:{speed:5}},
+    quotes:{low:['べ、別にあんたのためじゃないから。','ふん、整備くらい丁寧にしなさいよ。'],mid:['……ちょっとだけ、認めてあげる。','次は絶対勝つから！'],high:['あんたと走ってる時だけ、怖くないの。','もう一度、"最速"って呼ばせてあげる。']}
+  },
+  {
+    id:'gou', name:'剛', type:'car', typeLabel:'旧型ピックアップ', emoji:'🚚',
+    era:'80s', eraLabel:'80年代', garage:'丸信運送', hue:'linear-gradient(135deg,#8b7cf6,#4a3a8a)',
+    background:'廃業した運送会社の最後の一台だった旧いピックアップトラック。無口で不器用だが、仲間を最後まで背負って走り抜く覚悟がある。',
+    personality:'寡黙で不器用な力持ち。仲間を最後まで守り抜く責任感が強い。',
+    base:{speed:44,corner:40,accel:38,durability:95},
+    abilityPre:{name:'不屈',desc:'アンカー区間で耐久・速度が上昇する。',zone:'anchor',effectPct:16},
+    abilityPost:{name:'最後の一台',desc:'覚醒後、アンカー区間の効果が大幅に強化される。',zone:'anchor',effectPct:30},
+    leaderSkill:{name:'最後尾の安心感',desc:'チーム全体の耐久+8%、信頼度上昇速度+5%',statPct:{durability:8},bondGainPct:5},
+    quotes:{low:['……。積み荷は、もうねぇよ。','おれは、最後まで走ることしかできねぇ。'],mid:['……お前がいれば、走れる気がする。','荷物じゃなく、仲間を運ぶのも悪くねぇ。'],high:['お前を、最後まで背負って走る。','これが、おれの覚悟だ。']}
+  },
+];
+const CHAR_MAP = Object.fromEntries(CHARACTERS.map(c=>[c.id,c]));
+const STAT_KEYS = ['speed','corner','accel','durability'];
+const STAT_LABEL = {speed:'速度',corner:'コーナー',accel:'加速',durability:'耐久'};
+const SLOTS = [
+  {key:'vanguard1',label:'先頭 1',rec:'バイク推奨・俊敏に切り込む'},
+  {key:'vanguard2',label:'先頭 2',rec:'バイク推奨・俊敏に切り込む'},
+  {key:'mid1',label:'中盤 1',rec:'車推奨・ペース維持'},
+  {key:'mid2',label:'中盤 2',rec:'車推奨・ペース維持'},
+  {key:'anchor',label:'アンカー',rec:'車推奨・耐久力で締める'},
+];
+const RIVAL_TEAMS = ['峠の伏兵チーム','絆なきスピードスターズ','元プロ整備士のガレージ','名もなき挑戦者たち','伝説の廃車回収軍団','流れ者レーシング'];
+
+/* ============ STATE ============ */
+const SAVE_KEY = 'soulGarageState_v1';
+function freshState(){
+  const chars = {};
+  CHARACTERS.forEach(c=>{ chars[c.id] = {bond:5, awakened:false, parts:{speed:0,corner:0,accel:0,durability:0}}; });
+  return {
+    mechanic:{exp:0},
+    partsPool:2,
+    chars,
+    formation:{vanguard1:null,vanguard2:null,mid1:null,mid2:null,anchor:null},
+    seenIntro:false,
+  };
+}
+let STATE = load();
+function load(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return freshState();
+    const parsed = JSON.parse(raw);
+    const fresh = freshState();
+    return Object.assign(fresh, parsed, {chars: Object.assign(fresh.chars, parsed.chars||{})});
+  }catch(e){ return freshState(); }
+}
+function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(STATE)); }
+
+function mechRank(){ return 1 + Math.floor(STATE.mechanic.exp/100); }
+function mechExpPct(){ return (STATE.mechanic.exp % 100); }
+
+/* ============ STATS / RACE ENGINE ============ */
+function effectiveStat(charId, key){
+  const def = CHAR_MAP[charId], st = STATE.chars[charId];
+  return def.base[key] + st.parts[key]*2;
+}
+function partsCap(charId){ return STATE.chars[charId].awakened ? 5 : 2; }
+
+function synergyInfo(){
+  const filled = SLOTS.map(s=>STATE.formation[s.key]).filter(Boolean);
+  const garageCount = {}, eraCount = {};
+  filled.forEach(id=>{
+    const d = CHAR_MAP[id];
+    garageCount[d.garage] = (garageCount[d.garage]||0)+1;
+    eraCount[d.era] = (eraCount[d.era]||0)+1;
+  });
+  const garageHit = Object.entries(garageCount).find(([k,v])=>v>=2);
+  const eraHit = Object.entries(eraCount).find(([k,v])=>v>=2);
+  let pct = 0;
+  if(garageHit) pct += 3;
+  if(eraHit) pct += 2;
+  return {pct, garageHit, eraHit, filledCount:filled.length};
+}
+
+function leaderEffects(){
+  const leaderId = STATE.formation.vanguard1;
+  const eff = {statPct:{}, bondGainPct:0, leaderDef:null};
+  if(!leaderId) return eff;
+  const def = CHAR_MAP[leaderId];
+  eff.leaderDef = def;
+  const ls = def.leaderSkill;
+  if(ls.statPct) eff.statPct = ls.statPct;
+  if(ls.bondGainPct) eff.bondGainPct = ls.bondGainPct;
+  return eff;
+}
+
+function broadZone(slotKey){
+  if(slotKey.startsWith('vanguard')) return 'vanguard';
+  if(slotKey.startsWith('mid')) return 'mid';
+  return 'anchor';
+}
+
+function legScore(charId, slotKey, weather, leader, synergyPct){
+  const def = CHAR_MAP[charId], st = STATE.chars[charId];
+  const s = {};
+  STAT_KEYS.forEach(k=>{
+    let v = effectiveStat(charId,k);
+    v *= (1 + (leader.statPct[k]||0)/100);
+    v *= (1 + synergyPct/100);
+    s[k] = v;
+  });
+  const zone = broadZone(slotKey);
+  let raw;
+  if(zone==='vanguard') raw = s.corner*0.5 + s.accel*0.35 + s.speed*0.15;
+  else if(zone==='mid') raw = s.speed*0.4 + s.durability*0.35 + s.corner*0.25;
+  else raw = s.durability*0.5 + s.speed*0.3 + s.corner*0.2;
+
+  raw *= (1 + st.bond/250);
+  if(st.awakened) raw *= 1.15;
+  if(weather==='rain'){ raw *= (def.type==='bike' ? 0.85 : 0.95); }
+
+  const abilities = [def.abilityPre];
+  if(st.awakened) abilities.push(def.abilityPost);
+  const triggered = [];
+  abilities.forEach(ab=>{
+    if(!ab.effectPct) return;
+    let hit=false;
+    if(ab.zone==='start') hit = (slotKey==='vanguard1');
+    else if(ab.zone==='rain') hit = (weather==='rain');
+    else if(ab.zone==='always') hit = true;
+    else hit = (ab.zone===zone);
+    if(hit){ raw *= (1+ab.effectPct/100); triggered.push(ab.name); }
+  });
+  raw *= (0.94 + Math.random()*0.12); // small RNG
+  return {score:raw, triggered};
+}
+
+function raceEndBondBonusPct(){
+  let pct = 0;
+  SLOTS.forEach(s=>{
+    const id = STATE.formation[s.key];
+    if(!id) return;
+    const def = CHAR_MAP[id], st = STATE.chars[id];
+    if(st.awakened && def.abilityPost.zone==='raceEnd' && def.abilityPost.bondGainPct) pct += def.abilityPost.bondGainPct;
+  });
+  return pct;
+}
+
+/* ============ RENDER: GARAGE ============ */
+function renderHeader(){
+  document.getElementById('mech-rank').textContent = 'Lv.' + mechRank();
+  document.getElementById('mech-exp-bar').style.width = mechExpPct()+'%';
+  document.getElementById('parts-pool').textContent = STATE.partsPool;
+  document.getElementById('awaken-count').textContent = CHARACTERS.filter(c=>STATE.chars[c.id].awakened).length;
+}
+
+function renderGarage(){
+  const grid = document.getElementById('garage-grid');
+  grid.innerHTML = CHARACTERS.map(def=>{
+    const st = STATE.chars[def.id];
+    return `<div class="ccard ${st.awakened?'awakened':''}" data-id="${def.id}">
+      ${st.awakened?'<div class="awaken-badge">✨覚醒済</div>':''}
+      <div class="avatar" style="background:${def.hue}">${def.emoji}</div>
+      <div class="cname">${def.name}</div>
+      <div class="ctype">${def.typeLabel} / ${def.eraLabel}</div>
+      <div class="bond-wrap">
+        <div class="bond-label"><span>絆</span><span>${st.bond}/100</span></div>
+        <div class="bondbar"><i style="width:${st.bond}%"></i></div>
+      </div>
+      <div class="tagrow"><span class="tag">${def.garage}</span><span class="tag">${def.type==='bike'?'🏍️ バイク':'🚗 車'}</span></div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.ccard').forEach(el=>{
+    el.addEventListener('click', ()=> openCharModal(el.dataset.id));
+  });
+}
+
+function pickQuote(def, st){
+  const tier = st.awakened ? 'high' : (st.bond>=30?'mid':'low');
+  const arr = def.quotes[tier];
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function openCharModal(id){
+  const def = CHAR_MAP[id];
+  renderCharModal(id);
+  document.getElementById('char-overlay').classList.add('on');
+}
+function closeCharModal(){ document.getElementById('char-overlay').classList.remove('on'); }
+
+function renderCharModal(id){
+  const def = CHAR_MAP[id], st = STATE.chars[id];
+  const cap = partsCap(id);
+  const canAwaken = !st.awakened && st.bond>=80 && mechRank()>=2;
+  const modal = document.getElementById('char-modal');
+  modal.innerHTML = `
+    <div class="modal-hd">
+      <div class="avatar" style="background:${def.hue}">${def.emoji}</div>
+      <div>
+        <h2>${def.name} ${st.awakened?'<span style="color:var(--cyan2);font-size:13px">✨覚醒</span>':''}</h2>
+        <div class="sub">${def.typeLabel} ・ ${def.eraLabel} ・ ${def.garage}</div>
+      </div>
+      <button class="modal-close" id="cm-close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="bg-text">${def.background}<br><br><b>${def.personality}</b></div>
+      <div class="quote-box" id="cm-quote">「${pickQuote(def, st)}」</div>
+
+      <div>
+        <div class="bond-label" style="margin-bottom:6px"><b>絆(信頼度)</b><span>${st.bond}/100</span></div>
+        <div class="bondbar" style="height:10px"><i style="width:${st.bond}%"></i></div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:8px">ステータス <span class="pool-note">(パーツ強化プール: ${STATE.partsPool} / 上限 ${cap}per stat)</span></div>
+        ${STAT_KEYS.map(k=>`
+          <div class="statrow">
+            <span class="sname">${STAT_LABEL[k]}</span>
+            <div class="statbar"><i style="width:${Math.min(100, effectiveStat(id,k))}%"></i></div>
+            <span class="statval">${effectiveStat(id,k)}</span>
+            <button class="statplus" data-stat="${k}" ${(STATE.partsPool<=0 || st.parts[k]>=cap)?'disabled':''}>+</button>
+          </div>`).join('')}
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="ability-card">
+          <div class="an"><span>${def.abilityPre.name}</span><span style="color:var(--ink3);font-weight:400">常時発動</span></div>
+          <div class="ad">${def.abilityPre.desc}</div>
+        </div>
+        <div class="ability-card post ${st.awakened?'':'locked'}">
+          <div class="an"><span>${def.abilityPost.name}</span><span style="color:var(--ink3);font-weight:400">${st.awakened?'覚醒により解放':'覚醒で解放 🔒'}</span></div>
+          <div class="ad">${def.abilityPost.desc}</div>
+        </div>
+        <div class="leader-card">
+          <div class="an">👑 リーダースキル: ${def.leaderSkill.name}</div>
+          <div class="ad">${def.leaderSkill.desc}</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-amber" id="cm-maintain">🔧 整備する (絆+)</button>
+        <button class="btn btn-cyan" id="cm-awaken" ${canAwaken?'':'disabled'}>✨ 覚醒させる</button>
+        <button class="btn btn-ghost" id="cm-close2">閉じる</button>
+      </div>
+      ${(!st.awakened && st.bond<80)?`<div class="pool-note">絆80以上、メカニックランク2以上で覚醒可能になります。</div>`: (!st.awakened && mechRank()<2)?`<div class="pool-note">メカニックランク2以上で覚醒可能になります。（現在 Lv.${mechRank()}）</div>`:''}
+    </div>
+  `;
+  modal.querySelectorAll('.statplus').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const k = b.dataset.stat;
+      if(STATE.partsPool<=0 || st.parts[k]>=cap) return;
+      st.parts[k]++; STATE.partsPool--;
+      save(); renderCharModal(id); renderHeader(); renderGarage();
+    });
+  });
+  modal.querySelector('#cm-close').addEventListener('click', closeCharModal);
+  modal.querySelector('#cm-close2').addEventListener('click', closeCharModal);
+  modal.querySelector('#cm-maintain').addEventListener('click', ()=>{
+    const gain = 2 + Math.floor(Math.random()*4);
+    st.bond = Math.min(100, st.bond+gain);
+    STATE.mechanic.exp += 3;
+    if(Math.random()<0.3) STATE.partsPool += 1;
+    save();
+    document.getElementById('cm-quote').textContent = '「'+pickQuote(def, st)+'」';
+    renderCharModal(id); renderHeader(); renderGarage();
+  });
+  modal.querySelector('#cm-awaken').addEventListener('click', ()=>{
+    if(!canAwaken) return;
+    st.awakened = true;
+    save();
+    renderCharModal(id); renderHeader(); renderGarage(); renderTeam();
+  });
+}
+
+/* ============ RENDER: TEAM ============ */
+function usedIds(exceptSlot){
+  return SLOTS.filter(s=>s.key!==exceptSlot).map(s=>STATE.formation[s.key]).filter(Boolean);
+}
+function renderTeam(){
+  const wrap = document.getElementById('slots');
+  const leaderId = STATE.formation.vanguard1;
+  wrap.innerHTML = SLOTS.map(s=>{
+    const taken = usedIds(s.key);
+    const options = CHARACTERS.filter(c=>!taken.includes(c.id));
+    const cur = STATE.formation[s.key];
+    const isLeader = s.key==='vanguard1';
+    let info = '';
+    if(cur){
+      const def = CHAR_MAP[cur], st = STATE.chars[cur];
+      info = `<div class="sinfo">
+        <span>${def.typeLabel}</span>
+        <span>絆 ${st.bond}/100 ${st.awakened?'✨':''}</span>
+        ${isLeader?`<span class="leader-flag">👑 ${def.leaderSkill.name}</span>`:''}
+      </div>`;
+    }
+    return `<div class="slot ${isLeader?'leader':''}">
+      <div class="slabel">${s.label}${isLeader?' 👑リーダー':''}</div>
+      <div class="srec">${s.rec}</div>
+      <select data-slot="${s.key}">
+        <option value="">-- 空き --</option>
+        ${options.map(c=>`<option value="${c.id}" ${cur===c.id?'selected':''}>${c.name}</option>`).join('')}
+      </select>
+      ${info}
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('select').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      STATE.formation[sel.dataset.slot] = sel.value || null;
+      save(); renderTeam(); renderRacePre();
+    });
+  });
+  const syn = synergyInfo();
+  document.getElementById('synergy-box').innerHTML = `
+    <div class="item"><span>編成状況</span><b>${syn.filledCount}/5 台</b></div>
+    <div class="item"><span>ガレージシナジー</span><b>${syn.garageHit?('+3% ('+syn.garageHit[0]+')'):'なし'}</b></div>
+    <div class="item"><span>時代シナジー</span><b>${syn.eraHit?('+2% ('+syn.eraHit[1]+' が同時代)'):'なし'}</b></div>
+    <div class="item"><span>合計シナジー倍率</span><b>+${syn.pct}%</b></div>
+  `;
+}
+
+/* ============ RENDER: RACE ============ */
+function renderRacePre(){
+  const el = document.getElementById('race-pre');
+  const filled = SLOTS.every(s=>STATE.formation[s.key]);
+  if(!filled){
+    el.innerHTML = `<div class="warn-box">チームが5台揃っていません。「編成」タブで全スロットを埋めてください。</div>`;
+    document.getElementById('race-log').innerHTML = '';
+    return;
+  }
+  el.innerHTML = `<button class="btn btn-amber" id="race-start">🏁 レース開始</button>`;
+  document.getElementById('race-start').addEventListener('click', runRace);
+}
+
+function runRace(){
+  const filled = SLOTS.every(s=>STATE.formation[s.key]);
+  if(!filled) return;
+  const logEl = document.getElementById('race-log');
+  logEl.innerHTML = '';
+  const weather = ['晴れ','雨','曇り'][Math.floor(Math.random()*3)];
+  const weatherKey = weather==='雨' ? 'rain' : 'clear';
+  const leader = leaderEffects();
+  const syn = synergyInfo();
+  const rivalName = RIVAL_TEAMS[Math.floor(Math.random()*RIVAL_TEAMS.length)];
+  const difficulty = Math.min(1.3, 0.9 + mechRank()*0.03);
+
+  const legs = [];
+  let playerTotal = 0;
+  SLOTS.forEach(s=>{
+    const id = STATE.formation[s.key];
+    const r = legScore(id, s.key, weatherKey, leader, syn.pct);
+    legs.push({slot:s, id, playerScore:r.score, triggered:r.triggered});
+    playerTotal += r.score;
+  });
+  const playerAvg = playerTotal/5;
+  let rivalTotal = 0;
+  legs.forEach(l=>{
+    const rivalScore = playerAvg * difficulty * (0.85+Math.random()*0.3);
+    l.rivalScore = rivalScore;
+    rivalTotal += rivalScore;
+  });
+
+  const lines = [];
+  lines.push({cls:'info', html:`天候: <b>${weather}</b> ／ 対戦相手: <b>${rivalName}</b>`});
+  legs.forEach(l=>{
+    const def = CHAR_MAP[l.id];
+    const legWin = l.playerScore >= l.rivalScore;
+    const abilityText = l.triggered.length ? `（${l.triggered.join('・')} 発動！）` : '';
+    lines.push({cls: legWin?'win':'', html:`【${l.slot.label}】${def.name} ${abilityText} — ${legWin?'区間リード':'区間で後れを取る'}`});
+  });
+  const win = playerTotal >= rivalTotal;
+  const legsWon = legs.filter(l=>l.playerScore>=l.rivalScore).length;
+
+  let i=0;
+  function step(){
+    if(i<lines.length){
+      const l = lines[i];
+      const div = document.createElement('div');
+      div.className = 'logline ' + (l.cls||'');
+      div.innerHTML = l.html;
+      logEl.appendChild(div);
+      logEl.scrollTop = logEl.scrollHeight;
+      i++;
+      setTimeout(step, 260);
+    } else {
+      finishRace();
+    }
+  }
+  step();
+
+  function finishRace(){
+    const bondGainBase = win ? 8 : 3;
+    const expGain = win ? 30 : 12;
+    const poolGain = win ? 2 : 1;
+    const endBonusPct = raceEndBondBonusPct() + (leader.bondGainPct||0);
+    const rewardLines = [];
+    legs.forEach(l=>{
+      const st = STATE.chars[l.id];
+      let gain = bondGainBase + (l.triggered.length?2:0);
+      gain = Math.round(gain * (1 + endBonusPct/100));
+      st.bond = Math.min(100, st.bond+gain);
+      rewardLines.push(`${CHAR_MAP[l.id].name} 絆+${gain}`);
+    });
+    STATE.mechanic.exp += expGain;
+    STATE.partsPool += poolGain;
+    save();
+    renderHeader(); renderGarage(); renderTeam();
+
+    const banner = document.createElement('div');
+    banner.className = 'result-banner ' + (win?'win':'lose');
+    banner.textContent = win ? '🏆 勝利！' : '力及ばず敗北……';
+    logEl.appendChild(banner);
+
+    const table = document.createElement('table');
+    table.className = 'leg-table';
+    table.innerHTML = `<tr><th>区間</th><th>キャラ</th><th>自チーム</th><th>相手</th><th>結果</th></tr>` +
+      legs.map(l=>{
+        const legWin = l.playerScore>=l.rivalScore;
+        return `<tr><td>${l.slot.label}</td><td>${CHAR_MAP[l.id].name}</td><td>${l.playerScore.toFixed(1)}</td><td>${l.rivalScore.toFixed(1)}</td><td class="${legWin?'wintag':'losetag'}">${legWin?'○':'×'}</td></tr>`;
+      }).join('') +
+      `<tr><td colspan="2"><b>合計</b></td><td><b>${playerTotal.toFixed(1)}</b></td><td><b>${rivalTotal.toFixed(1)}</b></td><td>${legsWon}/5区間</td></tr>`;
+    logEl.appendChild(table);
+
+    const rewardDiv = document.createElement('div');
+    rewardDiv.className = 'logline';
+    rewardDiv.innerHTML = `<b>獲得報酬</b>: メカニックEXP+${expGain} ／ パーツP+${poolGain} ／ ${rewardLines.join('、')}`;
+    logEl.appendChild(rewardDiv);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+}
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById('view-'+t.dataset.view).classList.add('on');
+    if(t.dataset.view==='race') renderRacePre();
+  });
+});
+
+/* ============ MODALS / MISC ============ */
+document.getElementById('char-overlay').addEventListener('click', (e)=>{ if(e.target.id==='char-overlay') closeCharModal(); });
+document.getElementById('help-btn').addEventListener('click', ()=> document.getElementById('intro').classList.add('on'));
+document.getElementById('intro-close').addEventListener('click', ()=> document.getElementById('intro').classList.remove('on'));
+document.getElementById('intro-start').addEventListener('click', ()=>{
+  STATE.seenIntro = true; save();
+  document.getElementById('intro').classList.remove('on');
+});
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  if(confirm('進行状況をすべて初期化します。よろしいですか？')){
+    localStorage.removeItem(SAVE_KEY);
+    STATE = freshState();
+    save();
+    renderHeader(); renderGarage(); renderTeam(); renderRacePre();
+  }
+});
+
+/* ============ INIT ============ */
+function init(){
+  renderHeader();
+  renderGarage();
+  renderTeam();
+  renderRacePre();
+  if(!STATE.seenIntro){ document.getElementById('intro').classList.add('on'); }
+}
+init();
+</script>
+</body>
+</html>
