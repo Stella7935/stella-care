@@ -414,7 +414,7 @@ const CAR_ARCHETYPES = {
   sedan:    {len:200,bodyH:34,bodyY:0,cabinX0:.30,cabinX1:.68,cabinH:30,roofRake:10,wheelR:19,wheelXf:.78,wheelXr:.22,extra:'trunk'},
   kei:      {len:150,bodyH:36,bodyY:0,cabinX0:.14,cabinX1:.86,cabinH:38,roofRake:6, wheelR:18,wheelXf:.80,wheelXr:.20,extra:''},
   hothatch: {len:190,bodyH:33,bodyY:0,cabinX0:.28,cabinX1:.80,cabinH:31,roofRake:14,wheelR:19,wheelXf:.80,wheelXr:.20,extra:'spoiler'},
-  pickup:   {len:210,bodyH:34,bodyY:0,cabinX0:.14,cabinX1:.46,cabinH:32,roofRake:8, wheelR:20,wheelXf:.82,wheelXr:.20,extra:'bed'},
+  pickup:   {len:210,bodyH:34,bodyY:0,cabinX0:.52,cabinX1:.84,cabinH:32,roofRake:8, wheelR:20,wheelXf:.82,wheelXr:.20,extra:'bed'},
   coupe:    {len:220,bodyH:26,bodyY:4,cabinX0:.42,cabinX1:.74,cabinH:22,roofRake:20,wheelR:19,wheelXf:.84,wheelXr:.18,extra:'popup'},
 };
 const BIKE_ARCHETYPES = {
@@ -438,15 +438,19 @@ function carArtSVG(arch, uid, colorA, colorB, awakened){
   const fillId = 'f'+uid, glowId='g'+uid;
   let extra='';
   if(a.extra==='trunk'){
-    extra += `<path d="M${cx1},${bodyTop} L${bx1-8},${bodyTop+6} L${bx1-8},${bodyTop+a.cabinH*0.55} L${cx1-6},${bodyTop+a.cabinH*0.4} Z" fill="url(#${fillId})"/>`;
+    // rear deck line — must sit on the bx0/cx0 (rear) side, opposite the headlight at bx1
+    extra += `<path d="M${cx0},${bodyTop} L${bx0+8},${bodyTop+6} L${bx0+8},${bodyTop+a.cabinH*0.55} L${cx0+6},${bodyTop+a.cabinH*0.4} Z" fill="url(#${fillId})"/>`;
   }
   if(a.extra==='spoiler'){
-    extra += `<rect x="${cx1-6}" y="${cabinTop-10}" width="26" height="6" rx="2" fill="url(#${fillId})"/><rect x="${cx1-2}" y="${cabinTop-10}" width="4" height="12" fill="url(#${fillId})"/>`;
+    // rear wing mounted on the trailing edge of the roof (rear/bx0 side)
+    extra += `<rect x="${cx0+16}" y="${cabinTop-10}" width="26" height="6" rx="2" fill="url(#${fillId})"/><rect x="${cx0+16}" y="${cabinTop-10}" width="4" height="12" fill="url(#${fillId})"/>`;
   }
   if(a.extra==='bed'){
-    extra += `<rect x="${cx1+4}" y="${bodyTop}" width="${bx1-cx1-10}" height="${a.bodyH-6}" fill="none" stroke="url(#${fillId})" stroke-width="4"/>`;
+    // open cargo bed sits behind the cab, toward the rear (bx0/cx0 side)
+    extra += `<rect x="${bx0+6}" y="${bodyTop}" width="${cx0-bx0-10}" height="${a.bodyH-6}" fill="none" stroke="url(#${fillId})" stroke-width="4"/>`;
   }
   if(a.extra==='popup'){
+    // pop-up headlight sits at the front (bx1 side, same side as the headlight block)
     extra += `<rect x="${bx1-30}" y="${bodyTop-10}" width="16" height="10" rx="2" fill="url(#${fillId})"/>`;
   }
   const scratches = !awakened ? `
