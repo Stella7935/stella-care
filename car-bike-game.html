@@ -162,7 +162,7 @@ select,input{font-family:inherit}
     <div class="mstat"><span class="lbl">メカニックランク</span><b id="mech-rank">Lv.1</b></div>
     <div class="mstat"><span class="lbl">EXP</span><div class="expbar"><i id="mech-exp-bar" style="width:0%"></i></div></div>
     <div class="chip">🔩 パーツP: <b id="parts-pool">0</b></div>
-    <div class="chip">✨ 覚醒: <b id="awaken-count">0</b>/6</div>
+    <div class="chip">✨ 覚醒: <b id="awaken-count">0</b>/8</div>
   </div>
   <button id="help-btn" title="遊び方">?</button>
   <button id="reset-btn">初期化</button>
@@ -294,6 +294,28 @@ const CHARACTERS = [
     abilityPost:{name:'最後の一台',desc:'覚醒後、アンカー区間の効果が大幅に強化される。',zone:'anchor',effectPct:30},
     leaderSkill:{name:'最後尾の安心感',desc:'チーム全体の耐久+8%、信頼度上昇速度+5%',statPct:{durability:8},bondGainPct:5},
     quotes:{low:['……。積み荷は、もうねぇよ。','おれは、最後まで走ることしかできねぇ。'],mid:['……お前がいれば、走れる気がする。','荷物じゃなく、仲間を運ぶのも悪くねぇ。'],high:['お前を、最後まで背負って走る。','これが、おれの覚悟だ。']}
+  },
+  {
+    id:'cb350four', name:'CB350FOUR', type:'bike', typeLabel:'並列4気筒ネイキッド', emoji:'🏍️',
+    era:'70s', eraLabel:'1970年代', garage:'谷口オートバイ店', hue:'linear-gradient(135deg,#c9c9c9,#75797f)',
+    background:'1972年、ホンダは大ヒットした「CB750FOUR」の弟分として、より手に入れやすい並列四気筒モデル「CB350FOUR」を送り出した。しかし2年後に登場した後継機「CB400FOUR」の人気があまりに大きく、その存在は歴史の陰に隠れがちだった。峠道を愛したオーナーの手を離れてからは、長らく倉庫の奥で眠っていたが、四気筒特有の甲高いエンジンサウンドへの憧れだけは失っていない。',
+    personality:'有名になれなかった悔しさを抱えながらも、負けん気と誠実さを兼ね備えた性格。口は悪いが根は真面目な努力家。',
+    base:{speed:58,corner:82,accel:72,durability:50},
+    abilityPre:{name:'俊敏な小型四気筒',desc:'軽量な車体を活かし、先頭区間でコーナリングと加速が上昇する。',zone:'vanguard',effectPct:14},
+    abilityPost:{name:'名機、覚醒す',desc:'覚醒後、有名な弟分にも劣らぬ走りを解放。先頭区間の効果がさらに強化される。',zone:'vanguard',effectPct:26},
+    leaderSkill:{name:'縁の下のエース',desc:'チーム全体のコーナリング+5%',statPct:{corner:5}},
+    quotes:{low:['……おれ、CB400みたいに有名じゃないけどさ。','こんな古いおれでも、まだ使ってくれるのか。'],mid:['四気筒の音、聞いてくれよ。悪くないだろ？','お前と走ると、忘れてたことを思い出すんだ。'],high:['有名じゃなくたっていい。お前が認めてくれるなら。','おれの全開、見せてやるよ。']}
+  },
+  {
+    id:'supra70', name:'70スープラ', type:'car', typeLabel:'ターボGTクーペ', emoji:'🏎️',
+    era:'80s', eraLabel:'1980年代', garage:'第二整備工場', hue:'linear-gradient(135deg,#d64550,#2b2d42)',
+    background:'1986年、トヨタは「セリカXX」の後継として、セリカから独立した単独ブランドの三代目スープラ(通称・70スープラ)を送り出した。ポップアップヘッドライトと直列6気筒ターボエンジンを備えた、バブル期日本を代表するハイテクスポーツだった。しかし1993年に登場した伝説的な四代目・80スープラの陰に隠れ、今ではその名を知る者も少なくなった。持ち主が手放してからは、薄暗いガレージの奥で静かに眠り続けていた。',
+    personality:'伝説と呼ばれる後継機と比較され続けてきた複雑な想いを抱えつつも、誇り高く紳士的な佇まいを崩さない「元祖」としての貫禄。',
+    base:{speed:72,corner:54,accel:58,durability:80},
+    abilityPre:{name:'ハイテク・グランドツーリング',desc:'中盤区間で速度と耐久が安定して上昇する。',zone:'mid',effectPct:15},
+    abilityPost:{name:'伝説の礎',desc:'覚醒後、後に伝説と呼ばれた弟分に劣らぬポテンシャルを解放。中盤区間の効果がさらに強化される。',zone:'mid',effectPct:28},
+    leaderSkill:{name:'元祖ハイテクスポーツ',desc:'チーム全体の速度+5%、耐久+3%',statPct:{speed:5,durability:3}},
+    quotes:{low:['……ターボの調子、まだ本調子じゃない。','おれの後継機の話は、もういい。'],mid:['ポップアップヘッドライト、上げてみるか？','お前の整備、なかなか筋がいいな。'],high:['あいつが伝説なら、おれはその礎だ。誇れる。','80年代、おれはここにいた。忘れさせはしない。']}
   },
 ];
 const CHAR_MAP = Object.fromEntries(CHARACTERS.map(c=>[c.id,c]));
