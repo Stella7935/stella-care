@@ -415,7 +415,7 @@ const CAR_ARCHETYPES = {
   kei:      {len:150,bodyH:36,bodyY:0,cabinX0:.14,cabinX1:.86,cabinH:38,roofRake:6, wheelR:18,wheelXf:.80,wheelXr:.20,extra:''},
   hothatch: {len:190,bodyH:33,bodyY:0,cabinX0:.28,cabinX1:.80,cabinH:31,roofRake:14,wheelR:19,wheelXf:.80,wheelXr:.20,extra:'spoiler'},
   pickup:   {len:210,bodyH:34,bodyY:0,cabinX0:.52,cabinX1:.84,cabinH:32,roofRake:8, wheelR:20,wheelXf:.82,wheelXr:.20,extra:'bed'},
-  coupe:    {len:220,bodyH:26,bodyY:4,cabinX0:.42,cabinX1:.74,cabinH:22,roofRake:20,wheelR:19,wheelXf:.84,wheelXr:.18,extra:'popup'},
+  coupe:    {len:220,bodyH:26,bodyY:4,cabinX0:.18,cabinX1:.54,cabinH:22,roofRake:20,wheelR:19,wheelXf:.60,wheelXr:.18,extra:'popup'},
 };
 const BIKE_ARCHETYPES = {
   'naked-bike':   {wheelR:22},
@@ -450,8 +450,8 @@ function carArtSVG(arch, uid, colorA, colorB, awakened){
     extra += `<rect x="${bx0+6}" y="${bodyTop}" width="${cx0-bx0-10}" height="${a.bodyH-6}" fill="none" stroke="url(#${fillId})" stroke-width="4"/>`;
   }
   if(a.extra==='popup'){
-    // pop-up headlight sits at the front (bx1 side, same side as the headlight block)
-    extra += `<rect x="${bx1-30}" y="${bodyTop-10}" width="16" height="10" rx="2" fill="url(#${fillId})"/>`;
+    // pop-up headlight sits low on the hood surface (bx1 side, same side as the headlight block)
+    extra += `<rect x="${bx1-32}" y="${bodyTop-5}" width="16" height="9" rx="2" fill="url(#${fillId})"/>`;
     // targa/T-bar roof panel + A70-style quad round tail lights on the rear panel
     const tailC = awakened ? '#ff6b6b' : '#7a4040';
     extra += `<rect x="${cx0+14}" y="${cabinTop+1}" width="${Math.max(10,(cx1-a.roofRake)-(cx0+14))}" height="5" rx="2" fill="#00000050"/>`;
